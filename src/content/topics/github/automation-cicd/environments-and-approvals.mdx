@@ -1,0 +1,67 @@
+---
+title: Environments and Approvals
+summary: A deployment environment lets you attach protection rules — like required human approval — to sensitive jobs, such as deploying to production.
+level: advanced
+primaryTab: github
+subtab: automation-cicd
+category: CI/CD
+tags: [github-actions, environments, approvals, deployment]
+sources:
+  - label: GitHub Docs — Actions
+    url: https://docs.github.com/en/actions
+readingTime: 4
+related: [secrets-and-variables, runners, reusable-workflows]
+order: 11
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Not every deployment should happen automatically just because CI passed. A production deploy is exactly the kind of thing that benefits from a human glancing at it first — an environment is how you enforce that, directly inside the workflow.
+
+## Setting one up
+
+Create an environment under **Settings → Environments** (e.g. `production`), and reference it from a job:
+
+```yaml
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - run: ./deploy.sh
+```
+
+On its own, this just labels the job — the real value comes from the protection rules you attach to the environment.
+
+## Protection rules
+
+From the environment's settings, you can require:
+
+- **Required reviewers** — one or more specific people (or teams) must approve before the job runs. The workflow pauses at that job and waits.
+- **Wait timer** — a mandatory delay before the job is allowed to start, useful as a "someone has a few minutes to cancel this" buffer.
+- **Deployment branches** — restrict which branches are even allowed to deploy to this environment (e.g. only `main` can deploy to `production`).
+
+## Environment secrets
+
+Secrets and variables can also be scoped to an environment instead of the whole repository:
+
+```yaml
+jobs:
+  deploy:
+    environment: production
+    steps:
+      - run: ./deploy.sh
+        env:
+          API_KEY: ${{ secrets.PROD_API_KEY }}   # only readable by jobs targeting this environment
+```
+
+This means a `staging` environment and a `production` environment can hold *different* secrets under the *same* name, each only accessible to jobs that target that specific environment — a job targeting `staging` simply can't read `production`'s secrets.
+
+<Callout type="golden">
+Environments turn "please remember to double-check before deploying" into something GitHub actually enforces, instead of a habit someone can forget under pressure.
+</Callout>
+
+## Try it yourself
+
+Create an environment called `production`, add yourself as a required reviewer, and reference it from a test job — watch the run pause and wait for your approval in the Actions tab.

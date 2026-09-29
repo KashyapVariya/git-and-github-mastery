@@ -1,0 +1,45 @@
+---
+title: I want to throw away all my local changes
+symptom: "I've been experimenting and just want my working directory back to exactly how the last commit looked."
+summary: git restore . discards tracked file edits; add git clean for untracked files too. Both are destructive and cannot be undone.
+severity: scary
+tags: [restore, clean, reset]
+sources:
+  - label: Git — git clean
+    url: https://git-scm.com/docs/git-clean
+related: [undo-last-commit]
+order: 13
+lastReviewed: 2026-01-15
+---
+
+## Diagnosis
+
+You want a clean slate matching the last commit exactly — no half-finished edits, no stray new files. This is one of the few genuinely irreversible operations in Git, so it's worth being deliberate.
+
+## Fix
+
+**Discard changes to tracked files:**
+
+```bash
+git restore .
+```
+
+This reverts every modified tracked file back to how it looked at `HEAD`.
+
+**Also remove untracked files** (new files you created but never `git add`ed) — preview first:
+
+```bash
+git clean -nd
+```
+
+`-n` is a dry run; it only *lists* what would be deleted. Once you're sure, actually delete them:
+
+```bash
+git clean -fd
+```
+
+`-f` forces the deletion, `-d` includes untracked directories too.
+
+<Callout type="warning">
+There is no undo for `git clean`. Deleted untracked files are gone — they were never committed, so Git has no copy of them anywhere. Always run `git clean -nd` first and read the output carefully.
+</Callout>

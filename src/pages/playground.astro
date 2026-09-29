@@ -1,0 +1,32 @@
+---
+import Layout from '../layouts/Layout.astro';
+import GitGraphPlayground from '../components/playground/GitGraphPlayground.tsx';
+import TerminalSimulator from '../components/playground/TerminalSimulator.tsx';
+---
+
+<Layout title="Playground" description="An interactive Git graph playground and a safe sandbox terminal — practice branching, merging, rebasing, and every-day commands." primaryTab="playground">
+  <div class="mx-auto max-w-[1400px] px-4 py-10 sm:px-6 sm:py-14">
+    <div data-reveal class="mb-10">
+      <h1 class="text-3xl font-bold tracking-tight text-[var(--color-ink)] sm:text-4xl">Playground</h1>
+      <p class="mt-3 max-w-2xl text-[15px] leading-relaxed text-[var(--color-ink-muted)]">
+        Two safe sandboxes, no real repository required. Nothing here can break anything — reset either one at any time.
+      </p>
+    </div>
+
+    <section data-reveal class="mb-16">
+      <h2 class="mb-1 text-xl font-bold text-[var(--color-ink)]">Git Graph Playground</h2>
+      <p class="mb-5 text-[14px] text-[var(--color-ink-muted)]">
+        Commit, branch, merge, rebase, cherry-pick, reset, and revert — watch the graph and the equivalent commands update live.
+      </p>
+      <GitGraphPlayground client:load />
+    </section>
+
+    <section data-reveal>
+      <h2 class="mb-1 text-xl font-bold text-[var(--color-ink)]">Terminal Simulator</h2>
+      <p class="mb-5 text-[14px] text-[var(--color-ink-muted)]">
+        A fake shell that understands the everyday commands: <code class="inline-code">init</code>, <code class="inline-code">add</code>, <code class="inline-code">commit</code>, <code class="inline-code">status</code>, <code class="inline-code">log</code>, and <code class="inline-code">branch</code>.
+      </p>
+      <TerminalSimulator client:load />
+    </section>
+  </div>
+</Layout>

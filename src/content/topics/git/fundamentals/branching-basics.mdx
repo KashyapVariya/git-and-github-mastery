@@ -1,0 +1,75 @@
+---
+title: Branching Basics
+summary: A branch is just a lightweight, movable label pointing at a commit — creating one is instant because nothing gets copied.
+level: beginner
+primaryTab: git
+subtab: fundamentals
+category: Branching
+tags: [branches, git-branch, git-switch]
+sources:
+  - label: Pro Git — Branches in a Nutshell
+    url: https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell
+  - label: Git — git branch
+    url: https://git-scm.com/docs/git-branch
+readingTime: 5
+related: [switching-branches, merging-basics, the-four-areas]
+order: 13
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Branches are what make Git genuinely powerful for experimenting and collaborating. They let you try something risky, work on a feature for days, or let three people build three different things — all without any of it interfering with the stable version until you're ready.
+
+## What a branch actually is
+
+This surprises a lot of people: a branch is *not* a copy of your files. It's a tiny pointer — just a name attached to one specific commit. When you commit while "on" a branch, Git automatically moves that pointer forward to the new commit. That's the entire mechanism.
+
+This is why creating a branch is instant, even in a massive repository — Git isn't duplicating gigabytes of files, it's writing a few bytes to a small file.
+
+## Creating a branch
+
+```bash
+git branch feature/dark-mode
+```
+
+This creates the branch but does **not** switch to it — you're still on your original branch. To create *and* switch in one step:
+
+```bash
+git switch -c feature/dark-mode
+```
+
+(`-c` stands for "create." This is the modern equivalent of the older `git checkout -b feature/dark-mode`, which you'll still see in plenty of tutorials and older muscle memory.)
+
+## Seeing your branches
+
+```bash
+git branch
+```
+
+```text
+  main
+* feature/dark-mode
+```
+
+The `*` marks whichever branch you're currently on.
+
+## Deleting a branch
+
+```bash
+git branch -d feature/dark-mode
+```
+
+Git refuses (`-d`) if the branch has commits that aren't merged anywhere yet, as a safety check. Force it with `-D` if you're certain you want to discard that work — see [Switching branches](/git/fundamentals/switching-branches) and [Merging basics](/git/fundamentals/merging-basics) for what "merged" means first.
+
+<Callout type="golden">
+Branches are cheap and disposable by design. Create one for almost anything — a small fix, an experiment you might throw away, a feature that'll take a week. There's essentially no cost to having many of them.
+</Callout>
+
+<Callout type="tip">
+A good branch name describes the work, not the person: `feature/dark-mode` or `fix/pagination-bug` age much better than `johns-branch` once a few months have passed.
+</Callout>
+
+## Try it yourself
+
+From `main`, run `git switch -c try-something`. Make a commit. Run `git branch` and watch the `*` sit next to your new branch. Nothing about `main` has changed at all — you can confirm with `git switch main` and look at `git log`.

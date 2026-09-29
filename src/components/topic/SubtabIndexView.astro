@@ -1,0 +1,70 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import SubTabBar from '../layout/SubTabBar.astro';
+import TopicCard from './TopicCard.astro';
+import Icon from '../ui/Icon.astro';
+import ProgressRing from '../ui/ProgressRing.tsx';
+import Quiz from '../topic/Quiz.tsx';
+import { subtabCopy } from '../../data/subtab-copy';
+import { quizzes } from '../../data/quizzes';
+
+interface Props {
+  primaryTab: 'git' | 'github';
+  subtab: string;
+  entries: CollectionEntry<'topics'>[];
+}
+
+const { primaryTab, subtab, entries } = Astro.props;
+const copy = subtabCopy[`${primaryTab}/${subtab}`] ?? { title: subtab, description: '' };
+const sorted = [...entries].sort((a, b) => a.data.order - b.data.order || a.data.title.localeCompare(b.data.title));
+const slugs = sorted.map((e) => e.id);
+const quiz = quizzes[`${primaryTab}/${subtab}`];
+---
+
+<Layout title={copy.title} description={copy.description} primaryTab={primaryTab} subtab={subtab}>
+  <SubTabBar primaryTab={primaryTab} active={subtab} />
+
+  <div class="mx-auto max-w-[1400px] px-4 py-10 sm:px-6 sm:py-14">
+    <div data-reveal class="mb-10 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <h1 class="text-3xl font-bold tracking-tight text-[var(--color-ink)] sm:text-4xl">{copy.title}</h1>
+        <p class="mt-3 max-w-2xl text-[15px] leading-relaxed text-[var(--color-ink-muted)]">{copy.description}</p>
+      </div>
+      {slugs.length > 0 && (
+        <div class="glass-card shrink-0 px-4 py-3">
+          <ProgressRing slugs={slugs} label="section progress" client:visible />
+        </div>
+      )}
+    </div>
+
+    {sorted.length === 0 ? (
+      <p class="rounded-xl border border-dashed border-[var(--color-border)] px-4 py-10 text-center text-sm text-[var(--color-ink-faint)]">
+        Topics for this section are being written — check back soon.
+      </p>
+    ) : (
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {sorted.map((t) => (
+          <TopicCard
+            title={t.data.title}
+            summary={t.data.summary}
+            level={t.data.level}
+            href={`/${primaryTab}/${subtab}/${t.id.split('/').pop()}`}
+            readingTime={t.data.readingTime}
+            category={t.data.category}
+          />
+        ))}
+      </div>
+    )}
+
+    {quiz && (
+      <section data-reveal class="mt-16">
+        <h2 class="mb-1 flex items-center gap-2 text-xl font-bold text-[var(--color-ink)]">
+          <Icon name="sparkles" size={18} class="text-[var(--color-git-orange-soft)]" /> Check your understanding
+        </h2>
+        <p class="mb-5 text-sm text-[var(--color-ink-muted)]">A quick 5-question recap of {copy.title}.</p>
+        <Quiz quiz={quiz} client:visible />
+      </section>
+    )}
+  </div>
+</Layout>

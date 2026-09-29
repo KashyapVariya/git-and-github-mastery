@@ -1,0 +1,56 @@
+---
+title: Reflog Internals
+summary: The reflog is a local, per-ref journal of every position HEAD and your branches have held — Git's real safety net, and it isn't shared or pushed.
+level: expert
+primaryTab: git
+subtab: expert
+category: Internals
+tags: [reflog, recovery, internals]
+sources:
+  - label: Git — git reflog
+    url: https://git-scm.com/docs/git-reflog
+  - label: Pro Git — Maintenance and Data Recovery
+    url: https://git-scm.com/book/en/v2/Git-Internals-Maintenance-and-Data-Recovery
+readingTime: 5
+related: [refs-and-head, packfiles-and-gc, git-objects-blob-tree-commit-tag]
+order: 6
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+You've likely already used `git reflog` to recover a "lost" commit. This page is about *why* that works — what the reflog actually is, and its real limits.
+
+## What gets recorded, and where
+
+Every time a ref moves — a commit, a checkout, a merge, a rebase, a reset — Git appends an entry to that ref's reflog: the old hash, the new hash, who did it, when, and a short description. These live as plain append-only log files under `.git/logs/`, mainly `.git/logs/HEAD` and one file per branch under `.git/logs/refs/heads/`.
+
+```bash
+git reflog show HEAD
+git reflog show main
+```
+
+This is a completely different mechanism from commit history. Commit history (`git log`) follows parent pointers between commit objects — it's part of the permanent, shareable structure of the project. The reflog is a local diary of *ref movements* — it's never pushed, never pulled, never cloned. Two people with the exact same commits will have completely different reflogs.
+
+## Why this is the real safety net
+
+Because the reflog remembers every position, not just the current one, it lets you recover from almost any local mistake: a bad `reset --hard`, an accidental branch deletion, a rebase you regret. The commits themselves usually still exist as unreachable objects (see [Packfiles & GC](/git/expert/packfiles-and-gc)) — the reflog is just the map that tells you which hash to point a new branch at.
+
+```bash
+git reflog
+# a1b2c3d HEAD@{0}: reset: moving to HEAD~1
+# e4f5g6h HEAD@{1}: commit: add login form
+git branch recovered e4f5g6h
+```
+
+<Callout type="warning">
+Reflog entries expire — 90 days by default for entries still reachable some other way, 30 days for entries that are otherwise completely unreachable (configurable via `gc.reflogExpire` and `gc.reflogExpireUnreachable`). It's a safety net with a time limit, not permanent storage.
+</Callout>
+
+<Callout type="tip">
+`git reflog` only shows `HEAD`'s reflog by default. Every branch has its own — `git reflog show <branch>` if you're hunting for something specific to that branch rather than wherever HEAD has wandered.
+</Callout>
+
+## Try it yourself
+
+Make a few commits, then run `git reset --hard HEAD~2`, then run `git reflog`. You'll see the reset logged as its own entry, with the pre-reset hash sitting right above it — exactly what you'd point a recovery branch at.

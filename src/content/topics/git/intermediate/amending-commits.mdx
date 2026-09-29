@@ -1,0 +1,73 @@
+---
+title: Amending Commits
+summary: git commit --amend replaces your last commit with a better one — a clean move before you push, a risky one after.
+level: intermediate
+primaryTab: git
+subtab: intermediate
+category: History
+tags: [amend, commits, history, rewriting-history]
+sources:
+  - label: Git — git commit
+    url: https://git-scm.com/docs/git-commit
+  - label: Pro Git — Undoing Things
+    url: https://git-scm.com/book/en/v2/Git-Basics-Undoing-Things
+readingTime: 5
+related: [restore-vs-reset-vs-revert, tagging-releases, git-blame-and-show]
+order: 4
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+You commit, then immediately notice a typo in the message, or realize you forgot to `git add` one file. Making a second tiny commit just to fix it clutters your history with noise like "fix typo" and "oops forgot file." `git commit --amend` fixes the *previous* commit in place instead — no extra commit, no clutter.
+
+Think of it less like "undo" and more like using correction fluid on the last thing you wrote, before you hand the page to anyone else.
+
+## Fixing the message
+
+```bash
+git commit --amend -m "Fix login validation on empty password"
+```
+
+This replaces the last commit's message. Nothing about the file contents changes.
+
+## Adding a forgotten file
+
+```bash
+git add forgotten-file.js
+git commit --amend --no-edit
+```
+
+`--no-edit` keeps the existing commit message and just folds the newly staged changes into the previous commit. The end result looks like you got it right the first time — one clean commit containing everything.
+
+## What actually happens under the hood
+
+Amending doesn't edit the old commit in place — Git commits are immutable. Instead, it creates a **brand-new commit** with the combined changes and message, and moves your branch pointer to it. The old commit still exists in Git's object database for a while, just no longer referenced by your branch. This detail matters because it's exactly why amending is risky once shared.
+
+## Safe vs. risky: the one rule that matters
+
+If the commit you're amending **hasn't been pushed** — or hasn't been seen by anyone else — amending is completely safe. You're the only one who knows the old version ever existed.
+
+If it **has already been pushed**, amending rewrites a commit that other people may have already pulled and built on top of. Your local history and the remote's history now disagree about what that commit is. Pushing again gets rejected as a non-fast-forward, and the "fix" is a force push:
+
+```bash
+git push --force-with-lease
+```
+
+`--force-with-lease` is safer than a plain `--force`: it refuses to overwrite the remote if someone else pushed something you haven't seen yet, instead of blindly clobbering their work.
+
+<Callout type="warning">
+Amending and force-pushing a commit that a teammate has already pulled means their local branch now diverges from yours in a way Git can't reconcile automatically. They'll typically need to reset their branch to match yours. Always check with the team before force-pushing a shared branch.
+</Callout>
+
+<Callout type="tip">
+A quick gut check before amending: run `git log origin/main..HEAD` (or your branch's upstream). If the commit shows up there, it hasn't been pushed yet, and amending is safe.
+</Callout>
+
+<Callout type="golden">
+The rule in one line: amend freely before you share, reach for `revert` instead once you have.
+</Callout>
+
+## Try it yourself
+
+Make a commit with a deliberately bad message, like `git commit -m "wip"`. Then run `git commit --amend -m "Add CSV export button"` and check `git log` — you'll still see just one commit, now with the message it should have had all along.

@@ -1,0 +1,15 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import GlossarySearch from '../../components/resources/GlossarySearch.tsx';
+import { glossary } from '../../data/glossary';
+---
+
+<Layout title="Glossary" description="Every Git and GitHub term explained in one sentence, instantly searchable." primaryTab="resources">
+  <div class="mx-auto max-w-[1400px] px-4 py-10 sm:px-6 sm:py-14">
+    <div data-reveal class="mb-8">
+      <h1 class="text-3xl font-bold tracking-tight text-[var(--color-ink)] sm:text-4xl">Glossary</h1>
+      <p class="mt-3 max-w-2xl text-[15px] leading-relaxed text-[var(--color-ink-muted)]">Every term used on this site, defined simply.</p>
+    </div>
+    <GlossarySearch terms={glossary} client:load />
+  </div>
+</Layout>

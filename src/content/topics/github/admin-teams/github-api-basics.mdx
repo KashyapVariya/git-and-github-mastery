@@ -1,0 +1,83 @@
+---
+title: GitHub API Basics — REST vs. GraphQL
+summary: GitHub exposes almost everything it does through two APIs, REST and GraphQL, built for slightly different jobs.
+level: advanced
+primaryTab: github
+subtab: admin-teams
+category: Integrations
+tags: [api, rest, graphql, automation]
+sources:
+  - label: GitHub Docs — REST API
+    url: https://docs.github.com/en/rest
+  - label: GitHub Docs — GraphQL API
+    url: https://docs.github.com/en/graphql
+readingTime: 6
+related: [github-cli, webhooks, github-apps-vs-oauth-apps]
+order: 8
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Almost everything you can do by clicking around GitHub.com — creating an issue, listing a repository's pull requests, adding a collaborator — can also be done programmatically. That's what makes bots, dashboards, custom automations, and tools like the `gh` CLI possible. GitHub offers two ways in: a **REST API** and a **GraphQL API**. They can both get you most of the same data, but they're shaped very differently.
+
+## REST: one resource per request
+
+REST organizes everything around **endpoints** — fixed URLs that represent a resource. Want a repository's open issues? You request a specific URL:
+
+```
+GET https://api.github.com/repos/acme-inc/api-server/issues
+```
+
+Each endpoint returns a fairly fixed shape of data — usually more fields than you actually need, and if you also need each issue's comments, that's a separate request per issue. REST is simple to understand and simple to try in a browser or with `curl`, which makes it a good starting point.
+
+## GraphQL: one request, exactly the fields you ask for
+
+GraphQL exposes a single endpoint, and instead of the server deciding what a response contains, *you* write a query describing exactly the fields you want, potentially spanning multiple related objects in one round trip:
+
+```graphql
+query {
+  repository(owner: "acme-inc", name: "api-server") {
+    issues(first: 5, states: OPEN) {
+      nodes {
+        title
+        author { login }
+        comments(first: 3) {
+          nodes { body }
+        }
+      }
+    }
+  }
+}
+```
+
+That single request returns issues, their authors, and their first few comments together — the equivalent REST version could take several separate calls. GraphQL shines when you need related data from multiple objects and want to avoid over-fetching or under-fetching.
+
+## Choosing between them
+
+| | REST | GraphQL |
+|---|---|---|
+| Shape | Fixed per endpoint | You choose exactly what's returned |
+| Related data | Often multiple requests | Often one request |
+| Learning curve | Lower — just URLs and JSON | Higher — its own query language |
+| Best for | Simple, one-off lookups; scripting | Dashboards and tools needing nested, related data |
+
+Neither one is strictly "better" — GitHub maintains both, and plenty of tools mix them, using REST for simple actions and GraphQL for anything that needs to pull a rich, connected view of data efficiently.
+
+<Callout type="tip">
+Both APIs use the same authentication (a personal access token or a GitHub App installation token) and the same underlying permissions — the choice between REST and GraphQL is purely about how you want to shape requests and responses, not about what you're allowed to access.
+</Callout>
+
+<Callout type="warning">
+Both APIs are rate-limited per hour, per token. A script that loops over hundreds of repositories calling the API for each one can hit that limit surprisingly fast — check the rate-limit headers in your responses (REST) or the `rateLimit` field (GraphQL) if a script starts failing unexpectedly.
+</Callout>
+
+## Try it yourself
+
+Run this in a terminal with no setup required — it hits the REST API anonymously and returns public data as JSON:
+
+```bash
+curl https://api.github.com/repos/octocat/Hello-World
+```
+
+Then compare it to poking around the interactive GraphQL Explorer linked from GitHub's GraphQL API docs, and notice how much more precisely you can shape the response.

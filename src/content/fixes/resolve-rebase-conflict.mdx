@@ -1,0 +1,57 @@
+---
+title: I have a conflict during a rebase
+symptom: "git rebase stopped and told me there's a conflict I need to resolve before it can continue."
+summary: Fix the conflicting lines in each affected file, stage them, then tell the rebase to continue — repeating per commit if needed.
+severity: moderate
+tags: [rebase, conflicts]
+sources:
+  - label: Git — Rebasing, resolving conflicts
+    url: https://git-scm.com/book/en/v2/Git-Branching-Rebasing
+related: [committed-to-wrong-branch]
+order: 6
+lastReviewed: 2026-01-15
+---
+
+## Diagnosis
+
+Rebase replays your commits one at a time onto a new base. When a commit's changes overlap with changes already on the new base, Git pauses on that exact commit and marks the conflicting file so you can resolve it by hand — the same as a merge conflict, just one commit at a time.
+
+Run `git status` to see which files are conflicted.
+
+## Fix
+
+**1. Open each conflicted file** and look for the conflict markers:
+
+```text
+<<<<<<< HEAD
+their version of the line (the new base)
+=======
+your version of the line (your commit)
+>>>>>>> a1b2c3d (your commit message)
+```
+
+Edit the file to keep the correct result, and delete the `<<<<<<<`, `=======`, and `>>>>>>>` markers entirely.
+
+**2. Stage the resolved files:**
+
+```bash
+git add path/to/resolved-file.js
+```
+
+**3. Continue the rebase:**
+
+```bash
+git rebase --continue
+```
+
+If another commit further along also conflicts, Git will stop again — just repeat steps 1–3.
+
+**Changed your mind partway through?** Back out completely and return to how things were before the rebase started:
+
+```bash
+git rebase --abort
+```
+
+<Callout type="tip">
+If you already fixed this exact conflict earlier in the rebase (common when squashing similar commits), enable `git config --global rerere.enabled true` beforehand — Git will remember and reapply the resolution automatically next time.
+</Callout>

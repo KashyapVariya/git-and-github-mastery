@@ -1,0 +1,61 @@
+---
+title: Switching Branches
+summary: git switch moves you between branches, instantly swapping your working directory to match — git checkout does the same job, older and more overloaded.
+level: beginner
+primaryTab: git
+subtab: fundamentals
+category: Branching
+tags: [git-switch, git-checkout, branches]
+sources:
+  - label: Git — git switch
+    url: https://git-scm.com/docs/git-switch
+  - label: Git — git checkout
+    url: https://git-scm.com/docs/git-checkout
+readingTime: 4
+related: [branching-basics, merging-basics]
+order: 14
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Creating a branch is only half the story — you need to actually move onto it to start working there. Switching is instant and updates every file in your working directory to match that branch's latest commit.
+
+## The modern command
+
+```bash
+git switch feature/dark-mode
+```
+
+Git rewrites your working directory to match exactly what that branch's last commit looked like. Switch back with `git switch main`, and your files flip back too — this is genuinely one of Git's most impressive tricks once you internalize it: you can jump between entirely different versions of your project in a fraction of a second.
+
+Create and switch in one step, as covered in [Branching basics](/git/fundamentals/branching-basics):
+
+```bash
+git switch -c feature/new-idea
+```
+
+## The older command: `git checkout`
+
+Before `git switch` existed (introduced in Git 2.23), `git checkout` did this job — and still does, in every Git version. You'll see it constantly in older tutorials, Stack Overflow answers, and teammates' habits:
+
+```bash
+git checkout feature/dark-mode
+git checkout -b feature/new-idea   # same as switch -c
+```
+
+`git checkout` is functionally still there and still works. The reason `git switch` (and its sibling `git restore`, for undoing file changes) was introduced is that `checkout` was doing *too many unrelated jobs* — switching branches, restoring files, and detaching HEAD were all crammed into one command with confusingly overlapping flags. `switch` and `restore` split those responsibilities apart, making each one's purpose obvious from its name.
+
+This site uses `git switch` throughout, but you'll understand `git checkout` immediately once you know what it means — they're solving the same core problem.
+
+## When Git won't let you switch
+
+If you have uncommitted changes that conflict with the branch you're switching to, Git blocks the switch rather than silently losing your work. See [Git won't let me switch branches](/fix-it/cant-switch-branch) for exactly what to do.
+
+<Callout type="tip">
+`git switch -` (a single dash, just like `cd -`) jumps back to whichever branch you were on before your last switch — a fast way to bounce between two branches repeatedly.
+</Callout>
+
+## Try it yourself
+
+Create a second branch, switch to it with `git switch`, then switch back to `main` with `git switch main`. Notice your files actually change on disk each time — open one in your editor and watch it happen.

@@ -1,0 +1,72 @@
+---
+title: Artifacts and Reports
+summary: Artifacts let one job hand files — build output, test reports, screenshots — to another job or to you, since separate jobs don't share a filesystem.
+level: intermediate
+primaryTab: github
+subtab: automation-cicd
+category: CI/CD
+tags: [github-actions, artifacts, reports]
+sources:
+  - label: GitHub Docs — Actions
+    url: https://docs.github.com/en/actions
+readingTime: 3
+related: [jobs-and-steps, reusable-workflows]
+order: 9
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Jobs run on separate, temporary machines that vanish the moment the job finishes. If a `build` job produces a compiled bundle and a later `deploy` job needs it, that file has to be explicitly handed over — it won't just be sitting on disk waiting.
+
+## Uploading an artifact
+
+```yaml
+- name: Build
+  run: npm run build
+
+- uses: actions/upload-artifact@v4
+  with:
+    name: site-build
+    path: dist/
+```
+
+This packages the `dist/` folder and attaches it to the workflow run — visible as a downloadable zip from the run's summary page in the GitHub UI, and available to other jobs in the same workflow.
+
+## Downloading it in another job
+
+```yaml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: site-build
+          path: dist/
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: site-build
+          path: dist/
+      - run: ./deploy.sh
+```
+
+`needs: build` ensures `build` finishes (and uploads) before `deploy` starts downloading.
+
+## Artifacts as human-readable reports
+
+Artifacts aren't only for machine-to-machine handoff — they're also how you get things *out* of CI for a person to look at: test coverage reports, screenshots from a visual regression test, a generated PDF. Anyone with access to the run can download them from the Actions UI.
+
+<Callout type="tip">
+Artifacts have a retention period (90 days by default, configurable down or up to your plan's limit) — they're for short-term handoff and debugging, not long-term storage. Use Releases for anything you need to keep indefinitely.
+</Callout>
+
+## Try it yourself
+
+Add a step that writes a simple text file (`echo "build info" > report.txt`), upload it with `actions/upload-artifact`, then download the zip from the workflow run's summary page in the GitHub UI.

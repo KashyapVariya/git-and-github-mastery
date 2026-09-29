@@ -1,0 +1,86 @@
+---
+title: Patch Staging with git add -p
+summary: git add -p lets you stage individual hunks of a file instead of the whole thing, so you can split messy changes into clean, focused commits.
+level: advanced
+primaryTab: git
+subtab: advanced
+category: Workflow
+tags: [staging, patch, add, hunks, commits]
+sources:
+  - label: Git — git-add
+    url: https://git-scm.com/docs/git-add
+  - label: Git — git-commit
+    url: https://git-scm.com/docs/git-commit
+readingTime: 5
+related: [fixup-and-autosquash, interactive-rebase, cherry-picking]
+order: 9
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+`git add <file>` stages the entire file, every change in it, as one lump. But real editing sessions rarely produce one clean idea per file — you might fix a bug *and* rename a variable *and* add a debug `console.log` in the same file before you've committed anything. Staging the whole file forces all of that into one commit. `git add -p` (patch mode) lets you stage line-by-line **hunks** instead, so each commit can tell one clean story even when your editing didn't.
+
+## Starting patch mode
+
+```bash
+git add -p
+# or, for one specific file
+git add -p src/app.js
+```
+
+Git walks through each changed **hunk** — a contiguous block of changed lines — and shows it to you with a prompt:
+
+```text
+@@ -12,7 +12,8 @@ function total(items) {
+-  return items.reduce((a, b) => a + b, 0);
++  const sum = items.reduce((a, b) => a + b, 0);
++  return Math.round(sum * 100) / 100;
+Stage this hunk [y,n,q,a,d,s,e,?]?
+```
+
+## The main options
+
+| Key | Meaning |
+|---|---|
+| `y` | Stage this hunk |
+| `n` | Skip this hunk, don't stage it |
+| `s` | Split this hunk into smaller hunks, if possible |
+| `e` | Manually edit the hunk before staging |
+| `q` | Quit — stop reviewing, stage nothing further |
+| `a` | Stage this hunk and all remaining hunks in this file |
+| `d` | Don't stage this hunk or any remaining ones in this file |
+
+Type `?` at the prompt to see the full list. In practice, `y`, `n`, and `s` cover the vast majority of real sessions.
+
+## Splitting a hunk
+
+If a hunk bundles two unrelated changes together, `s` tries to split it into smaller, independent hunks you can accept or reject separately. If Git can't split it automatically (the changed lines are too intertwined), `e` drops you into a manual editor where you can hand-edit exactly which lines to keep in the patch.
+
+## A typical use
+
+You fixed a real bug in `app.js` and also left a stray `console.log` in there while debugging. Instead of committing both together:
+
+```bash
+git add -p app.js
+# 'y' on the hunk with the real fix
+# 'n' on the hunk with the console.log
+git commit -m "Fix rounding error in total()"
+
+# later, either discard the leftover debug line or commit it separately
+git restore app.js
+```
+
+The result: one focused commit with a clear message, and no debug noise mixed in.
+
+<Callout type="tip">
+`git diff --staged` (or `git diff --cached`) right before committing shows exactly what you've patch-staged — a good final check that you didn't accidentally include the wrong hunk.
+</Callout>
+
+<Callout type="golden">
+Patch staging is the tool that makes "commit one logical change at a time" actually achievable, even when your real editing session was messier than that. Write the code however you naturally would, then use `-p` to sort it into clean commits afterward.
+</Callout>
+
+## Try it yourself
+
+Edit a file in two unrelated ways — for example, fix a typo in a comment and change a function's logic. Run `git add -p`, stage only one of the two hunks, commit it with a specific message, then stage and commit the other separately. Check `git log -p` to confirm each commit contains exactly one change.

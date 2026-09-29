@@ -1,0 +1,76 @@
+---
+title: .gitignore Basics
+summary: A .gitignore file tells Git which files to never track or suggest adding — build output, dependencies, secrets, and anything else that doesn't belong in history.
+level: beginner
+primaryTab: git
+subtab: fundamentals
+category: Configuration
+tags: [gitignore, configuration, best-practices]
+sources:
+  - label: Git — gitignore
+    url: https://git-scm.com/docs/gitignore
+readingTime: 4
+related: [staging-with-add, git-status, ignoring-vs-excluding-files]
+order: 12
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Not everything in a project folder belongs in version control — installed dependencies, build output, log files, and API keys are common examples. Without a `.gitignore`, these clutter every `git status`, tempt you into committing them by accident with `git add .`, and can bloat the repository badly.
+
+## Creating one
+
+Add a file literally named `.gitignore` to the root of your project:
+
+```text
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Environment & secrets
+.env
+.env.local
+
+# OS and editor clutter
+.DS_Store
+.vscode/
+```
+
+Once this exists, any file or folder matching a pattern simply stops appearing in `git status` and won't get added even with `git add .` — Git quietly skips it.
+
+## Pattern syntax, briefly
+
+```text
+*.log           # any file ending in .log, anywhere
+/config.json    # only config.json at the project root, not nested copies
+logs/           # a folder named logs, anywhere in the project
+!important.log  # an exception — un-ignore one specific file
+```
+
+The leading `/` and trailing `/` matter: `/config.json` anchors to the root, while `logs/` matches a folder of that name at any depth.
+
+## It only affects untracked files
+
+This is the single most common `.gitignore` surprise: **it has no effect on files Git is already tracking.** If you `git add`ed a file before it was in `.gitignore`, adding the pattern afterward won't remove it from tracking — you have to explicitly untrack it:
+
+```bash
+git rm --cached path/to/file
+```
+
+The `--cached` flag removes it from Git's tracking while leaving the actual file on your disk untouched.
+
+<Callout type="warning">
+Never rely on `.gitignore` alone to keep a secret out of history *after* it's already been committed once. If a secret was ever committed, see [I committed a secret or credential](/fix-it/remove-secret-from-history) — the fix is different and more involved.
+</Callout>
+
+<Callout type="tip">
+GitHub maintains a huge collection of ready-made `.gitignore` templates for every language and framework at [github.com/github/gitignore](https://github.com/github/gitignore) — usually faster to start from one of these than write your own from scratch.
+</Callout>
+
+## Try it yourself
+
+Add a `.gitignore` to a project with a `node_modules/` or similar dependency folder, add the right pattern, and confirm with `git status` that the folder disappears from the untracked list entirely.

@@ -1,0 +1,71 @@
+---
+title: First-Time Setup
+summary: Tell Git your name and email once, and it attaches them to every commit you ever make on this machine.
+level: beginner
+primaryTab: git
+subtab: fundamentals
+category: Setup
+tags: [config, setup, git-config]
+sources:
+  - label: Pro Git — First-Time Git Setup
+    url: https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup
+  - label: Git — git config
+    url: https://git-scm.com/docs/git-config
+readingTime: 4
+related: [installing-git, git-init, config-levels]
+order: 4
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Every commit records who made it. If you skip this step, Git will either refuse to commit or attach a generic, unhelpful identity — and you'll have to go back and fix it later. It takes ten seconds to do properly now.
+
+## Set your identity
+
+```bash
+git config --global user.name "Ada Lovelace"
+git config --global user.email "ada@example.com"
+```
+
+Use the same email you'll use for your GitHub account — GitHub matches commits to profiles by email address, which is what makes your contribution graph and commit avatars work correctly.
+
+## A few more useful defaults
+
+```bash
+git config --global init.defaultBranch main
+git config --global core.editor "code --wait"
+```
+
+The first line makes every new repository start on a branch named `main` instead of the older default, `master`. The second sets which text editor Git opens for things like writing a longer commit message — swap `"code --wait"` for `"vim"`, `"nano"`, or whatever you actually use.
+
+## What `--global` means
+
+`--global` writes these settings to a config file in your home directory, so they apply to *every* repository on your machine. Without it, `git config` would only affect the one repository you're currently standing in — useful if, say, you want a different email for work versus personal projects.
+
+```bash
+# Just for this one repository:
+git config user.email "ada@work-company.com"
+```
+
+You'll see exactly how this precedence works in [Config levels](/git/intermediate/config-levels) once you're comfortable with the basics.
+
+## Check what's set
+
+```bash
+git config --global --list
+```
+
+This prints every global setting currently active — a good way to confirm your name and email landed correctly.
+
+<Callout type="warning">
+If you commit before setting your identity, Git will stop you with an error like `Please tell me who you are`. That's expected — just run the two commands above and try again.
+</Callout>
+
+<Callout type="tip">
+Your name and email aren't private — they're visible to anyone who can see your commits, including on public GitHub repositories. Many people use a GitHub-provided "noreply" email address specifically to avoid exposing their real one.
+</Callout>
+
+## Try it yourself
+
+Run `git config --global user.name "Your Name"` and `git config --global user.email "you@example.com"` right now with your own details, then confirm with `git config --global --list`. You're now ready for [git init](/git/fundamentals/git-init).

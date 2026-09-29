@@ -1,0 +1,89 @@
+---
+title: "Restore vs. Reset vs. Revert"
+summary: Three different "undo" commands for three different jobs — restore for files, reset for local history, revert for anything already shared.
+level: intermediate
+primaryTab: git
+subtab: intermediate
+category: Undo
+tags: [restore, reset, revert, undo]
+sources:
+  - label: Git — git restore
+    url: https://git-scm.com/docs/git-restore
+  - label: Git — git reset
+    url: https://git-scm.com/docs/git-reset
+  - label: Git — git revert
+    url: https://git-scm.com/docs/git-revert
+  - label: Pro Git — Undoing Things
+    url: https://git-scm.com/book/en/v2/Git-Basics-Undoing-Things
+readingTime: 6
+related: [amending-commits, cleaning-the-working-directory, diffing-changes]
+order: 3
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Git has three commands that all sound like "undo," and people mix them up constantly — often at the exact moment they most need to get it right. Picking the wrong one can range from harmless to genuinely destructive, so it's worth knowing, precisely, what each one touches.
+
+The short version: `restore` fixes files, `reset` rewinds your local branch, and `revert` undoes a commit by adding a new one. Only one of the three is safe to use on history you've already pushed.
+
+## git restore — undo changes to files
+
+`restore` works on your working directory and staging area. It never touches commit history.
+
+```bash
+git restore file.txt              # discard working-directory changes, back to HEAD
+git restore --staged file.txt     # unstage a file (undo git add), keep the edits
+```
+
+Use it when you've edited or staged a file and simply want to throw that edit away or take it back off the stage. It's the modern replacement for the older, more overloaded `git checkout -- file.txt`, which did the same thing but under a command name that also switches branches — `restore` exists specifically to be less ambiguous.
+
+## git reset — move your branch pointer
+
+`reset` moves where your current branch *points*, and optionally changes your staging area and working directory to match. It operates locally and rewrites history on your branch.
+
+```bash
+git reset --soft HEAD~1     # undo the last commit, keep changes staged
+git reset HEAD~1            # (--mixed, the default) undo the commit, keep changes unstaged
+git reset --hard HEAD~1     # undo the commit AND discard the changes entirely
+```
+
+`--soft` is the gentlest: your commit disappears but its changes sit ready to re-commit. `--mixed` un-stages them too. `--hard` throws the changes away completely — there's no gentle version of that one.
+
+`reset` is also how you un-stage everything at once (`git reset` with no commit argument) or fully rewind a branch to an earlier point in its own history.
+
+## git revert — undo a commit, safely, in public
+
+`revert` doesn't rewrite anything. It looks at a past commit, works out the opposite of what it did, and creates a **brand-new commit** that applies that opposite change.
+
+```bash
+git revert a1b2c3d
+```
+
+History keeps growing forward — nothing is erased, nothing is rewritten. That makes it the only one of the three that's safe to run on a commit that's already been pushed and pulled by other people, because everyone else's history stays valid.
+
+## Which one, when
+
+| Situation | Use |
+|---|---|
+| Discard uncommitted edits to a file | `git restore` |
+| Undo `git add` on a file | `git restore --staged` |
+| Undo your last local (unpushed) commit | `git reset` |
+| Wipe local commits and their changes entirely | `git reset --hard` (careful) |
+| Undo a commit that's already pushed / shared | `git revert` |
+
+<Callout type="golden">
+The one question that decides everything: **has this been shared with anyone else?** If no, `reset` is fine. If yes, reach for `revert` instead.
+</Callout>
+
+<Callout type="warning">
+`git reset --hard` deletes uncommitted work with no confirmation and no easy recovery for changes that were never committed. Run `git status` first, and consider `git stash` if there's anything you might want back.
+</Callout>
+
+<Callout type="tip">
+Prefer `git switch` for changing branches and `git restore` for changing files — the older `git checkout` still works for both, but it's the same command doing two very different jobs, which is exactly the confusion these newer commands were split out to avoid.
+</Callout>
+
+## Try it yourself
+
+Make a commit, then run `git reset --soft HEAD~1` and check `git status` — the commit is gone but the changes are staged. Re-commit it, then try `git revert HEAD` instead and compare: this time your log has *two* commits, not one undone.

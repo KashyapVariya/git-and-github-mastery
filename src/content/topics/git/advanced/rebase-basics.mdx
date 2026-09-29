@@ -1,0 +1,88 @@
+---
+title: Rebase Basics
+summary: Rebasing replays your commits onto a new base instead of tying two histories together, giving you a straighter, easier-to-read timeline.
+level: advanced
+primaryTab: git
+subtab: advanced
+category: History rewriting
+tags: [rebase, branching, history]
+sources:
+  - label: Git — git-rebase
+    url: https://git-scm.com/docs/git-rebase
+  - label: Pro Git — Rebasing
+    url: https://git-scm.com/book/en/v2/Git-Branching-Rebasing
+readingTime: 6
+related: [interactive-rebase, cherry-picking, the-reflog, force-with-lease]
+order: 1
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+`git merge` and `git rebase` both combine work from two branches, but they tell very different stories about how it happened. Merge says "these two histories happened in parallel, and here's where they joined." Rebase says "pretend this work happened one commit at a time, starting from here" — it rewrites the story to look linear, even if it wasn't.
+
+Neither is universally correct. But once you understand what rebase actually *does* under the hood, you'll know exactly when to reach for it.
+
+## What merge does
+
+When you merge `feature` into `main`, Git creates a new **merge commit** with two parents: the tip of `main` and the tip of `feature`. Both histories stay exactly as they were, permanently preserved, just joined by that one extra commit.
+
+```text
+main:    A---B---C-------M
+              \         /
+feature:       D---E---F
+```
+
+## What rebase does instead
+
+`git rebase main` (run while on `feature`) takes your commits `D`, `E`, `F`, and replays them one by one on top of `main`'s current tip, as if you'd started your branch from there all along. Each replayed commit gets a **new SHA**, even if its content is identical — it's technically a new commit with the same diff and message.
+
+```text
+before:  main:    A---B---C
+                        \
+         feature:        D---E---F
+
+after:   main:    A---B---C
+                            \
+         feature:            D'---E'---F'
+```
+
+The result is a straight line: `A-B-C-D'-E'-F'`. There's no merge commit, and no visual evidence the two branches ever diverged.
+
+## Doing it
+
+```bash
+git switch feature
+git rebase main
+```
+
+Git replays each commit in turn. If a commit's changes conflict with what's already on `main`, the rebase pauses:
+
+```bash
+# fix the conflicting files, then
+git add <file>
+git rebase --continue
+
+# or bail out entirely and go back to how things were
+git rebase --abort
+```
+
+Once finished, `feature` points at the last replayed commit, and `main` is untouched — you still need to merge or push `feature` afterward.
+
+## When to use which
+
+- **Rebase** local, not-yet-shared branches to keep a clean, readable history before opening a pull request.
+- **Merge** when you want to preserve the true record of how branches diverged and joined — especially for long-lived branches like `main` or `release`.
+- **Never rebase commits other people have already pulled.** Because rebase creates new SHAs, anyone with the old commits now has a history that's diverged from yours, and their next pull will look like a conflicting mess.
+
+<Callout type="warning">
+Rebasing rewrites history. If a branch is only on your machine, that's fine. If it's already pushed and someone else might have it, rebasing it is a foot-gun — use `merge` instead, or coordinate carefully with `--force-with-lease`.
+</Callout>
+
+<Callout type="golden">
+A simple rule that covers 90% of real-world use: rebase your feature branch onto the latest `main` before opening a PR, then let the PR be merged (not rebased) into `main`. Clean local history, honest shared history.
+</Callout>
+
+## Try it yourself
+
+Create a scratch repo, branch off, make two commits on `main` and two on a feature branch, then run `git rebase main` from the feature branch. Run `git log --oneline --graph --all` before and after to see the shape of history change from a diamond to a straight line.

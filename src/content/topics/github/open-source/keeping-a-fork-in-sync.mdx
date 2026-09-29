@@ -1,0 +1,61 @@
+---
+title: Keeping a Fork in Sync
+summary: Add the original repository as a second remote called upstream, then regularly fetch and merge its changes into your fork.
+level: beginner
+primaryTab: github
+subtab: open-source
+category: Open source
+tags: [open-source, fork, upstream, remotes]
+sources:
+  - label: GitHub Docs — Repositories
+    url: https://docs.github.com/en/repositories
+readingTime: 4
+related: [how-to-contribute, working-with-remotes]
+order: 2
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Your fork freezes at the moment you created it. The original project keeps moving — new commits land on its main branch every day you're not looking. If you branch off a stale fork, you'll eventually hit painful conflicts. Staying in sync avoids that entirely.
+
+## Add the upstream remote
+
+Your fork already has one remote, `origin`, pointing at your copy. Add a second one pointing at the original project:
+
+```bash
+git remote add upstream git@github.com:original-owner/project.git
+git remote -v
+```
+
+You'll now see both `origin` (yours) and `upstream` (theirs) listed.
+
+## Sync your local main branch
+
+```bash
+git switch main
+git fetch upstream
+git merge upstream/main
+```
+
+`git fetch upstream` downloads their new commits without touching your files. `git merge upstream/main` then brings those commits into your local `main`. If you haven't made any commits of your own on `main` — which is the point, you should always branch off it — this merge is a simple fast-forward with no conflicts.
+
+## Push the update back to your fork
+
+Your fork on GitHub is still behind at this point — only your local copy is updated:
+
+```bash
+git push origin main
+```
+
+<Callout type="tip">
+GitHub's web UI also has a "Sync fork" button on your fork's homepage that does the fetch-and-merge step for you, if you'd rather not use the terminal for this part.
+</Callout>
+
+<Callout type="golden">
+Never commit directly to your fork's `main` branch. Keep it a pure mirror of upstream, and always branch off it for your own work — that's what makes syncing conflict-free.
+</Callout>
+
+## Try it yourself
+
+If you've already forked a project, run `git remote add upstream <url>` on it right now and sync your `main` branch — even if you have no pending changes, it's good practice to run through the steps once.

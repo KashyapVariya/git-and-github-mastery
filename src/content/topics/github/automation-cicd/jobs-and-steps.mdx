@@ -1,0 +1,79 @@
+---
+title: Jobs and Steps
+summary: A workflow is made of jobs that run in parallel by default, each containing steps that always run in order — understanding this split unlocks faster, more reliable pipelines.
+level: intermediate
+primaryTab: github
+subtab: automation-cicd
+category: CI/CD
+tags: [github-actions, jobs, steps, dependencies]
+sources:
+  - label: GitHub Docs — Actions
+    url: https://docs.github.com/en/actions
+readingTime: 4
+related: [workflow-syntax, runners, matrix-builds]
+order: 4
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+A slow CI pipeline is usually a structure problem, not a hardware problem. Knowing how jobs and steps actually execute — what runs in parallel, what runs in order, and how to connect them — is how you get a five-minute pipeline instead of a fifteen-minute one.
+
+## Steps run in order, on one machine
+
+Every step in a job runs sequentially, on the same runner, sharing the same filesystem. If step 3 depends on a file step 2 created, that just works — they're on the same machine.
+
+```yaml
+steps:
+  - run: echo "one"
+  - run: echo "two"   # runs after "one" finishes
+  - run: echo "three" # runs after "two" finishes
+```
+
+If any step fails, the job stops there by default (later steps are skipped) and the job is marked failed — unless that step sets `continue-on-error: true`.
+
+## Jobs run in parallel, on separate machines
+
+Unlike steps, jobs don't share a machine or a filesystem, and by default they all start at once:
+
+```yaml
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps: [...]
+  test:
+    runs-on: ubuntu-latest
+    steps: [...]
+```
+
+`lint` and `test` here start simultaneously on two separate runners — faster overall, since they're not waiting on each other.
+
+## Making jobs depend on each other
+
+Use `needs:` when one job genuinely requires another to finish first — most commonly, don't deploy until tests pass:
+
+```yaml
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps: [...]
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps: [...]
+```
+
+`deploy` now waits for `test` to succeed before starting; if `test` fails, `deploy` is skipped entirely.
+
+<Callout type="tip">
+Default to parallel jobs and only add `needs:` where there's a real dependency. Every unnecessary `needs:` link adds wall-clock time to your pipeline for no benefit.
+</Callout>
+
+<Callout type="warning">
+Because jobs run on separate machines, files created in one job (build output, for example) don't exist in another — pass them along explicitly with `actions/upload-artifact` and `actions/download-artifact`.
+</Callout>
+
+## Try it yourself
+
+Split a single-job workflow into two parallel jobs (say, `lint` and `test`), then add a third `deploy` job that uses `needs: [lint, test]` so it only runs once both succeed.

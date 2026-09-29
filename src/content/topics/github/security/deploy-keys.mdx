@@ -1,0 +1,48 @@
+---
+title: Deploy Keys
+summary: A deploy key is an SSH key scoped to a single repository — the right way to give a server access without handing it a personal account.
+level: advanced
+primaryTab: github
+subtab: security
+category: Access control
+tags: [deploy-keys, ssh, servers, access]
+sources:
+  - label: GitHub Docs — Authentication
+    url: https://docs.github.com/en/authentication
+readingTime: 3
+related: [oidc-basics, permissions-and-roles, ssh-keys]
+order: 10
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+A deployment server sometimes needs to `git clone` or `git pull` a private repository. The tempting shortcut is putting a real person's SSH key on that server — but now that person's key can access every repository they can, from a machine they don't fully control, and it's tied to an individual who might leave the team. A deploy key solves this properly: it's scoped to exactly one repository.
+
+## How it works
+
+Generate a dedicated SSH key pair just for this purpose:
+
+```bash
+ssh-keygen -t ed25519 -C "deploy-key-for-myapp" -f deploy_key
+```
+
+Add the **public** key to the repository under Settings → Deploy keys. Put the **private** key on the server (or in your deployment system's secret store) — never anywhere else.
+
+By default, a deploy key is **read-only**, which is exactly right for a server that only needs to pull code to deploy it. You can optionally grant write access if the server needs to push (for example, a bot that commits generated files back) — but only do this if it's genuinely required.
+
+## Deploy keys vs. machine users vs. GitHub Apps
+
+Deploy keys are the simplest option when a *single repository* needs *SSH-level* access from a *single server*. If several repositories need access, a **GitHub App** with scoped permissions is usually the better modern choice — it's not tied to a person, and access can be revoked centrally without touching every repository. Older setups sometimes use a "machine user" (a dedicated bot account), but that approach has mostly been superseded by Apps.
+
+<Callout type="warning">
+Never reuse one deploy key's private half across multiple repositories or servers just because it's convenient — if that key ever leaks, the blast radius should be exactly one repository, not your whole infrastructure.
+</Callout>
+
+<Callout type="tip">
+Deploying to cloud infrastructure (AWS, GCP, Azure) from GitHub Actions specifically? Prefer [OIDC](/github/security/oidc-basics) over any long-lived key — it avoids storing a credential at all.
+</Callout>
+
+## Try it yourself
+
+If you have a server that pulls from a private repository today, check what credential it's using. If it's a personal account's SSH key, that's worth replacing with a dedicated, read-only deploy key.

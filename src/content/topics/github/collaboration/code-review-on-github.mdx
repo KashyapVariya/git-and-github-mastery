@@ -1,0 +1,59 @@
+---
+title: Code Review on GitHub
+summary: Reviewing a pull request means reading the diff, leaving comments where they matter, and choosing an overall verdict.
+level: intermediate
+primaryTab: github
+subtab: collaboration
+category: Code review
+tags: [code-review, pull-requests, collaboration]
+sources:
+  - label: GitHub Docs — Pull requests
+    url: https://docs.github.com/en/pull-requests
+readingTime: 5
+related: [pull-requests-basics, suggested-changes, codeowners]
+order: 5
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+A second pair of eyes catches things the author is too close to see — a missed edge case, an inconsistent naming choice, a simpler way to write the same logic. Code review is where that happens, and GitHub builds the whole workflow directly into the pull request: line-by-line comments, an overall verdict, and a clear record of who signed off on what.
+
+## Reading the diff
+
+Open a pull request's **Files changed** tab. Each file shows a diff — red lines removed, green lines added — and you can comment on any specific line by hovering over it and clicking the blue `+` that appears in the gutter.
+
+A line comment is scoped to that exact line, which keeps feedback precise: "this could throw if `items` is empty" attached directly to the line in question is far clearer than the same sentence buried in a general comment thread.
+
+## Starting a review
+
+Individual line comments can be posted immediately, but GitHub also lets you batch several comments into one **review**, submitted together with an overall verdict:
+
+- **Comment** — feedback with no formal verdict, useful for questions or minor notes
+- **Approve** — you're satisfied; if the repository requires approvals to merge, this counts toward that requirement
+- **Request changes** — something needs to be fixed before this should merge; on a protected branch, this can block merging until resolved
+
+Click **Start a review** on any line comment to queue it instead of posting instantly, add as many more comments as you like across the diff, then submit them all at once from the **Review changes** button at the top of the Files tab.
+
+```text
+Review changes
+○ Comment
+○ Approve
+● Request changes
+```
+
+<Callout type="tip">
+Batch your comments into a single review rather than posting them one at a time. Posting individually fires a separate notification for each comment — batching sends the author one clean summary instead.
+</Callout>
+
+## Responding as the author
+
+The author can reply inline to any comment, mark a thread **Resolved** once it's addressed, or push new commits that automatically update the diff view. Resolved threads collapse but stay in the history — nothing is deleted, so the reasoning behind a change survives even after the conversation is tidied up.
+
+<Callout type="golden">
+"Request changes" is a signal, not a punishment. The clearest reviews explain *why* something needs to change, ideally with a suggested fix — a blocked PR with no explanation just stalls the whole team.
+</Callout>
+
+## Try it yourself
+
+Find an open pull request — yours or a public project's — and leave one specific, line-level comment on something you'd genuinely want to know about: a missing test, an unclear variable name, anything concrete. Then read how the author (or other reviewers) responded to similar comments already on that PR.

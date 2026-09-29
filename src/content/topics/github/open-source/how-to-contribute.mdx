@@ -1,0 +1,55 @@
+---
+title: How to Contribute to Open Source
+summary: The standard loop is fork, branch, make your change, open a pull request — small, well-described contributions get merged fastest.
+level: beginner
+primaryTab: github
+subtab: open-source
+category: Open source
+tags: [open-source, contributing, fork, pull-request]
+sources:
+  - label: GitHub Docs — Communities
+    url: https://docs.github.com/en/communities
+readingTime: 5
+related: [keeping-a-fork-in-sync, good-first-issues, contributing-guidelines]
+order: 1
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+You don't need permission to improve most open-source projects — you need a fork, a branch, and a clear pull request. The mechanics are the same whether you're fixing a typo or adding a feature.
+
+## The loop
+
+1. **Fork the repository.** This creates your own copy under your GitHub account, connected to the original ("upstream") repo.
+2. **Clone your fork** to your machine: `git clone git@github.com:your-username/project.git`
+3. **Create a branch** for your change: `git switch -c fix-typo-in-readme`
+4. **Make the change and commit it** with a clear message describing what and why.
+5. **Push your branch** to your fork: `git push -u origin fix-typo-in-readme`
+6. **Open a pull request** from your branch into the original project's main branch. GitHub shows a "Compare & pull request" button right after you push.
+
+```bash
+git clone git@github.com:your-username/project.git
+cd project
+git switch -c fix-typo-in-readme
+# ...make your edit...
+git add .
+git commit -m "docs: fix typo in installation steps"
+git push -u origin fix-typo-in-readme
+```
+
+## Before you open the PR
+
+Read the project's `CONTRIBUTING.md` if it has one — it often tells you exactly how to run tests, what commit style is expected, and whether to open an issue first for larger changes. Skipping this step is the single most common reason contributions get delayed.
+
+<Callout type="tip">
+Keep your first pull request small. A five-line fix that gets merged in a day teaches you more about a project's process than a five-hundred-line one stuck in review for a month.
+</Callout>
+
+<Callout type="golden">
+Explain the *why*, not just the *what*, in your PR description. Maintainers can read your diff; they can't read your motivation.
+</Callout>
+
+## Try it yourself
+
+Find a small project you already use, fork it, and fix one thing — a typo, an outdated link, a missing example. Open the PR and see the review process firsthand.

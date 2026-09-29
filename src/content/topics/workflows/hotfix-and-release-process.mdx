@@ -1,0 +1,71 @@
+---
+title: Hotfix and Release Process
+summary: A hotfix patches production directly from a released version, bypassing whatever unfinished work sits on your main development line.
+level: advanced
+primaryTab: workflows
+subtab: guides
+category: Release management
+tags: [workflows, hotfix, releases, branching]
+sources:
+  - label: Atlassian — Comparing Git workflows
+    url: https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow
+readingTime: 6
+related: [git-flow, semantic-versioning, team-git-rules-checklist]
+order: 10
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Production breaks at inconvenient times, and whatever is currently on your development branch is usually not what's running live — it might be half a release ahead, full of unfinished features. A hotfix process exists so you can patch exactly what's deployed, quickly and safely, without dragging unrelated in-progress work along with it.
+
+## The core idea
+
+A hotfix branches from the **tag or commit that's actually in production** — not from your main development branch — applies the smallest possible fix, and ships that alone.
+
+```bash
+# v2.4.1 is live in production and broken
+git switch --detach v2.4.1
+git switch -c hotfix/2.4.2
+# ...apply the minimal fix...
+git commit -m "fix: prevent crash on empty cart checkout"
+git tag v2.4.2
+```
+
+That new tag, `v2.4.2`, is deployed — nothing else. Whatever half-finished features exist on `main` or `develop` stay right where they were, untouched and unshipped.
+
+## Don't forget the merge back
+
+The fix has to reach your ongoing development line too, or the next regular release will silently reintroduce the same bug:
+
+```bash
+git switch main
+git merge hotfix/2.4.2
+
+git switch develop
+git merge hotfix/2.4.2
+```
+
+Skipping this step is the single most common hotfix mistake — the production fire gets put out, but the same bug ships again three weeks later in the next scheduled release.
+
+<Callout type="warning">
+A hotfix branch should contain the fix and *only* the fix. It's tempting to "just quickly clean up this other thing" while you're in there — resist it. Every extra line is a line that didn't get the normal review and testing cycle.
+</Callout>
+
+## Versioning the fix
+
+Under [Semantic Versioning](/workflows/semantic-versioning), a hotfix almost always bumps the **PATCH** number — `2.4.1` to `2.4.2` — since by definition it's a backward-compatible bug fix, not new functionality or a breaking change.
+
+## What a good hotfix process needs in place beforehand
+
+- A clear way to identify exactly what's live (a tag per deploy, not just "whatever main looked like on Tuesday")
+- A fast-tracked review path — one senior reviewer instead of the usual two, for example — so speed doesn't mean skipping review entirely
+- A standing checklist: fix, test, deploy, merge back to every active branch, communicate to the team
+
+<Callout type="golden">
+The teams that handle hotfixes calmly are the ones who rehearsed the *process* before they needed it, not just the code fix. Knowing exactly which branch to cut from and where the merge-back needs to land turns a 2am incident into a 20-minute one.
+</Callout>
+
+## Try it yourself
+
+Write down, in five steps, exactly what your team would do right now if production broke and needed a same-hour fix. If you can't answer "which commit would I branch from," that's the gap to close before you actually need it.

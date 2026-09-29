@@ -1,0 +1,78 @@
+---
+title: Performance Tuning
+summary: On very large repositories, a few specific features — fsmonitor, partial clone, the commit-graph, and git maintenance — make everyday Git commands dramatically faster.
+level: expert
+primaryTab: git
+subtab: expert
+category: Performance
+tags: [performance, fsmonitor, partial-clone, commit-graph, maintenance]
+sources:
+  - label: Git — git gc
+    url: https://git-scm.com/docs/git-gc
+  - label: Pro Git — Maintenance and Data Recovery
+    url: https://git-scm.com/book/en/v2/Git-Internals-Maintenance-and-Data-Recovery
+readingTime: 7
+related: [packfiles-and-gc, plumbing-commands, git-objects-blob-tree-commit-tag]
+order: 15
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+On a small repo, Git feels instant no matter what you do. On a repository with hundreds of thousands of commits, or a working directory with hundreds of thousands of files, plain Git can start to genuinely drag — `git status` taking seconds, clones taking hours. None of that means Git itself doesn't scale; it means a few opt-in features aren't switched on yet.
+
+## core.fsmonitor: skip re-scanning the whole working directory
+
+`git status` normally works by checking every tracked file's metadata against what Git last recorded — on a huge working directory, that's the slow part, not the actual Git logic. `fsmonitor` replaces that full scan with a background watcher that already knows exactly which files changed since last time.
+
+```bash
+git config core.fsmonitor true
+```
+
+Modern Git ships a built-in fsmonitor daemon (no separate tool needed since Git 2.37), so this is usually a one-line, genuinely free speedup on large working directories.
+
+## Partial clone: don't download what you don't need yet
+
+A normal `git clone` downloads every blob for every commit in history, even ones you'll never look at. **Partial clone** defers that:
+
+```bash
+git clone --filter=blob:none https://example.com/huge-repo.git
+```
+
+`--filter=blob:none` fetches all commit and tree objects (so history, `log`, and navigation work immediately) but skips downloading file *contents* until you actually check out or diff something that needs them — at which point Git fetches just those specific blobs on demand. `--filter=tree:0` goes further, deferring trees too, for cases like a build server that only needs a shallow, narrow slice of the repo.
+
+## The commit-graph: pre-computed history shortcuts
+
+Commands like `git log --graph` and merge-base calculations normally have to walk commit objects one at a time, following parent links and opening each object individually. The **commit-graph** file precomputes this into one compact, fast-to-read file:
+
+```bash
+git commit-graph write --reachable
+```
+
+It stores each commit's parents, generation number, and a few other fields in a format built for rapid traversal — history-walking operations that touch many commits get noticeably faster, especially on repositories with tens of thousands of commits.
+
+## git maintenance: automating all of it
+
+Rather than remembering to run `git gc`, refresh the commit-graph, and repack manually, `git maintenance` schedules this as ongoing background upkeep:
+
+```bash
+git maintenance start
+```
+
+This registers scheduled tasks (via cron, launchd, or Windows' Task Scheduler, depending on your OS) that run maintenance in small, low-impact increments — rather than one occasional, disruptive `git gc` that you notice because it's slow. It covers packfile compaction, loose object cleanup, and commit-graph updates together, tuned by repository size automatically.
+
+<Callout type="tip">
+Most of this is safe to enable globally and forget about: `git config --global core.fsmonitor true` and `git maintenance start` cost nothing on a small repo and pay off automatically the moment a repo grows.
+</Callout>
+
+<Callout type="warning">
+Partial clone requires the server to support it (most major hosts do). Some plumbing-level operations — certain diffs or blame across huge swaths of history — may trigger a burst of on-demand blob fetches the first time you run them, which can look like a network hiccup rather than a config issue.
+</Callout>
+
+<Callout type="golden">
+None of these features change what your repository *contains* — only how efficiently Git reads and stores it. They're safe to turn on, safe to turn off, and never affect collaborators who haven't enabled them themselves.
+</Callout>
+
+## Try it yourself
+
+Run `git maintenance start` in a repository you use daily, then check `git config --get-all maintenance.strategy` — you'll see Git has registered itself for ongoing background upkeep, no more manual `git gc` required.

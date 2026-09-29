@@ -1,0 +1,52 @@
+---
+title: Packfiles and Garbage Collection
+summary: Git periodically compresses many loose objects into single, highly efficient packfiles, and cleans up ones nothing points to anymore.
+level: expert
+primaryTab: git
+subtab: expert
+category: Internals
+tags: [packfiles, gc, garbage-collection, performance]
+sources:
+  - label: Pro Git — Packfiles
+    url: https://git-scm.com/book/en/v2/Git-Internals-Packfiles
+  - label: Git — git gc
+    url: https://git-scm.com/docs/git-gc
+readingTime: 5
+related: [git-objects-blob-tree-commit-tag, reflog-internals, performance-tuning]
+order: 4
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Every commit could, in theory, create a brand-new "loose object" file for its tree and any changed blobs. On a large, long-lived repository that would mean hundreds of thousands of tiny files — slow to read, slow to transfer, wasteful on disk. Packfiles are how Git avoids that.
+
+## Loose objects vs packfiles
+
+Right after you commit, new objects start as **loose objects** — one file per object, named after its hash, living under `.git/objects/xx/`. This is simple but not efficient at scale.
+
+Periodically (and automatically during operations like `git push` and `git fetch`), Git bundles many loose objects into a single **packfile**: a compressed, highly efficient archive that also stores *deltas* — many blobs are near-identical between commits, so Git stores one full version and small diffs against it, rather than full copies of everything.
+
+You can trigger this manually:
+
+```bash
+git gc
+```
+
+This packs loose objects, removes ones that are no longer reachable from any ref (and old enough to safely discard), and generally tidies up. `git gc --aggressive` repacks more thoroughly, at the cost of taking longer.
+
+## What "reachable" means here
+
+An object is reachable if you can get to it by following refs (branches, tags) and then parent pointers, tree entries, and blob references from there. A commit that no branch or tag points to anymore — like one from a deleted branch, or an old commit after a `reset --hard` — becomes **unreachable**. It isn't deleted immediately; Git keeps it around for a grace period (commonly 90 days for loose objects reachable only via the reflog), specifically so operations like [recovering a deleted branch](/fix-it/recover-deleted-branch) still work.
+
+<Callout type="tip">
+Check how much of your repo is packed vs loose, and its rough size, with `git count-objects -v`.
+</Callout>
+
+<Callout type="warning">
+`git gc --prune=now` deletes unreachable objects immediately instead of waiting out the grace period. Only run it if you're certain you don't need reflog-based recovery for recent work.
+</Callout>
+
+## Try it yourself
+
+Run `git count-objects -v` before and after `git gc` in a repository with some history — you'll typically see `count` (loose objects) drop toward zero and a packfile appear in its place.

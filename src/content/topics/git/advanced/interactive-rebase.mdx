@@ -1,0 +1,85 @@
+---
+title: Interactive Rebase
+summary: git rebase -i lets you rewrite, reorder, squash, or drop commits before anyone else sees them — turning messy work-in-progress history into a clean story.
+level: advanced
+primaryTab: git
+subtab: advanced
+category: History rewriting
+tags: [rebase, interactive-rebase, history, cleanup]
+sources:
+  - label: Git — git-rebase
+    url: https://git-scm.com/docs/git-rebase
+  - label: Pro Git — Rewriting History
+    url: https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History
+readingTime: 7
+related: [rebase-basics, fixup-and-autosquash, the-reflog]
+order: 2
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Real work is messy. You commit "wip", then "fix typo", then "actually fix typo", then "wip again" — and by the time you're ready to open a pull request, that history is noise nobody wants to read. Interactive rebase lets you edit that story after the fact, turning six sloppy commits into two clean, well-described ones, without changing the final result of your code.
+
+## Starting one
+
+```bash
+git rebase -i HEAD~5
+```
+
+This opens your editor with the last 5 commits listed **oldest to newest**, each on its own line:
+
+```text
+pick a1b2c3d Add login form
+pick e4f5g6h wip
+pick i7j8k9l fix typo
+pick m1n2o3p actually fix typo
+pick q4r5s6t Add form validation
+```
+
+You edit this list — not the commits directly — to describe what should happen to each one. Save and close the editor, and Git carries out your instructions in order.
+
+## The commands
+
+| Command | Short | What it does |
+|---|---|---|
+| `pick` | `p` | Keep the commit as-is |
+| `reword` | `r` | Keep the commit's changes, but let you edit its message |
+| `edit` | `e` | Pause here so you can amend the commit (change code, split it, etc.) |
+| `squash` | `s` | Merge this commit into the one above it, combining both messages |
+| `fixup` | `f` | Like squash, but discard this commit's message entirely |
+| `drop` | `d` | Delete this commit and its changes completely |
+
+You can also reorder commits simply by moving their lines around — Git replays them top to bottom, so the new order becomes the new history.
+
+## A worked example
+
+Cleaning up the messy log above into two commits:
+
+```text
+pick a1b2c3d Add login form
+squash e4f5g6h wip
+squash i7j8k9l fix typo
+squash m1n2o3p actually fix typo
+pick q4r5s6t Add form validation
+```
+
+Save and close. Git squashes the three `wip`/typo commits into the first one and opens your editor again so you can write a single combined message like "Add login form." The result is a two-commit history: one for the form, one for validation — even though it took five attempts to get there.
+
+If you use `edit` on a commit, the rebase pauses right after checking it out. You can change files, run `git add`, then `git commit --amend`, and finally `git rebase --continue` to resume.
+
+<Callout type="tip">
+Every line still says `pick` by default. You only need to change the word on the lines you want to treat differently — leave the rest alone.
+</Callout>
+
+<Callout type="warning">
+Like any rebase, this rewrites commit SHAs. Only do this on commits that haven't been pushed and shared yet — or that you've explicitly coordinated to rewrite with collaborators.
+</Callout>
+
+<Callout type="golden">
+`git rebase -i --root` rebases the *entire* history of a branch, including the very first commit — useful for cleaning up an old project's history from scratch, but rare in day-to-day use.
+</Callout>
+
+## Try it yourself
+
+Make three throwaway commits in a scratch repo with messages like "wip", "wip2", "final fix." Run `git rebase -i HEAD~3`, squash the last two into the first, and give the result one clean message. Check `git log --oneline` before and after to see the difference.

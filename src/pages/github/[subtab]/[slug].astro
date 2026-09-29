@@ -1,0 +1,16 @@
+---
+import { getCollection } from 'astro:content';
+import TopicPage from '../../../layouts/TopicPage.astro';
+
+export async function getStaticPaths() {
+  const topics = await getCollection('topics', ({ data }) => data.primaryTab === 'github' && !data.draft);
+  return topics.map((entry) => ({
+    params: { subtab: entry.data.subtab, slug: entry.id.split('/').pop() },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+---
+
+<TopicPage entry={entry} />

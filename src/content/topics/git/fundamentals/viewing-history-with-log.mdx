@@ -1,0 +1,86 @@
+---
+title: Viewing History with git log
+summary: git log shows your commit history — and a few flags turn it from a wall of text into a readable, visual map of your project.
+level: beginner
+primaryTab: git
+subtab: fundamentals
+category: Commands
+tags: [git-log, history, daily-workflow]
+sources:
+  - label: Git — git log
+    url: https://git-scm.com/docs/git-log
+  - label: Pro Git — Viewing the Commit History
+    url: https://git-scm.com/book/en/v2/Git-Basics-Viewing-the-Commit-History
+readingTime: 4
+related: [making-commits, git-status, branching-basics]
+order: 11
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Every commit you make joins a permanent timeline — `git log` is how you actually read it back. It's how you answer "when did this change," "who wrote this," and "what else happened around the same time."
+
+## The default view
+
+```bash
+git log
+```
+
+```text
+commit a1b2c3d4e5f6...
+Author: Ada Lovelace <ada@example.com>
+Date:   Mon Jan 12 10:04:21 2026 -0500
+
+    Add login form validation
+
+commit 9f8e7d6c5b4a...
+Author: Ada Lovelace <ada@example.com>
+Date:   Sun Jan 11 18:22:03 2026 -0500
+
+    Initial commit
+```
+
+Newest first, each entry showing the full commit hash, author, date, and message. Press `q` to exit if it drops you into a pager.
+
+## The compact, everyday version
+
+```bash
+git log --oneline
+```
+
+```text
+a1b2c3d Add login form validation
+9f8e7d6 Initial commit
+```
+
+One line per commit — the short hash plus the message. This is what most people actually reach for day to day.
+
+## Seeing branches visually
+
+```bash
+git log --oneline --graph --all
+```
+
+Adds a text-based graph of branches and merges alongside the log — genuinely useful once your project has more than one branch, since it shows *where* branches split and rejoined.
+
+## Useful filters
+
+```bash
+git log -5                      # just the last 5 commits
+git log --author="Ada"          # only commits by a specific person
+git log --since="2 weeks ago"   # commits after a given time
+git log -- app.js               # commits that touched one specific file
+```
+
+<Callout type="tip">
+Make `git log --oneline --graph --all` a permanent shortcut: `git config --global alias.lg "log --oneline --graph --all"` lets you just type `git lg` from then on. More in [Git aliases](/git/intermediate/git-aliases).
+</Callout>
+
+<Callout type="golden">
+The short hash you see (like `a1b2c3d`) isn't a separate, shorter ID — it's just the first several characters of the full 40-character SHA, and Git is smart enough to accept it anywhere as long as it's unambiguous.
+</Callout>
+
+## Try it yourself
+
+Run `git log --oneline --graph --all` in any repository with more than a couple of commits, even this early one of yours. Get comfortable reading it now — it becomes essential once branches enter the picture.

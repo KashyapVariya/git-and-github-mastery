@@ -1,0 +1,47 @@
+---
+title: I deleted a branch I still needed
+symptom: "I ran git branch -D on a branch, or force-deleted it another way, and now I need those commits back."
+summary: The commits almost certainly still exist. Find the branch's last commit in git reflog and create a new branch pointing at it.
+severity: scary
+tags: [reflog, recovery, branches]
+sources:
+  - label: Git — git reflog
+    url: https://git-scm.com/docs/git-reflog
+related: [detached-head]
+order: 4
+lastReviewed: 2026-01-15
+---
+
+## Diagnosis
+
+Deleting a branch only removes the *pointer* — the commits it pointed to are still sitting in Git's object database until garbage collection eventually cleans them up (which usually takes weeks, not minutes). You almost always have time to recover.
+
+## Fix
+
+Look through the reflog, which records everywhere `HEAD` has recently pointed, including the branch right before you deleted it:
+
+```bash
+git reflog
+```
+
+You're looking for a line like:
+
+```
+a1b2c3d HEAD@{2}: commit: add login form
+```
+
+Find the last commit that belonged to your deleted branch (its commit message usually gives it away), then recreate the branch pointing at it:
+
+```bash
+git branch recovered-branch a1b2c3d
+```
+
+That's it — `recovered-branch` now has the full history the deleted branch had.
+
+<Callout type="tip">
+Can't find it in `git reflog`? Try `git fsck --lost-found`, which lists commits that aren't reachable from any branch at all — a broader but noisier search.
+</Callout>
+
+<Callout type="golden">
+Already pushed that branch to GitHub before deleting it locally? The remote copy (`origin/branch-name`) is likely still there — check `git branch -r` or the repository's branch list on GitHub before doing any local recovery work.
+</Callout>

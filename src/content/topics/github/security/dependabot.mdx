@@ -1,0 +1,54 @@
+---
+title: Dependabot
+summary: Dependabot watches your dependencies for known vulnerabilities and outdated versions, and opens pull requests to fix them automatically.
+level: advanced
+primaryTab: github
+subtab: security
+category: Security
+tags: [dependabot, dependencies, vulnerabilities, automation]
+sources:
+  - label: GitHub Docs — Code security
+    url: https://docs.github.com/en/code-security
+readingTime: 4
+related: [secret-scanning, code-scanning-codeql, security-advisories]
+order: 3
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Every dependency you install is code you didn't write, running in your project. When a vulnerability is found in a popular package, you need to know quickly — and updating dependencies by hand across dozens of repositories doesn't scale. Dependabot does both jobs: it tells you about problems and offers to fix them.
+
+## The two features
+
+**Dependabot alerts** scan your dependency manifests (`package.json`, `requirements.txt`, `go.mod`, and more) against a public database of known vulnerabilities, and flag any dependency — direct or transitive — that has one.
+
+**Dependabot security updates** go a step further: when an alert fires, Dependabot automatically opens a pull request that bumps the affected package to a patched version, with the change summarized and the advisory linked.
+
+There's a third, related feature — **Dependabot version updates** — which isn't about security at all. Configured through a `.github/dependabot.yml` file, it periodically opens PRs just to keep dependencies current, on whatever schedule you choose (daily, weekly, monthly).
+
+```yaml
+# .github/dependabot.yml
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+```
+
+## What you actually do with it
+
+Turn on Dependabot alerts and security updates in repository Settings → Code security. From then on, vulnerable dependencies show up under the Security tab, and fixes arrive as ordinary pull requests you review and merge like any other — your CI still runs against them, so you're not merging blind.
+
+<Callout type="tip">
+Dependabot PRs are still just PRs. Require your normal status checks on them like anything else — a "security fix" that breaks your build isn't actually a fix yet.
+</Callout>
+
+<Callout type="warning">
+A patched version isn't always a drop-in replacement — occasionally a fix bumps a major version with breaking changes. Read the PR description Dependabot generates; it links directly to the advisory and the changelog.
+</Callout>
+
+## Try it yourself
+
+Turn on Dependabot alerts on one of your repositories (Settings → Code security → Dependabot alerts), then check the Security tab. If you have any outdated dependencies, you'll likely see at least one alert waiting already.

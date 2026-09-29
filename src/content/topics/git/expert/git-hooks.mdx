@@ -1,0 +1,56 @@
+---
+title: Git Hooks
+summary: Hooks are scripts Git runs automatically at specific points — like before a commit or push — used to enforce checks or automate tasks.
+level: expert
+primaryTab: git
+subtab: expert
+category: Automation
+tags: [hooks, automation, pre-commit, ci]
+sources:
+  - label: Git — githooks
+    url: https://git-scm.com/docs/githooks
+  - label: Pro Git — Git Hooks
+    url: https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks
+readingTime: 6
+related: [inside-the-git-folder, config-levels, signing-commits]
+order: 8
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Hooks let Git *do something* automatically at key moments — run your tests before a commit is allowed, check a commit message's format, or notify a service after a push. They're how teams enforce conventions without relying on everyone remembering to run a checklist by hand.
+
+## Where they live
+
+Hooks are just executable scripts in `.git/hooks/`. Git creates that folder with `.sample` template files for every hook it supports — rename one (dropping `.sample`) and make it executable, and Git will run it automatically.
+
+```bash
+mv .git/hooks/pre-commit.sample .git/hooks/pre-commit
+chmod +x .git/hooks/pre-commit
+```
+
+A hook can be written in any language — it just needs to be executable and (usually) exit with status `0` to allow the operation to continue, or non-zero to block it.
+
+## The hooks you'll actually use
+
+- **`pre-commit`** — runs before a commit message is even entered. Perfect for linting, formatting checks, or running fast tests. Exit non-zero to block the commit.
+- **`commit-msg`** — runs after the message is written, receives its file path as an argument. Ideal for enforcing a message format, like [Conventional Commits](/workflows/commit-message-conventions).
+- **`pre-push`** — runs before anything is uploaded to a remote. A good last line of defense — run the full test suite here if it's not too slow.
+- **`post-merge`** / **`post-checkout`** — run after those operations complete; commonly used to reinstall dependencies automatically when a lockfile changed.
+
+<Callout type="warning">
+Hooks in `.git/hooks/` are **not committed or shared** — `.git/` is never tracked. Every teammate has to set them up individually, which is exactly the problem tools like <a href="https://pre-commit.com" target="_blank" rel="noopener">pre-commit</a> or Husky solve: they install real hook scripts automatically (often via a `postinstall` step) that then run a shared, version-controlled configuration.
+</Callout>
+
+## Server-side hooks
+
+The hooks above are client-side, running on your machine. GitHub-hosted repositories don't expose server-side Git hooks (`pre-receive`, `update`) directly — instead, the equivalent enforcement happens through [branch protection rules](/github/security/branch-protection-rules) and [GitHub Actions](/github/automation-cicd/github-actions-overview).
+
+<Callout type="tip">
+Keep hooks fast. A `pre-commit` hook that takes 30 seconds will get disabled by frustrated teammates faster than it prevents mistakes — push slower checks to `pre-push` or CI instead.
+</Callout>
+
+## Try it yourself
+
+Create `.git/hooks/pre-commit` containing `#!/bin/sh` and `echo "Running pre-commit checks…"` on the next line, make it executable, then run `git commit` — watch your message print automatically before the commit completes.

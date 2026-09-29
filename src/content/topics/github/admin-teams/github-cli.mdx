@@ -1,0 +1,78 @@
+---
+title: GitHub CLI (gh)
+summary: The gh command-line tool brings pull requests, issues, releases, and repo management into your terminal, so you rarely need to open a browser.
+level: advanced
+primaryTab: github
+subtab: admin-teams
+category: Developer tools
+tags: [cli, gh, productivity, automation]
+sources:
+  - label: gh CLI Manual
+    url: https://cli.github.com/manual
+readingTime: 5
+related: [github-api-basics, github-copilot-overview, repository-settings]
+order: 9
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+A typical GitHub workflow bounces between your terminal and your browser constantly: `git push`, then alt-tab to open a pull request, then alt-tab again to check if CI passed. The **GitHub CLI** (`gh`) closes that loop — it's an official command-line tool that talks to GitHub directly, so the same terminal you're already using for Git can also create pull requests, browse issues, check CI status, and more.
+
+## Installing and signing in
+
+`gh` is a separate install from Git itself, available via most package managers (`brew install gh`, `winget install GitHub.cli`, or your Linux distro's package manager). After installing, authenticate once:
+
+```bash
+gh auth login
+```
+
+This walks you through browser-based or token-based authentication and stores credentials securely for future commands.
+
+## A handful of commands that replace a lot of browser tabs
+
+**Clone a repository** — shorter than typing out the full URL:
+
+```bash
+gh repo clone acme-inc/api-server
+```
+
+**Open a pull request straight from your current branch**, using your commits' messages to prefill the title and body:
+
+```bash
+gh pr create --fill
+```
+
+**Check the status of your open pull requests** at a glance, including CI checks:
+
+```bash
+gh pr status
+```
+
+**List open issues**, optionally filtered:
+
+```bash
+gh issue list --label bug --assignee @me
+```
+
+**Check out a pull request locally** to review or test it, without manually adding a remote or fetching a branch:
+
+```bash
+gh pr checkout 42
+```
+
+<Callout type="tip">
+`gh pr create --fill` is the single highest-leverage habit to build. Push your branch, run that one command, and you're looking at a live pull request URL without ever opening a browser — it uses your commit messages so the title and description are already populated.
+</Callout>
+
+## Beyond pull requests and issues
+
+`gh` also covers releases (`gh release create`), GitHub Actions workflow runs (`gh run list`, `gh run watch`), Codespaces (`gh codespace create`), and even raw API access (`gh api /repos/acme-inc/api-server`) for anything that doesn't have a dedicated command yet. That last one is worth knowing about specifically — `gh api` gives you an authenticated shortcut into the full REST or GraphQL API (see [GitHub API Basics](/github/admin-teams/github-api-basics)) without handling tokens yourself.
+
+<Callout type="warning">
+`gh` uses its own stored authentication, separate from any Git credential helper you've configured for `git push`/`git pull`. If `gh` commands work but plain `git` commands over HTTPS ask for a password, run `gh auth setup-git` to have `gh` also handle Git's own credential prompts.
+</Callout>
+
+## Try it yourself
+
+Install `gh`, run `gh auth login`, then try `gh repo view --web` inside any repository you have cloned locally — it opens that exact repository in your browser, confirming `gh` knows exactly which repo you're standing in without you typing a URL.

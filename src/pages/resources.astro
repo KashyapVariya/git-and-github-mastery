@@ -1,0 +1,41 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/ui/Icon.astro';
+import { resources } from '../data/resources';
+import { url } from '../lib/nav';
+---
+
+<Layout title="Resources" description="Curated official docs, interactive tutorials, books, tools, and a searchable Git/GitHub glossary." primaryTab="resources">
+  <div class="mx-auto max-w-[1400px] px-4 py-10 sm:px-6 sm:py-14">
+    <div data-reveal class="mb-10 flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <h1 class="text-3xl font-bold tracking-tight text-[var(--color-ink)] sm:text-4xl">Resources</h1>
+        <p class="mt-3 max-w-2xl text-[15px] leading-relaxed text-[var(--color-ink-muted)]">
+          Where to go deeper: the official docs everything here is based on, interactive practice tools, and software worth having installed.
+        </p>
+      </div>
+      <a href={url('/resources/glossary')} data-magnetic class="btn-magnetic flex items-center gap-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] px-5 py-2.5 text-sm font-semibold text-[var(--color-ink)] hover:border-[var(--color-git-orange)]/50">
+        <Icon name="search" size={15} /> Open glossary
+      </a>
+    </div>
+
+    <div class="space-y-12">
+      {resources.map((group) => (
+        <section data-reveal>
+          <h2 class="mb-4 text-xl font-bold text-[var(--color-ink)]">{group.title}</h2>
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {group.items.map((item) => (
+              <a href={item.url} target="_blank" rel="noopener" data-tilt class="glass-card flex flex-col gap-2 p-5 [transform-style:preserve-3d]">
+                <div class="flex items-center justify-between gap-2">
+                  <h3 class="text-[14.5px] font-semibold text-[var(--color-ink)]">{item.title}</h3>
+                  <Icon name="external-link" size={14} class="shrink-0 text-[var(--color-ink-faint)]" />
+                </div>
+                <p class="text-[13px] leading-relaxed text-[var(--color-ink-muted)]">{item.description}</p>
+              </a>
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  </div>
+</Layout>

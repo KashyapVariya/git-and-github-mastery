@@ -1,0 +1,71 @@
+---
+title: Fetch vs Pull
+summary: git fetch downloads new commits without touching your work; git pull does the same download and immediately merges it in. Knowing the difference gives you more control.
+level: beginner
+primaryTab: git
+subtab: fundamentals
+category: Remotes
+tags: [git-fetch, git-pull, remotes]
+sources:
+  - label: Git — git fetch
+    url: https://git-scm.com/docs/git-fetch
+  - label: Git — git pull
+    url: https://git-scm.com/docs/git-pull
+readingTime: 3
+related: [push-and-pull, working-with-remotes, resolving-merge-conflicts]
+order: 18
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+`git pull` is convenient, but it hides a step — and understanding that hidden step gives you more control, especially when you want to look before you leap.
+
+## What fetch does
+
+```bash
+git fetch
+```
+
+Downloads any new commits, branches, and tags from the remote — but does **not** touch your current branch or working directory at all. Your files stay exactly as they were. Git just updates its internal record of "what does the remote currently look like" (stored in a remote-tracking branch like `origin/main`).
+
+This makes `fetch` completely safe to run at any time, even mid-task — it can never cause a conflict or change a single file on your disk.
+
+## What pull does
+
+```bash
+git pull
+```
+
+This is fetch, immediately followed by a merge (or rebase, if you've configured that) of the fetched commits into your current branch. It's genuinely just those two steps glued together — you can prove it to yourself:
+
+```bash
+git fetch
+git merge origin/main
+```
+
+...is functionally the same as running `git pull` while on `main`.
+
+## Why the distinction is useful
+
+`git fetch` lets you see what changed *before* committing to merging it in:
+
+```bash
+git fetch
+git log main..origin/main --oneline   # what's new on the remote?
+git diff main origin/main             # what actually changed?
+```
+
+Once you're comfortable with what's coming, `git merge origin/main` (or a plain `git pull`) brings it in.
+
+<Callout type="tip">
+If you'd rather replay your own commits on top of the fetched ones instead of creating a merge commit, use `git pull --rebase` — same idea, different combining strategy. See [Rebase, basics](/git/advanced/rebase-basics).
+</Callout>
+
+<Callout type="golden">
+When in doubt, `git fetch` is always the safer first move. It can only add information — it never merges, never overwrites, and never creates a conflict.
+</Callout>
+
+## Try it yourself
+
+In a repository with a remote, run `git fetch` followed by `git log main..origin/main --oneline`. If it prints nothing, you're fully up to date; if it lists commits, you've just previewed exactly what a `git pull` would bring in, without changing anything yet.

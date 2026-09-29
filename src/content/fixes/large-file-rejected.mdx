@@ -1,0 +1,45 @@
+---
+title: GitHub rejected my push for a large file
+symptom: "Push fails with a file size error — GitHub blocks individual files over 100 MB, and warns above 50 MB."
+summary: Remove the large file from history (or move it to Git LFS) before pushing again — deleting it from the latest commit alone isn't enough.
+severity: moderate
+tags: [large-files, git-lfs, history-rewrite]
+sources:
+  - label: GitHub Docs — About large files on GitHub
+    url: https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-large-files-on-github
+related: [remove-secret-from-history]
+order: 12
+lastReviewed: 2026-01-15
+---
+
+## Diagnosis
+
+The push is rejected because the large file exists *somewhere in the commits you're pushing* — even if you deleted it afterward, it's still sitting in an earlier commit's history and still gets uploaded.
+
+## Fix
+
+**If the file genuinely needs to be versioned** (large assets, datasets), move it to Git LFS instead of plain Git:
+
+```bash
+git lfs install
+git lfs track "*.psd"
+git add .gitattributes
+```
+
+Then commit and push as normal — matching files are now stored efficiently via LFS.
+
+**If the file shouldn't be tracked at all**, remove it from history entirely with `git-filter-repo`:
+
+```bash
+git filter-repo --path path/to/large-file.zip --invert-paths
+```
+
+Add it to `.gitignore` so it can't be added again by accident, then push the rewritten history:
+
+```bash
+git push origin --force --all
+```
+
+<Callout type="warning">
+Just running `git rm large-file.zip` and committing does **not** fix this — the file is still present in the earlier commit(s) and Git still has to push that entire history.
+</Callout>

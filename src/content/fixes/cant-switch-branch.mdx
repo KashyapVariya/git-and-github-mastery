@@ -1,0 +1,47 @@
+---
+title: Git won't let me switch branches
+symptom: "git switch (or git checkout) fails with 'Your local changes to the following files would be overwritten by checkout.'"
+summary: Commit or stash your uncommitted changes first — Git is protecting you from silently losing them.
+severity: minor
+tags: [switch, checkout, stash]
+sources:
+  - label: Git — git switch
+    url: https://git-scm.com/docs/git-switch
+related: [committed-to-wrong-branch]
+order: 15
+lastReviewed: 2026-01-15
+---
+
+## Diagnosis
+
+You have uncommitted changes to a file that's different on the branch you're trying to switch to. Git refuses to switch because doing so would overwrite those changes with no way to get them back — this message is a safety net, not a bug.
+
+## Fix
+
+**If the changes belong on the branch you're leaving**, commit them first:
+
+```bash
+git add .
+git commit -m "wip: save progress"
+git switch other-branch
+```
+
+**If you're not ready to commit yet**, stash them instead, switch, and reapply later:
+
+```bash
+git stash
+git switch other-branch
+# ...later, back on the original branch...
+git stash pop
+```
+
+**If the changes don't matter at all**, discard them:
+
+```bash
+git restore .
+git switch other-branch
+```
+
+<Callout type="warning">
+Only use `git restore .` if you're certain — it permanently discards the uncommitted edits with no undo.
+</Callout>

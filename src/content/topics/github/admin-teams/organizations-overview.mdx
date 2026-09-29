@@ -1,0 +1,63 @@
+---
+title: Organizations Overview
+summary: A GitHub organization is a shared account for a company or project, with its own billing, membership, and security settings separate from any one person.
+level: advanced
+primaryTab: github
+subtab: admin-teams
+category: Admin
+tags: [organizations, admin, billing, ownership]
+sources:
+  - label: GitHub Docs — Organizations
+    url: https://docs.github.com/en/organizations
+readingTime: 5
+related: [teams-and-permissions, repository-settings, permissions-and-roles]
+order: 1
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+A personal GitHub account is built around one person. That works fine for side projects, but it breaks down the moment a company, a team, or an open-source project has repositories that need to outlive any single member. If your only admin quits and takes their account with them, who owns the code now?
+
+An **organization** solves this. It's an account type built for groups: repositories belong to the organization itself, not to any individual, membership can be granted and revoked as people join and leave, and billing is centralized instead of scattered across personal cards.
+
+## What lives at the organization level
+
+Think of an organization as a container one level above repositories:
+
+- **Members** — people with some level of access to the organization, managed independently of any one repository
+- **Teams** — named groups of members used to grant repository access in bulk (covered in [Teams & Permissions](/github/admin-teams/teams-and-permissions))
+- **Repositories** — owned by the org, not by a person; access is granted per repository or per team
+- **Organization-wide settings** — default repository permissions, whether members can create public repos, required 2FA, SAML single sign-on, and more
+- **Billing** — one invoice for seats, Actions minutes, storage, and Copilot licenses, instead of N personal accounts each paying separately
+
+## Roles at the organization level
+
+Two roles matter most:
+
+- **Owners** can do anything — change billing, delete the organization, manage every team and repository, and add or remove other owners. Keep this list short.
+- **Members** have whatever access their team memberships and repository-level roles grant them, and nothing more by default.
+
+There's also an **outside collaborator** — someone with access to a specific repository who isn't a member of the organization at all. Useful for a contractor who needs one repo and nothing else.
+
+<Callout type="warning">
+Never let an organization have a single owner. If that person loses access to their account, is unreachable, or leaves the company, nobody can manage billing, security settings, or membership until GitHub Support intervenes.
+</Callout>
+
+## Personal account vs. organization
+
+A personal account is still where you sign in and where your identity lives — organizations don't replace it. Instead, your personal account becomes a *member* of one or more organizations, the same way an employee has an ID card but doesn't personally own the building. You can belong to as many organizations as you like, each with independent permissions.
+
+<Callout type="tip">
+Moving an existing repository from a personal account into an organization is a supported transfer, not a rebuild — stars, issues, pull requests, and history all come along. Do this early for any project that's becoming a team effort, rather than waiting until access management gets painful.
+</Callout>
+
+## A small worked example
+
+Say a startup has three engineers and a growing set of repositories. Without an organization, each repo is owned by whoever happened to create it, and adding a new hire means someone individually inviting them to every relevant repo — and remembering to remove them from all of them the day they leave.
+
+With an organization: the company creates `acme-inc`, all repositories live under it, a `backend` team and a `frontend` team are created, and each new hire is added to the org and the right team once. When they leave, removing them from the organization revokes everything at once.
+
+## Try it yourself
+
+If you don't already belong to one, create a free organization from your GitHub account settings. Create one repository inside it, then look at Settings → Member privileges to see the org-wide defaults you can control — this is the same screen you'll use once your team grows.

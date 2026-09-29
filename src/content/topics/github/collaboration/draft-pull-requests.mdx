@@ -1,0 +1,50 @@
+---
+title: Draft Pull Requests
+summary: A draft pull request shares work in progress without inviting a formal review or a merge until you say it's ready.
+level: intermediate
+primaryTab: github
+subtab: collaboration
+category: Pull requests
+tags: [pull-requests, draft, workflow]
+sources:
+  - label: GitHub Docs — Pull requests
+    url: https://docs.github.com/en/pull-requests
+readingTime: 3
+related: [pull-requests-basics, code-review-on-github, merge-methods]
+order: 4
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Sometimes you want feedback on a direction before the work is finished — a half-built feature, an approach you're not sure about, or just visibility into what you're working on. Opening a normal pull request for that sends a slightly wrong signal: it invites reviewers to approve something, and it's eligible to merge the moment checks pass. A **draft pull request** solves that by making "not ready yet" an explicit, visible state.
+
+## Opening one as a draft
+
+When creating a pull request, GitHub gives you a dropdown next to the create button: **Create pull request** or **Create draft pull request**. Choose draft. The PR opens exactly like a normal one — same diff, same commits, same discussion tab — but with a gray "Draft" badge instead of the green "Open" one, and the merge button is disabled.
+
+You can also convert an existing open PR to a draft, or a draft back to "ready for review," from the sidebar at any time.
+
+## What changes in draft mode
+
+- The **Merge** button is greyed out, even if all checks pass — GitHub won't let a draft merge by accident.
+- Reviewers generally treat it as a signal to skip formal review, though they can still comment.
+- Any CI checks configured on the repository still run normally against a draft's commits, so you get the same test feedback as a regular PR.
+
+This makes drafts genuinely useful for a "let CI tell me if this breaks anything" workflow, separate from asking a human to review it.
+
+<Callout type="tip">
+Draft PRs are also a good habit for solo work: opening one the moment you start a feature branch gives you a running diff view of everything you've changed so far, without needing to remember to open a PR later.
+</Callout>
+
+## Marking it ready
+
+When the work is actually done, click **Ready for review** on the PR page. This flips the badge to "Open," notifies any requested reviewers, and enables the merge button once checks and required approvals are satisfied. Nothing about the branch or its history changes — it's purely a status flag on the pull request itself.
+
+<Callout type="info">
+Converting to "ready for review" does re-notify reviewers, so it's worth waiting until the PR is actually in a state you want eyes on — flipping it back and forth repeatedly gets noisy for your team.
+</Callout>
+
+## Try it yourself
+
+Next time you start a multi-commit feature branch, push it early and open a draft pull request immediately, before the work is finished. Watch how the diff updates live as you keep committing, and mark it ready only once you're satisfied.

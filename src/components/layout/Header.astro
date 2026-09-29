@@ -1,0 +1,126 @@
+---
+import { primaryTabs, url } from '../../lib/nav';
+import Icon from '../ui/Icon.astro';
+
+interface Props {
+  primaryTab?: string;
+  subtab?: string;
+}
+
+const iconFor: Record<string, any> = {
+  'start-here': 'compass',
+  git: 'git-branch',
+  github: 'github',
+  workflows: 'route',
+  'fix-it': 'wrench',
+  'cheat-sheet': 'list',
+  playground: 'play',
+  'learning-path': 'map',
+  resources: 'book',
+};
+
+const { primaryTab = 'start-here' } = Astro.props;
+---
+
+<header class="sticky top-0 z-40 border-b border-[var(--color-border)] bg-[var(--color-bg)]/80 backdrop-blur-md">
+  <div class="mx-auto flex max-w-[1400px] items-center gap-3 px-4 py-3 sm:px-6">
+    <a href={url('/')} class="group flex shrink-0 items-center gap-2 font-semibold tracking-tight">
+      <span class="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-[var(--color-git-orange)] to-[var(--color-violet)] text-black">
+        <Icon name="git-branch" size={17} />
+      </span>
+      <span class="hidden text-[15px] sm:inline">Git <span class="text-gradient">Mastery</span></span>
+    </a>
+
+    <!-- Desktop primary tab bar -->
+    <nav aria-label="Primary" class="relative ml-2 hidden flex-1 lg:block">
+      <div data-tab-indicator-root class="relative flex items-center gap-0.5 overflow-x-auto">
+        <span data-tab-indicator class="pointer-events-none absolute bottom-0 left-0 h-[2px] rounded-full bg-gradient-to-r from-[var(--color-git-orange)] to-[var(--color-violet)] opacity-0 transition-[transform,width] duration-300 ease-out"></span>
+        {primaryTabs.map((tab) => (
+          <a
+            href={url(tab.href)}
+            data-tab-link
+            class:list={[
+              'relative flex items-center gap-1.5 whitespace-nowrap rounded-md px-3 py-2 text-[13px] font-medium text-[var(--color-ink-muted)] transition-colors hover:text-[var(--color-ink)]',
+              tab.slug === primaryTab && 'is-active text-[var(--color-ink)]',
+            ]}
+            aria-current={tab.slug === primaryTab ? 'page' : undefined}
+          >
+            <Icon name={iconFor[tab.slug]} size={15} />
+            {tab.label}
+          </a>
+        ))}
+      </div>
+    </nav>
+
+    <div class="ml-auto flex items-center gap-2">
+      <button
+        type="button"
+        data-cmdk-trigger
+        class="hidden items-center gap-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-elevated)] px-3 py-1.5 text-[13px] text-[var(--color-ink-muted)] transition hover:border-[var(--color-git-orange)]/50 hover:text-[var(--color-ink)] sm:flex"
+        aria-label="Open command palette"
+      >
+        <Icon name="search" size={14} />
+        <span>Search topics…</span>
+        <kbd class="ml-2 rounded border border-[var(--color-border)] bg-[var(--color-bg)] px-1.5 py-0.5 font-mono text-[10px] text-[var(--color-ink-faint)]">⌘K</kbd>
+      </button>
+      <button
+        type="button"
+        data-cmdk-trigger
+        class="grid h-9 w-9 place-items-center rounded-lg border border-[var(--color-border)] text-[var(--color-ink-muted)] sm:hidden"
+        aria-label="Open search"
+      >
+        <Icon name="search" size={16} />
+      </button>
+
+      <button
+        type="button"
+        data-sheet-toggle
+        aria-expanded="false"
+        aria-controls="mobile-sheet"
+        class="grid h-9 w-9 place-items-center rounded-lg border border-[var(--color-border)] text-[var(--color-ink-muted)] lg:hidden"
+        aria-label="Open menu"
+      >
+        <Icon name="menu" size={17} />
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile horizontally scrollable pill bar -->
+  <nav aria-label="Primary, mobile" class="border-t border-[var(--color-border-soft)] px-4 py-2 lg:hidden">
+    <div class="flex items-center gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      {primaryTabs.map((tab) => (
+        <a
+          href={url(tab.href)}
+          class:list={[
+            'chip shrink-0',
+            tab.slug === primaryTab ? 'border-[var(--color-git-orange)]/50 bg-[var(--color-git-orange)]/10 text-[var(--color-git-orange-soft)]' : '',
+          ]}
+        >
+          <Icon name={iconFor[tab.slug]} size={13} />
+          {tab.label}
+        </a>
+      ))}
+    </div>
+  </nav>
+</header>
+
+<!-- Mobile bottom sheet -->
+<div data-sheet-backdrop data-open="false" class="fixed inset-0 z-40 bg-black/60 opacity-0 backdrop-blur-sm transition-opacity duration-300 data-[open=true]:opacity-100 [&[data-open=false]]:pointer-events-none lg:hidden"></div>
+<div
+  id="mobile-sheet"
+  data-sheet
+  data-open="false"
+  class="fixed inset-x-0 bottom-0 z-40 translate-y-full rounded-t-2xl border-t border-[var(--color-border)] bg-[var(--color-bg-elevated)] p-4 pb-8 transition-transform duration-300 ease-out data-[open=true]:translate-y-0 lg:hidden"
+>
+  <div class="mx-auto mb-3 h-1 w-10 rounded-full bg-[var(--color-border)]"></div>
+  <p class="mb-2 px-1 text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">Jump to</p>
+  <div class="grid grid-cols-2 gap-2">
+    {primaryTabs.map((tab) => (
+      <a href={url(tab.href)} class="glass-card flex flex-col gap-1 p-3">
+        <Icon name={iconFor[tab.slug]} size={17} class="text-[var(--color-git-orange-soft)]" />
+        <span class="text-sm font-medium">{tab.label}</span>
+        <span class="text-xs text-[var(--color-ink-faint)]">{tab.hint}</span>
+      </a>
+    ))}
+  </div>
+</div>

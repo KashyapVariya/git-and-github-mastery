@@ -1,0 +1,13 @@
+---
+interface Props {
+  level: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+  class?: string;
+}
+const { level, class: className = '' } = Astro.props;
+const label = { beginner: 'Beginner', intermediate: 'Intermediate', advanced: 'Advanced', expert: 'Expert' }[level];
+---
+
+<span class={`chip level-${level} ${className}`}>
+  <span class="h-1.5 w-1.5 rounded-full" style="background: currentColor;"></span>
+  {label}
+</span>

@@ -1,0 +1,31 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  type?: 'tip' | 'warning' | 'golden' | 'info';
+  title?: string;
+}
+
+const { type = 'info', title } = Astro.props;
+
+const config = {
+  tip: { icon: 'lightbulb', label: title ?? 'Pro tip', color: 'var(--color-cyan)' },
+  warning: { icon: 'alert-triangle', label: title ?? 'Watch out', color: 'var(--color-warning)' },
+  golden: { icon: 'star', label: title ?? 'Golden rule', color: 'var(--color-git-orange-soft)' },
+  info: { icon: 'info', label: title ?? 'Good to know', color: 'var(--color-violet)' },
+}[type];
+---
+
+<div
+  class="my-5 flex gap-3 rounded-xl border px-4 py-3.5"
+  style={`border-color: color-mix(in srgb, ${config.color} 35%, var(--color-border)); background: color-mix(in srgb, ${config.color} 7%, var(--color-bg-elevated));`}
+  data-reveal
+>
+  <span class="mt-0.5 shrink-0" style={`color:${config.color}`}>
+    <Icon name={config.icon as any} size={18} />
+  </span>
+  <div class="min-w-0 text-[14.5px] leading-relaxed text-[var(--color-ink-muted)] [&_strong]:text-[var(--color-ink)] [&_a]:underline [&_a]:underline-offset-2">
+    <p class="mb-1 text-[13px] font-semibold uppercase tracking-wide" style={`color:${config.color}`}>{config.label}</p>
+    <div class="[&_p]:mb-0"><slot /></div>
+  </div>
+</div>

@@ -1,0 +1,52 @@
+---
+title: Undo my last commit
+symptom: "I just ran git commit and immediately realized it was a mistake — wrong files, wrong message, or just too early."
+summary: Use git reset to move your branch pointer back one commit, choosing whether to keep the changes staged, unstaged, or discard them.
+severity: minor
+tags: [undo, reset, commit, amend]
+sources:
+  - label: Git — git reset
+    url: https://git-scm.com/docs/git-reset
+related: [wrong-commit-message, unstage-a-file]
+order: 1
+lastReviewed: 2026-01-15
+---
+
+## Diagnosis
+
+You have not pushed yet, and the last commit on your branch is the one you want gone. As long as you haven't pushed, this is completely safe to undo.
+
+## Fix
+
+**If you just want to edit the last commit** (add a forgotten file, fix the message), amend it instead of resetting:
+
+```bash
+git add forgotten-file.js
+git commit --amend
+```
+
+**If you want to undo the commit but keep the changes, staged and ready to recommit:**
+
+```bash
+git reset --soft HEAD~1
+```
+
+**If you want to undo the commit and unstage the changes**, so they sit as normal edits in your working directory:
+
+```bash
+git reset --mixed HEAD~1
+```
+
+**If you want to throw the commit and its changes away entirely:**
+
+```bash
+git reset --hard HEAD~1
+```
+
+<Callout type="warning">
+`--hard` deletes the changes from your working directory too. Only use it if you're certain you don't want that work — or run `git reflog` afterward if you change your mind; the commit is usually still recoverable for a while.
+</Callout>
+
+<Callout type="golden">
+Already pushed this commit? Don't reset — use `git revert HEAD` instead. Rewriting pushed history breaks things for anyone who already pulled it.
+</Callout>

@@ -1,0 +1,68 @@
+---
+import '@fontsource-variable/inter';
+import '@fontsource-variable/jetbrains-mono';
+import '../styles/global.css';
+import ClientRouter from 'astro/components/ClientRouter.astro';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import CommandPalette from '../components/layout/CommandPalette.tsx';
+
+interface Props {
+  title: string;
+  description: string;
+  primaryTab?: string;
+  subtab?: string;
+  noIndex?: boolean;
+}
+
+const { title, description, primaryTab, subtab, noIndex = false } = Astro.props;
+const pageTitle = title === 'Git Mastery' ? title : `${title} · Git Mastery`;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}favicon.svg`} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="canonical" href={canonicalURL} />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    {noIndex && <meta name="robots" content="noindex" />}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+
+    <ClientRouter />
+  </head>
+  <body class="bg-mesh bg-noise" data-primary-tab={primaryTab} data-subtab={subtab}>
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:rounded-lg focus:bg-[var(--color-git-orange)] focus:px-4 focus:py-2 focus:text-black focus:font-semibold">
+      Skip to content
+    </a>
+
+    <div id="scroll-progress" class="fixed top-0 left-0 z-50 h-[3px] w-full origin-left scale-x-0 bg-gradient-to-r from-[var(--color-git-orange)] via-[var(--color-violet)] to-[var(--color-cyan)]"></div>
+
+    <Header primaryTab={primaryTab} subtab={subtab} />
+
+    <main id="main-content" transition:animate="fade" style="view-transition-name: main-content;">
+      <slot />
+    </main>
+
+    <Footer />
+
+    <CommandPalette client:idle />
+
+    <script>
+      import '../lib/app';
+    </script>
+  </body>
+</html>

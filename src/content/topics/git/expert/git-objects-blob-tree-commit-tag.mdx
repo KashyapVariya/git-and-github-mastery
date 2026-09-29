@@ -1,0 +1,74 @@
+---
+title: "Git Objects: Blob, Tree, Commit, Tag"
+summary: Everything Git stores is one of four simple object types, each identified by the SHA hash of its own content.
+level: expert
+primaryTab: git
+subtab: expert
+category: Internals
+tags: [objects, blob, tree, commit, internals, sha]
+sources:
+  - label: Pro Git — Git Objects
+    url: https://git-scm.com/book/en/v2/Git-Internals-Git-Objects
+  - label: Git — git cat-file
+    url: https://git-scm.com/docs/git-cat-file
+readingTime: 7
+related: [inside-the-git-folder, plumbing-commands, refs-and-head, packfiles-and-gc]
+order: 1
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Every command you've used so far — `commit`, `branch`, `log` — is really just a friendly wrapper around a tiny, elegant storage system underneath. Once you see the four object types Git actually stores, a lot of "magic" behavior (why commits are cheap, why branches are so lightweight, why Git can detect a file rename without being told) stops being magic.
+
+## The four object types
+
+Git's entire database is a big key-value store. The key is always a SHA hash of the content; the value is the content itself, compressed. There are exactly four kinds of values:
+
+- **Blob** — the raw contents of a single file. No filename, no permissions, just bytes. Two files with identical content, anywhere in your project, are the *same* blob.
+- **Tree** — represents a directory. It's a list of entries, each pointing to a blob (a file) or another tree (a subdirectory), along with a name and file mode.
+- **Commit** — a snapshot. It points to one tree (the root of your project at that moment), one or more parent commits, and metadata: author, committer, timestamp, and message.
+- **Tag** (annotated tags only) — a named, permanent pointer to a specific commit, with its own message, tagger, and optionally a GPG signature.
+
+## Seeing it for real
+
+Every object is addressed by the SHA-1 (or SHA-256, on newer repos) hash of its own contents. Look at any commit:
+
+```bash
+git cat-file -p HEAD
+```
+
+You'll see something like:
+
+```text
+tree 8f3b1c2...
+parent a91e4d0...
+author Ada Lovelace <ada@example.com> 1700000000 +0000
+committer Ada Lovelace <ada@example.com> 1700000000 +0000
+
+docs: initial commit
+```
+
+Follow the `tree` hash to see the snapshot it points to:
+
+```bash
+git cat-file -p 8f3b1c2
+```
+
+That prints a list of blobs and trees — the actual directory listing for that commit. Follow one of those blob hashes and you get the raw file content, byte for byte.
+
+<Callout type="tip">
+You can compute what hash a file *would* get without committing anything: `git hash-object path/to/file`. Because the hash depends only on content, this is also how Git instantly recognizes that a file is unchanged.
+</Callout>
+
+## Why commits are cheap
+
+A commit doesn't store a diff. It stores a full snapshot — but because unchanged files produce the exact same blob hash as before, Git simply reuses the existing blob instead of storing it again. Only genuinely new or changed content creates new objects. This is also why branches are so lightweight: a branch is nothing but a 40-character pointer to a commit object, not a copy of any files.
+
+<Callout type="golden">
+Everything in Git is content-addressed. If you understand that a hash is just "the fingerprint of what's inside," most of Git's internal behavior becomes predictable instead of mysterious.
+</Callout>
+
+## Try it yourself
+
+In any Git repository, run `git cat-file -p HEAD`, then copy the `tree` hash and run `git cat-file -p <that-hash>`, then pick a blob hash from the result and run `git cat-file -p <that-hash>` one more time. You've just manually walked the exact same path Git walks internally every time you run `git show`.

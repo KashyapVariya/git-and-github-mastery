@@ -1,0 +1,70 @@
+---
+title: SSH Keys
+summary: An SSH key pair lets you push and pull over SSH without typing a password or token every time — generate one, add the public half to GitHub, and you're set.
+level: beginner
+primaryTab: github
+subtab: basics
+category: Account setup
+tags: [ssh, authentication, security]
+sources:
+  - label: GitHub Docs — Authentication
+    url: https://docs.github.com/en/authentication
+readingTime: 4
+related: [personal-access-tokens, two-factor-authentication, creating-a-repository]
+order: 3
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Every `git push` or `git pull` against GitHub needs to prove it's really you. SSH keys are the most common way to do that on the command line — set them up once, and every future Git command over SSH just works, with no password prompt.
+
+## The core idea
+
+An SSH key is actually a *pair* of keys: a private key that never leaves your computer, and a public key you share with GitHub. They're mathematically linked so that anything encrypted with one can only be decrypted with the other. GitHub gives your public key to your account; when you connect, your computer proves it holds the matching private key without ever sending it anywhere.
+
+## Generate a key pair
+
+```bash
+ssh-keygen -t ed25519 -C "your_email@example.com"
+```
+
+Press Enter to accept the default file location, and optionally set a passphrase (recommended — it protects the private key file itself if your computer is ever compromised). This creates two files: `id_ed25519` (private — never share this) and `id_ed25519.pub` (public — safe to share).
+
+## Add the public key to GitHub
+
+Copy the public key's contents:
+
+```bash
+cat ~/.ssh/id_ed25519.pub
+```
+
+In GitHub, go to Settings → SSH and GPG keys → New SSH key, paste it in, and save.
+
+## Test the connection
+
+```bash
+ssh -T git@github.com
+```
+
+You should see a message like "Hi username! You've successfully authenticated." That's it — no repository was cloned, this just confirms the handshake works.
+
+## Using it
+
+Clone repositories with the SSH URL instead of the HTTPS one:
+
+```bash
+git clone git@github.com:owner/repo.git
+```
+
+<Callout type="tip">
+Already cloned something over HTTPS and want to switch? Run `git remote set-url origin git@github.com:owner/repo.git` — no need to re-clone.
+</Callout>
+
+<Callout type="warning">
+Never share, email, or commit your private key file (the one *without* `.pub`). If you ever suspect it's been exposed, delete the corresponding key from GitHub's settings and generate a new pair.
+</Callout>
+
+## Try it yourself
+
+Generate a key pair, add the public half to your GitHub account, and run `ssh -T git@github.com` to confirm it works.

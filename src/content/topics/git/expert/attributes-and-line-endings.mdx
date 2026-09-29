@@ -1,0 +1,78 @@
+---
+title: Attributes and Line Endings
+summary: .gitattributes tells Git how to treat specific paths — most commonly, how to normalize line endings so files don't look "changed" just from switching OS.
+level: expert
+primaryTab: git
+subtab: expert
+category: Internals
+tags: [gitattributes, line-endings, autocrlf, normalization]
+sources:
+  - label: Git — gitattributes
+    url: https://git-scm.com/docs/gitattributes
+  - label: Pro Git — Git Attributes
+    url: https://git-scm.com/book/en/v2/Customizing-Git-Git-Attributes
+readingTime: 6
+related: [git-lfs, git-hooks, plumbing-commands]
+order: 14
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Windows text files traditionally end lines with `\r\n`; macOS and Linux use just `\n`. If your team is mixed-OS and Git doesn't normalize this, you get a special kind of nightmare: files that show as "changed" in a diff even though nobody touched a single character — every line just flipped its line-ending character. `.gitattributes` is how you fix that, and it does several other useful jobs besides.
+
+## What .gitattributes actually is
+
+It's a plain text file, usually at your repo root, mapping path patterns to behaviors — conceptually similar to `.gitignore`'s syntax, but for "how should Git treat this," not "should Git track this at all."
+
+```text
+*.jpg  -text
+*.sh   text eol=lf
+*.md   text
+```
+
+Commit it like any other file, and every collaborator's Git respects the same rules automatically — no per-person setup required, unlike `core.autocrlf` below.
+
+## The line-ending problem, precisely
+
+The safest, most portable fix is `text=auto`, usually set globally for all files:
+
+```text
+* text=auto
+```
+
+This tells Git: figure out for yourself whether a file is text, and if it is, always store it in the repository with `\n` line endings internally, converting to the OS's native line ending only in your working directory on checkout. History stays consistent across every contributor's machine regardless of their OS, because the *stored* version is always normalized.
+
+## core.autocrlf: the older, per-person alternative
+
+Before `.gitattributes` support was common, this was handled with a personal config setting:
+
+```bash
+git config --global core.autocrlf true   # Windows: convert on checkout, normalize to LF on commit
+git config --global core.autocrlf input  # macOS/Linux: normalize to LF on commit, no conversion on checkout
+```
+
+The problem: it's a *personal* setting, not something you can commit. If even one teammate forgets to set it, mixed line endings creep back in. `text=auto` in a committed `.gitattributes` fixes the same problem for everyone at once, which is why it's now the recommended approach — `core.autocrlf` still works but is best left off when `.gitattributes` already handles it.
+
+## Other jobs .gitattributes does
+
+- **`-text`** marks a path as binary — never touched by line-ending conversion, never diffed as text. Correct for images, fonts, and other genuinely binary files.
+- **`filter=lfs`** is how [Git LFS](/git/expert/git-lfs) hooks large files into Git's clean/smudge filter system — it's literally an attributes rule under the hood.
+- **`linguist-vendored`** and similar tell GitHub's language-detection to ignore vendored or generated code in repository language statistics.
+- **`export-ignore`** excludes a path from `git archive` output — handy for excluding tests or CI config from a distributed tarball.
+
+<Callout type="warning">
+`text=auto` only normalizes line endings for files **committed after** the rule takes effect. Files already in history with mixed endings stay as they are until you deliberately re-normalize (`git add --renormalize .` after adding the rule, then commit).
+</Callout>
+
+<Callout type="tip">
+Check how Git currently classifies any path with `git check-attr -a <path>` — useful for confirming your `.gitattributes` rules actually match the files you think they do.
+</Callout>
+
+<Callout type="golden">
+Prefer a committed `.gitattributes` with `text=auto` over personal `core.autocrlf` settings whenever you can. One fixes the problem for the whole team, permanently; the other relies on everyone remembering to configure their own machine correctly.
+</Callout>
+
+## Try it yourself
+
+Add `* text=auto` to a `.gitattributes` file in a test repo, commit a text file, then run `git check-attr text <that-file>` — it confirms Git now recognizes the file as text and will normalize its line endings on future commits.

@@ -1,0 +1,64 @@
+---
+title: git clone
+summary: git clone downloads a complete copy of a remote repository — every file, branch, and commit in its history — onto your machine.
+level: beginner
+primaryTab: git
+subtab: fundamentals
+category: Commands
+tags: [git-clone, remotes, setup]
+sources:
+  - label: Git — git clone
+    url: https://git-scm.com/docs/git-clone
+readingTime: 3
+related: [git-init, working-with-remotes, push-and-pull]
+order: 7
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+If `git init` is how you *start* a new project, `git clone` is how you join an *existing* one. It's usually the very first command you run when working on someone else's repository, or your own from a different computer.
+
+## Basic usage
+
+```bash
+git clone https://github.com/owner/repository.git
+```
+
+This creates a new folder named `repository`, downloads the full history into it, and automatically checks out the default branch (usually `main`) so you have real files to look at right away. It also sets up a remote named `origin` pointing back at the URL you cloned from — no extra setup required.
+
+## Cloning into a specific folder name
+
+```bash
+git clone https://github.com/owner/repository.git my-folder-name
+```
+
+## HTTPS vs SSH
+
+You'll see two flavors of clone URL on GitHub:
+
+```bash
+# HTTPS — works everywhere, may prompt for a token
+git clone https://github.com/owner/repository.git
+
+# SSH — no prompts once your key is set up
+git clone git@github.com:owner/repository.git
+```
+
+HTTPS is simpler to start with. SSH is more convenient long-term since it authenticates automatically using a key instead of a password or token — see [SSH keys](/github/basics/ssh-keys) to set that up.
+
+## What you get
+
+After cloning, you have the *entire* history locally — every past commit, not just the latest snapshot. This is the "distributed" in distributed version control: your clone is a fully independent, complete copy, not a thin window into someone else's server.
+
+<Callout type="tip">
+Only need the very latest state, not the full history — for example, in a CI pipeline? Add `--depth 1` for a much faster, smaller shallow clone. See [Partial and shallow clones](/git/advanced/partial-and-shallow-clones) for details.
+</Callout>
+
+<Callout type="golden">
+`git clone` and `git init` solve opposite problems: `init` creates a repository from nothing, `clone` copies one that already exists. You'll almost never need both on the same project.
+</Callout>
+
+## Try it yourself
+
+Pick any public repository on GitHub, copy its HTTPS URL from the green "Code" button, and run `git clone <url>`. Then `cd` into the new folder and run `git log --oneline` to see its real history land on your machine.

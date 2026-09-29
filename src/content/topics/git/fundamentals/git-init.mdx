@@ -1,0 +1,63 @@
+---
+title: git init
+summary: git init turns any folder into a Git repository by creating a hidden .git folder that will hold the entire history.
+level: beginner
+primaryTab: git
+subtab: fundamentals
+category: Commands
+tags: [git-init, setup, repository]
+sources:
+  - label: Git — git init
+    url: https://git-scm.com/docs/git-init
+readingTime: 3
+related: [first-time-setup, git-status, git-clone]
+order: 6
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+This is the very first command for any new project — the moment a plain folder becomes a Git repository.
+
+## What it does
+
+```bash
+cd my-project
+git init
+```
+
+Git creates a hidden `.git` folder right inside `my-project`. That folder is the *entire* repository — every commit, branch, and piece of history you'll ever create lives inside it. Everything else in the folder is just your normal working files, untouched.
+
+You'll see a confirmation like:
+
+```text
+Initialized empty Git repository in ~/my-project/.git/
+```
+
+At this point nothing is tracked yet — `git init` doesn't automatically commit anything. It just switches the folder into "Git is now watching this" mode.
+
+## What's actually inside `.git`
+
+Out of curiosity, take a peek:
+
+```bash
+ls -la .git
+```
+
+You'll see folders like `objects`, `refs`, and a file called `HEAD`. You don't need to understand these yet — they're covered properly in [Inside the .git folder](/git/expert/inside-the-git-folder) — but it's worth knowing this is where everything actually lives. Delete `.git` and you delete the entire history; the rest of your files are unaffected.
+
+## Initializing an existing project
+
+`git init` is just as happy to run inside a folder that already has files in it — nothing gets deleted or overwritten. Run it, and every existing file simply shows up as "untracked" when you check `git status`, ready to be added on your own schedule.
+
+<Callout type="golden">
+You only run `git init` once per project, right at the start. Every teammate who later works on the project uses `git clone` instead — they're copying a repository that already exists, not creating a new one.
+</Callout>
+
+<Callout type="tip">
+Accidentally ran `git init` in the wrong folder, or want to completely undo it? Just delete the `.git` folder (`rm -rf .git`). Since all of Git's data lives there, this instantly and completely un-Git-ifies the folder.
+</Callout>
+
+## Try it yourself
+
+Create a new empty folder, `cd` into it, and run `git init`. Then run `git status` — it should say something like "No commits yet" and list nothing to commit, since there's nothing in it yet.

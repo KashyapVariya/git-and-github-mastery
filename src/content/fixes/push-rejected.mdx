@@ -1,0 +1,41 @@
+---
+title: My push was rejected
+symptom: "git push failed with 'Updates were rejected because the remote contains work that you do not have locally.'"
+summary: Someone else pushed first. Fetch and integrate their commits — usually with a pull — before pushing again.
+severity: minor
+tags: [push, pull, remotes]
+sources:
+  - label: Git — git push
+    url: https://git-scm.com/docs/git-push
+related: [resolve-rebase-conflict]
+order: 7
+lastReviewed: 2026-01-15
+---
+
+## Diagnosis
+
+Your local branch and the remote branch have diverged: the remote has commits you don't have locally, usually because a teammate (or another one of your own machines) pushed first. Git refuses to push and silently overwrite that work.
+
+## Fix
+
+**The standard fix — pull, then push:**
+
+```bash
+git pull
+git push
+```
+
+`git pull` fetches the remote's new commits and merges them into your branch (creating a merge commit if both sides changed things), then your push goes through cleanly.
+
+**Prefer a linear history?** Rebase your commits on top instead of merging:
+
+```bash
+git pull --rebase
+git push
+```
+
+**If a conflict appears** during either approach, resolve it the same way as any merge or rebase conflict — see [Resolving a rebase conflict](/fix-it/resolve-rebase-conflict).
+
+<Callout type="warning">
+Never reach for `git push --force` here just to make the rejection go away — that overwrites your teammate's commits on the remote, permanently. If you're certain your local history is the one that should win (e.g. after an intentional rebase of your *own* branch), use `git push --force-with-lease` instead — it still fails safely if someone else has pushed since your last fetch.
+</Callout>

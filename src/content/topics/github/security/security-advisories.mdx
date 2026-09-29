@@ -1,0 +1,48 @@
+---
+title: Security Advisories
+summary: Security advisories let you privately discuss, fix, and disclose a vulnerability in your own project on your own timeline, before it's public.
+level: advanced
+primaryTab: github
+subtab: security
+category: Security
+tags: [advisories, vulnerabilities, disclosure]
+sources:
+  - label: GitHub Docs — Code security
+    url: https://docs.github.com/en/code-security
+readingTime: 4
+related: [code-scanning-codeql, security-md, dependabot]
+order: 6
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+If someone reports a vulnerability in your open-source project, you have a problem: you need to discuss it, write a fix, and test that fix — all without tipping off anyone who might exploit it before a patch ships. Doing that in a public issue defeats the purpose. Security advisories give you a private space to handle exactly this.
+
+## How it works
+
+From a repository's Security tab, you draft a new security advisory: a title, a description, affected versions, and a severity (GitHub can calculate a CVSS score for you from a few questions). This draft is private — visible only to people you explicitly add as collaborators on it.
+
+From that same draft, you can create a **temporary private fork**, where you and your collaborators write and test the fix without it being visible anywhere public. Once the fix is ready and merged into your real repository, you publish the advisory. Publishing does several things at once: it makes the advisory public, and — if you request one — GitHub can assign the fix a CVE identifier, so it's tracked in the same system other tools and scanners use.
+
+## The disclosure timeline this enables
+
+1. Someone reports a vulnerability privately (often via your `SECURITY.md` instructions)
+2. You draft a security advisory and confirm the issue
+3. You fix it in a private fork, out of public view
+4. You release the patched version
+5. You publish the advisory, crediting the reporter
+
+This is exactly the responsible-disclosure process that protects your users: the fix ships *before* the details go public.
+
+<Callout type="golden">
+Publish the advisory only after the fixed version is actually released and available. Publishing first, patching second, gives attackers a head start.
+</Callout>
+
+<Callout type="tip">
+You can credit the person who reported the issue directly on the advisory — a nice, low-cost way to encourage responsible disclosure in the future.
+</Callout>
+
+## Try it yourself
+
+Open the Security tab on a repository you maintain and look for "Advisories." Even without an active vulnerability, it's worth knowing the draft flow exists before you need it under pressure.

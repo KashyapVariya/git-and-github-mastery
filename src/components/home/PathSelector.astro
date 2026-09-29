@@ -1,0 +1,89 @@
+---
+import Icon from '../ui/Icon.astro';
+import LevelBadge from '../ui/LevelBadge.astro';
+import { url } from '../../lib/nav';
+
+const levels = [
+  {
+    id: 'beginner',
+    blurb: 'Never used Git before, or only clicked around GitHub’s website.',
+    topics: [
+      { title: 'What is version control?', href: '/git/fundamentals/what-is-version-control' },
+      { title: 'Installing Git', href: '/git/fundamentals/installing-git' },
+      { title: 'First-time setup', href: '/git/fundamentals/first-time-setup' },
+      { title: 'Making your first commit', href: '/git/fundamentals/making-commits' },
+    ],
+  },
+  {
+    id: 'intermediate',
+    blurb: 'Comfortable with commit/push/pull, ready for real teamwork.',
+    topics: [
+      { title: 'Stashing changes', href: '/git/intermediate/stashing-changes' },
+      { title: 'restore vs reset vs revert', href: '/git/intermediate/restore-vs-reset-vs-revert' },
+      { title: 'Pull requests, basics', href: '/github/collaboration/pull-requests-basics' },
+      { title: 'Resolving merge conflicts', href: '/git/intermediate/resolving-merge-conflicts' },
+    ],
+  },
+  {
+    id: 'advanced',
+    blurb: 'Ready to rewrite history cleanly and automate your pipeline.',
+    topics: [
+      { title: 'Interactive rebase', href: '/git/advanced/interactive-rebase' },
+      { title: 'Cherry-picking commits', href: '/git/advanced/cherry-picking' },
+      { title: 'Bisecting bugs', href: '/git/advanced/bisecting-bugs' },
+      { title: 'GitHub Actions overview', href: '/github/automation-cicd/github-actions-overview' },
+    ],
+  },
+  {
+    id: 'expert',
+    blurb: 'Want to know what Git is actually doing under the hood.',
+    topics: [
+      { title: 'Git objects: blob, tree, commit, tag', href: '/git/expert/git-objects-blob-tree-commit-tag' },
+      { title: 'Git hooks', href: '/git/expert/git-hooks' },
+      { title: 'Submodules', href: '/git/expert/submodules' },
+      { title: 'OIDC basics', href: '/github/security/oidc-basics' },
+    ],
+  },
+] as const;
+---
+
+<div class="path-selector">
+  {levels.map((l, i) => <input type="radio" name="learning-level" id={`lvl-${l.id}`} class="sr-only" checked={i === 0} />)}
+
+  <div class="mb-6 grid gap-2 sm:grid-cols-4">
+    {levels.map((l) => (
+      <label for={`lvl-${l.id}`} data-target={l.id} class="path-card glass-card cursor-pointer select-none p-4 text-center">
+        <LevelBadge level={l.id} class="mx-auto mb-2" />
+        <p class="text-[13px] leading-snug text-[var(--color-ink-muted)]">{l.blurb}</p>
+      </label>
+    ))}
+  </div>
+
+  {levels.map((l) => (
+    <div class="panel grid gap-3 sm:grid-cols-2" data-panel={l.id}>
+      {l.topics.map((t) => (
+        <a href={url(t.href)} class="glass-card flex items-center justify-between gap-2 p-4">
+          <span class="text-[14px] font-medium text-[var(--color-ink)]">{t.title}</span>
+          <Icon name="arrow-right" size={15} class="shrink-0 text-[var(--color-ink-faint)]" />
+        </a>
+      ))}
+    </div>
+  ))}
+</div>
+
+<style>
+  .path-selector .panel { display: none; }
+  .path-selector:has(#lvl-beginner:checked) .panel[data-panel='beginner'] { display: grid; }
+  .path-selector:has(#lvl-intermediate:checked) .panel[data-panel='intermediate'] { display: grid; }
+  .path-selector:has(#lvl-advanced:checked) .panel[data-panel='advanced'] { display: grid; }
+  .path-selector:has(#lvl-expert:checked) .panel[data-panel='expert'] { display: grid; }
+
+  .path-card { transition: border-color 0.2s ease, transform 0.2s ease; }
+  .path-selector:has(#lvl-beginner:checked) label[data-target='beginner'],
+  .path-selector:has(#lvl-intermediate:checked) label[data-target='intermediate'],
+  .path-selector:has(#lvl-advanced:checked) label[data-target='advanced'],
+  .path-selector:has(#lvl-expert:checked) label[data-target='expert'] {
+    border-color: color-mix(in srgb, var(--color-git-orange) 55%, var(--color-border));
+    transform: translateY(-2px);
+  }
+</style>

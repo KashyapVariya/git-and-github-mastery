@@ -1,0 +1,84 @@
+---
+title: Cherry-Picking Commits
+summary: git cherry-pick copies a single commit from anywhere onto your current branch — the right tool when you need one specific change, not a whole branch's worth.
+level: advanced
+primaryTab: git
+subtab: advanced
+category: History rewriting
+tags: [cherry-pick, commits, branching]
+sources:
+  - label: Git — git-cherry-pick
+    url: https://git-scm.com/docs/git-cherry-pick
+  - label: Atlassian — Rewriting Git History
+    url: https://www.atlassian.com/git/tutorials/rewriting-history
+readingTime: 5
+related: [rebase-basics, the-reflog, patch-staging]
+order: 3
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Merge and rebase both move a **range** of commits between branches. Sometimes you don't want a range — you want exactly one commit, and none of its neighbors. Maybe a hotfix landed on `main` and you need it on an older `release` branch too, without dragging along three months of unrelated `main` history. That's what cherry-pick is for: take one commit, apply its exact changes on top of wherever you are right now.
+
+## The basic command
+
+```bash
+git switch release-1.2
+git cherry-pick a1b2c3d
+```
+
+Git looks at the diff introduced by commit `a1b2c3d`, applies that same diff to your current branch, and creates a **brand-new commit** with the same message and author, but a new SHA and a new parent. The original commit is untouched — this is a copy, not a move.
+
+## Picking several commits
+
+```bash
+git cherry-pick a1b2c3d e4f5g6h
+```
+
+Cherry-picks each listed commit in order. For a contiguous run of commits, use a range:
+
+```bash
+git cherry-pick a1b2c3d^..q4r5s6t
+```
+
+The `^` after the first hash includes that commit itself (ranges are normally exclusive of their starting point).
+
+## Handling conflicts
+
+If the target branch has diverged enough that the diff doesn't apply cleanly, Git pauses:
+
+```bash
+# resolve conflicts in the affected files, then
+git add <file>
+git cherry-pick --continue
+
+# or stop and undo the in-progress pick
+git cherry-pick --abort
+```
+
+## Cherry-pick vs. merge vs. rebase
+
+- **Merge** brings in an entire branch's history, preserving how it diverged.
+- **Rebase** replays an entire branch's commits onto a new base.
+- **Cherry-pick** copies just the commits *you name*, nothing more.
+
+Reach for cherry-pick when:
+
+- A critical fix needs to be backported to an older release branch.
+- You want one commit from a colleague's branch without pulling in their unfinished work.
+- You're salvaging a couple of good commits from a branch you're about to discard.
+
+Avoid it as a substitute for merging or rebasing a whole feature — repeatedly cherry-picking many commits between two branches leads to duplicate content and confusing history, since Git treats each cherry-picked commit as unrelated to its original.
+
+<Callout type="tip">
+Add `-x` when cherry-picking to automatically append a line like `(cherry picked from commit a1b2c3d)` to the new commit's message — handy for tracing where a backport came from later.
+</Callout>
+
+<Callout type="warning">
+Cherry-picking a merge commit needs a `-m <parent-number>` flag to tell Git which parent's history to diff against. It's rarely what you want — prefer picking the individual commits instead.
+</Callout>
+
+## Try it yourself
+
+Create two branches from the same starting point, make a commit on one, and use `git cherry-pick <hash>` to bring just that commit onto the other. Run `git log --oneline` on both branches afterward and notice the commit appears twice, with two different SHAs.

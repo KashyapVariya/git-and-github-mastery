@@ -1,0 +1,45 @@
+---
+title: GitHub Projects
+summary: GitHub Projects is a flexible board for planning work, built from issues and pull requests you already have.
+level: intermediate
+primaryTab: github
+subtab: project-management
+category: Planning
+tags: [projects, planning, kanban, boards]
+sources:
+  - label: GitHub Docs — Issues (includes Projects)
+    url: https://docs.github.com/en/issues
+readingTime: 4
+related: [project-views, milestones-and-tracking, github-issues]
+order: 1
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Issues and pull requests are great for tracking individual pieces of work, but they don't show you the bigger picture — what's planned, what's in progress, what's blocked. GitHub Projects is a planning layer on top of them: a board (or table, or timeline) that pulls in your issues and pull requests and lets you organize them visually.
+
+## The core idea
+
+A Project is essentially a flexible spreadsheet crossed with a kanban board. You add items to it — issues, pull requests, or plain draft notes — and each item can carry custom fields you define: status, priority, size, a target date, whatever your team actually tracks. Because a Project lives at the organization or user level (not tied to one repository), it can pull in work from several repositories at once.
+
+The status field is what usually drives the familiar board view: columns like "Todo," "In Progress," and "Done," with cards you drag between them. Moving a card updates the underlying field — nothing magic, just a value on the item.
+
+## Getting started
+
+1. From your profile or organization, open the **Projects** tab and create a new project.
+2. Add items: either link existing issues/PRs, or create draft items first and convert them later.
+3. Customize fields: add a "Priority" single-select field, a "Size" field, whatever matches how your team talks about work.
+4. Switch views: the same data can be shown as a board, a table, or (for date-based fields) a roadmap timeline.
+
+<Callout type="tip">
+Automate the boring part: Projects supports built-in workflows like "when an issue is closed, set Status to Done" — set these once under the project's workflow settings instead of dragging cards by hand.
+</Callout>
+
+<Callout type="golden">
+A Project is a *view* over your issues and pull requests, not a separate source of truth. Closing an issue elsewhere still updates it here automatically.
+</Callout>
+
+## Try it yourself
+
+Create a Project in a repository you own, add three issues to it, and create a custom "Priority" field with High/Medium/Low options. Assign a priority to each and switch to the table view to sort by it.

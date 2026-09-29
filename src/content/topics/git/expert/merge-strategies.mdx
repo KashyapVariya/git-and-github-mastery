@@ -1,0 +1,59 @@
+---
+title: Merge Strategies
+summary: Git can combine branches using different algorithms — ort (the modern default), octopus for multiple branches at once, and manual ours/theirs overrides.
+level: expert
+primaryTab: git
+subtab: expert
+category: Internals
+tags: [merge, strategies, ort, octopus]
+sources:
+  - label: Pro Git — Advanced Merging
+    url: https://git-scm.com/book/en/v2/Git-Tools-Advanced-Merging
+  - label: Git — git merge
+    url: https://git-scm.com/docs/git-merge
+readingTime: 5
+related: [refs-and-head, git-objects-blob-tree-commit-tag, resolving-merge-conflicts]
+order: 7
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+"Merge" sounds like one operation, but Git actually supports several different merge *strategies* — algorithms for deciding how to combine two histories. You'll rarely need to choose one explicitly, but knowing they exist explains some merge behavior that otherwise looks inconsistent.
+
+## The default: ort (and its predecessor, recursive)
+
+For the common case — merging two branches — modern Git uses the **ort** strategy ("ostensibly recursive's twin"), which replaced the older **recursive** strategy as the default in Git 2.34. Both work the same conceptually: find the best common ancestor (the *merge base*), then apply a three-way diff between the merge base, your branch, and the other branch. ort is a faster, more correct reimplementation of the same idea, with better handling of renames and criss-cross merge histories.
+
+You rarely need to name a strategy explicitly, but you can:
+
+```bash
+git merge -s ort -X ours feature   # prefer your side on any conflicting hunk
+git merge -s ort -X theirs feature # prefer their side on any conflicting hunk
+```
+
+`-X ours`/`-X theirs` only apply at the *hunk* level when there's a real conflict — different from the separate `-s ours` strategy below, which discards the other side entirely.
+
+## Discarding one side entirely: -s ours
+
+```bash
+git merge -s ours old-experiment
+```
+
+This records a merge commit — so the other branch's history is linked in and won't show as "unmerged" — but keeps your tree completely unchanged, discarding all of the other branch's content. It's a deliberate "we're done with this branch, but want the history connected" move, distinct from `-X ours` above.
+
+## Merging more than two branches: octopus
+
+```bash
+git merge feature-a feature-b feature-c
+```
+
+Git's default strategy switches automatically to **octopus** when you merge more than two heads at once. It only works cleanly when there are no conflicts between any of the branches — if there's a real conflict, an octopus merge simply refuses rather than asking you to resolve it, and falls back to a manual per-branch merge.
+
+<Callout type="tip">
+You'll almost never type `-s` yourself day to day — Git picks ort automatically for a normal two-branch merge. This page mostly matters for recognizing *why* a merge behaved the way it did, and for the rare case (`-s ours`, or a genuine multi-branch octopus) where you want something different.
+</Callout>
+
+## Try it yourself
+
+Run `git merge -s ort -X theirs some-branch` on a branch with a deliberate conflict, and compare the result to resolving the same conflict by hand — `-X theirs` picks the incoming side automatically for every conflicting hunk, with no editing required.

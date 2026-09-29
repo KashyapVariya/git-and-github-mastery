@@ -1,0 +1,57 @@
+---
+title: Signed Commits & Vigilant Mode
+summary: Signing proves a commit really came from you. Vigilant mode makes GitHub flag every commit that isn't signed, so forgeries stand out immediately.
+level: advanced
+primaryTab: github
+subtab: security
+category: Security
+tags: [signing, gpg, ssh, vigilant-mode]
+sources:
+  - label: GitHub Docs — Authentication
+    url: https://docs.github.com/en/authentication
+readingTime: 5
+related: [permissions-and-roles, branch-protection-rules]
+order: 8
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Git's author field is just text — anyone can `git config user.name "Linus Torvalds"` and commit under that name. Nothing stops it. Signing adds cryptographic proof: a signed commit is mathematically tied to a private key only you hold, so a green "Verified" badge on GitHub means the commit really did come from the account it claims to.
+
+## Two ways to sign
+
+**GPG signing** is the traditional approach: you generate a GPG key pair, add the public key to your GitHub account, and configure Git to sign automatically:
+
+```bash
+git config --global user.signingkey <your-key-id>
+git config --global commit.gpgsign true
+```
+
+**SSH signing** is newer and reuses the SSH key you likely already have for pushing and pulling — no separate GPG key needed:
+
+```bash
+git config --global gpg.format ssh
+git config --global user.signingkey ~/.ssh/id_ed25519.pub
+git config --global commit.gpgsign true
+```
+
+Add the same public key to GitHub a second time, but under "Signing Keys" specifically (the same key can be used for both authentication and signing).
+
+Once configured, every `git commit` is signed automatically, and GitHub shows a "Verified" badge next to it.
+
+## Vigilant mode
+
+Signing only helps if *unsigned* commits are noticeable. Vigilant mode, turned on in your GitHub account's SSH and GPG keys settings, marks every commit associated with your account that *isn't* signed as "Unverified" — even ones made from a machine where you simply forgot to configure signing. This makes any commit that claims to be from you, but isn't properly signed, visually stand out.
+
+<Callout type="tip">
+Require signed commits via a branch protection rule or ruleset on your most important branches — it turns "please sign your commits" from a policy nobody remembers into something Git enforces.
+</Callout>
+
+<Callout type="warning">
+Signing proves *authorship*, not that the code is safe or correct — it's a different guarantee than code review or CI. Keep both.
+</Callout>
+
+## Try it yourself
+
+Set up SSH commit signing (it's the quicker path if you already have an SSH key for GitHub), make a commit, push it, and check for the "Verified" badge on GitHub.

@@ -1,0 +1,78 @@
+---
+title: Git LFS
+summary: Git LFS swaps large files for tiny pointer files in your repo, storing the real content on a separate server so your history stays small and fast.
+level: expert
+primaryTab: git
+subtab: expert
+category: Multi-repo
+tags: [lfs, large-files, pointers, binary]
+sources:
+  - label: Git LFS
+    url: https://git-lfs.com
+  - label: Pro Git — Submodules
+    url: https://git-scm.com/book/en/v2/Git-Tools-Submodules
+readingTime: 5
+related: [submodules, subtrees, attributes-and-line-endings]
+order: 11
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Git is built around a simple assumption: files are text, changes are small, and storing every version forever is cheap. A 200 MB video file breaks that assumption completely. Every commit that touches it stores another near-full copy, and since Git can't usefully diff binary content, your `.git` folder balloons and every clone gets slower. Git LFS (Large File Storage) is the standard fix.
+
+## The core trick: pointer files
+
+Git LFS doesn't change how Git works. Instead, it replaces a large file *inside your repository* with a tiny text pointer that looks like this:
+
+```text
+version https://git-lfs.github.com/spec/v1
+oid sha256:4d7a214614ab2935c943f9e0ff69d22eadbb8f32b1258daaa5e2ca24d17e2393
+size 47185920
+```
+
+That's it — a few bytes, committed to Git like any other file. The actual 45 MB video lives on a separate LFS server (often bundled with your Git host, like GitHub or GitLab), addressed by that SHA-256 hash. Git's own history only ever stores these small pointers, so your repository stays lean no matter how large the tracked files are or how many versions of them you commit.
+
+## Setting it up
+
+```bash
+git lfs install
+```
+
+This runs once per machine — it registers LFS's filters with Git so pointer files get transparently swapped for real content on checkout, and vice versa on commit.
+
+Then tell LFS which files to track, usually by extension:
+
+```bash
+git lfs track "*.psd"
+git lfs track "*.mp4"
+```
+
+This writes rules into a `.gitattributes` file (see [Attributes & Line Endings](/git/expert/attributes-and-line-endings) for more on that file's other jobs):
+
+```text
+*.psd filter=lfs diff=lfs merge=lfs -text
+*.mp4 filter=lfs diff=lfs merge=lfs -text
+```
+
+Commit `.gitattributes` itself as a normal file — it's small, and it's what tells every collaborator's Git (once they've also run `git lfs install`) to treat those extensions specially.
+
+## How it behaves day to day
+
+Once tracked, everything looks ordinary: `git add`, `git commit`, `git push` all work exactly as before. Under the hood, LFS's clean/smudge filters do the swap — turning your real file into a pointer on the way into Git, and back into the real file on checkout. `git lfs ls-files` lists which tracked files exist in your current checkout, and `git lfs pull` fetches the actual content for pointers you have but haven't downloaded yet (useful after a shallow or filtered clone).
+
+<Callout type="warning">
+Tracking a file with `git lfs track` only affects files added **after** that point. A large binary already committed in your history stays exactly as it was — migrating it into LFS retroactively means rewriting history, which is a bigger, riskier operation (see [Rewriting History with git-filter-repo](/git/expert/rewriting-history-filter-repo)).
+</Callout>
+
+<Callout type="tip">
+Forgot to install LFS before cloning a repo that uses it? You'll get real pointer *text* checked out instead of your files. Run `git lfs install` then `git lfs pull` to fix it — no need to reclone.
+</Callout>
+
+<Callout type="golden">
+LFS trades one kind of storage cost for another: your Git history stays small, but LFS storage and bandwidth are usually billed separately by your host, with their own quotas. Check those limits before tracking gigabytes of assets.
+</Callout>
+
+## Try it yourself
+
+In a scratch repository, run `git lfs install`, then `git lfs track "*.bin"`, add a small dummy file with a `.bin` extension, and commit it. Run `git show HEAD:yourfile.bin` — instead of your binary content, you'll see the plain-text pointer that's actually stored in Git's history.

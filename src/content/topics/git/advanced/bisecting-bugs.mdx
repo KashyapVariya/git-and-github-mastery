@@ -1,0 +1,88 @@
+---
+title: Bisecting Bugs
+summary: git bisect uses binary search over your commit history to pinpoint the exact commit that introduced a bug, in a fraction of the commits you'd check by hand.
+level: advanced
+primaryTab: git
+subtab: advanced
+category: Debugging
+tags: [bisect, debugging, binary-search, history]
+sources:
+  - label: Git — git-bisect
+    url: https://git-scm.com/docs/git-bisect
+  - label: Pro Git — Debugging with Git
+    url: https://git-scm.com/book/en/v2/Git-Tools-Debugging-with-Git
+readingTime: 6
+related: [the-reflog, pickaxe-search, cherry-picking]
+order: 5
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+You know a bug exists. You know it wasn't there a month and 400 commits ago. Checking every commit in between one by one would take forever — but you don't have to. If "broken" and "working" are the only two states, you can binary search the history: check the middle commit, and you've just cut the search space in half. `git bisect` automates exactly that.
+
+## Starting a bisect session
+
+```bash
+git bisect start
+git bisect bad              # the current commit is broken
+git bisect good v1.4.0      # this older tag/commit was fine
+```
+
+Git checks out a commit roughly halfway between `good` and `bad`, and drops you there. You test it — run the app, run the failing test, whatever proves the bug is present or absent — then tell Git the result:
+
+```bash
+git bisect good   # this commit works
+# or
+git bisect bad    # this commit is also broken
+```
+
+Git narrows the range and checks out the next midpoint automatically. Repeat until Git reports the exact first bad commit:
+
+```text
+a1b2c3d is the first bad commit
+```
+
+When you're done, return to where you started:
+
+```bash
+git bisect reset
+```
+
+## Automating it with a script
+
+Manually testing each commit works, but if the bug can be detected by a script or test command, `git bisect run` does the entire loop for you:
+
+```bash
+git bisect start
+git bisect bad HEAD
+git bisect good v1.4.0
+git bisect run npm test -- --grep "checkout flow"
+```
+
+Git checks out each candidate commit, runs the given command, and interprets its **exit code**: `0` means good, any nonzero code (except 125) means bad. It keeps going, fully unattended, until it lands on the exact commit — often finishing in seconds for a history that would take an hour to search by hand.
+
+```text
+# a minimal standalone test script also works well:
+#!/bin/sh
+npm run build || exit 1
+node ./check-output.js
+```
+
+Exit code `125` has a special meaning: "skip this commit, I can't tell" — useful if a commit doesn't build at all and can't be meaningfully tested.
+
+## Why it's fast
+
+Binary search means the number of commits you actually check is `log2(n)`. Bisecting a 1,000-commit range takes about 10 checks, not 1,000 — that's the entire point.
+
+<Callout type="tip">
+Write the test script *before* starting the bisect. A script that just runs `pytest tests/test_login.py` is often all you need, and it turns a tedious manual hunt into a one-line `git bisect run` command.
+</Callout>
+
+<Callout type="golden">
+`git bisect` works on any binary condition, not just bugs — you can bisect performance regressions (script exits nonzero if a benchmark is too slow) or even find when a specific string first appeared in build output.
+</Callout>
+
+## Try it yourself
+
+In a repo with some history, run `git bisect start`, mark `HEAD` as bad and an old commit as good, and manually walk through a few steps with `git bisect good`/`git bisect bad`, checking the code at each stop. Then try `git bisect reset` and repeat it with `git bisect run` and a simple shell test to see the automated version finish in seconds.

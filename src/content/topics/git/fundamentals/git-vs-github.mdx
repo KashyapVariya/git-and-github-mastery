@@ -1,0 +1,48 @@
+---
+title: Git vs GitHub
+summary: Git is the version control tool that runs on your machine; GitHub is a website built around Git that adds hosting, collaboration, and automation.
+level: beginner
+primaryTab: git
+subtab: fundamentals
+category: Mental model
+tags: [git-vs-github, concepts, github]
+sources:
+  - label: Git — About Git
+    url: https://git-scm.com/about
+  - label: GitHub Docs — Get started
+    url: https://docs.github.com/en/get-started
+readingTime: 3
+related: [what-is-version-control, the-four-areas, creating-a-github-account]
+order: 2
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Beginners often say "Git and GitHub" as if they're one thing. They're not — and the moment the split clicks, a lot of confusion about what runs where disappears.
+
+## Git: the tool
+
+Git is a program. You install it on your computer, and it tracks changes to files in a folder entirely on that machine. It needs no internet connection, no account, and no external service. `git init`, `git add`, `git commit` — every one of these happens locally, on your disk, whether or not you're online.
+
+## GitHub: a website built on top of Git
+
+GitHub is a company and a website that *hosts* Git repositories, and adds a large set of features around them: a place to store a copy of your repo online, pull requests for reviewing changes, issues for tracking work, GitHub Actions for automation, and much more. When you `git push`, you're uploading your local Git history to GitHub's servers — but the pushing itself is still just Git.
+
+## Why this distinction matters day to day
+
+- You can use Git productively for years without ever creating a GitHub account — plenty of solo projects and internal company tools never touch it.
+- GitHub is not the only option for hosting: GitLab and Bitbucket are direct competitors that also host Git repositories, with mostly similar concepts under different names.
+- When something goes wrong, it helps to know which layer you're in. "My commit disappeared" is almost always a Git question. "My pull request won't merge" is a GitHub question.
+
+<Callout type="golden">
+A simple way to remember it: Git is the *engine*. GitHub is one possible *garage* you can park that engine in — a good one, with a lot of extra tools, but not the only one, and not required to drive at all.
+</Callout>
+
+<Callout type="tip">
+Everything under this site's "Git" tab works with no GitHub account. Everything under "GitHub" specifically assumes you're using GitHub's website or API.
+</Callout>
+
+## Try it yourself
+
+Run `git init` in an empty folder, make a commit, and check `git log` — you've just used Git successfully with zero mention of GitHub anywhere.

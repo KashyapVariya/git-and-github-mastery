@@ -1,0 +1,71 @@
+---
+title: GitHub Pages
+summary: GitHub Pages hosts a static website directly from a repository, for free, and can be deployed automatically by a GitHub Actions workflow on every push.
+level: intermediate
+primaryTab: github
+subtab: automation-cicd
+category: Deployment
+tags: [github-pages, hosting, static-sites]
+sources:
+  - label: GitHub Docs — Pages
+    url: https://docs.github.com/en/pages
+readingTime: 4
+related: [github-actions-overview, releases]
+order: 12
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Documentation sites, project landing pages, portfolios, and this very kind of learning site are often static — plain HTML/CSS/JS with no server-side logic required. GitHub Pages hosts exactly that, for free, straight from a repository you already have.
+
+## Two ways to publish
+
+**Deploy from a branch** — the simpler, older approach. Pick a branch (often `gh-pages`, or `main` with a `/docs` folder) under **Settings → Pages**, and GitHub serves whatever HTML is there. You (or a build step) are responsible for putting built files onto that branch.
+
+**Deploy with GitHub Actions** — the modern, more flexible approach. A workflow builds your site (from a static site generator, a bundler, whatever you use) and publishes the result directly, without needing a dedicated branch at all:
+
+```yaml
+name: Deploy to Pages
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: |
+          npm ci
+          npm run build
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - id: deployment
+        uses: actions/deploy-pages@v4
+```
+
+This uploads the built `dist/` folder as a special Pages artifact, then deploys it — no separate branch to keep in sync.
+
+## Custom domains
+
+Pages supports a custom domain via a `CNAME` file in the published output (or the Settings UI, which manages it for you), plus a DNS record pointing at GitHub's servers.
+
+<Callout type="tip">
+For a project site (as opposed to a user/org root site), your build tool usually needs to know the site is served from a sub-path like `/repo-name/` — check your framework's "base path" or "public path" configuration option.
+</Callout>
+
+## Try it yourself
+
+Enable Pages on a repository under Settings → Pages, choose "GitHub Actions" as the source, and use the workflow above (adjusted to your build command) to deploy a static site automatically on every push to main.

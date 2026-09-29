@@ -1,0 +1,41 @@
+---
+title: I committed to the wrong branch
+symptom: "I meant to be on a feature branch but I was still on main (or another branch) when I committed."
+summary: Move the commit to the right branch by creating that branch where you are now, then resetting the original branch back.
+severity: moderate
+tags: [branches, reset, cherry-pick]
+sources:
+  - label: Git — git branch
+    url: https://git-scm.com/docs/git-branch
+related: [detached-head, undo-last-commit]
+order: 2
+lastReviewed: 2026-01-15
+---
+
+## Diagnosis
+
+Not pushed yet, and you're still sitting on the wrong branch (often `main`) with one or more commits that belong elsewhere.
+
+## Fix
+
+**If you haven't committed yet**, this is the easy version — just stash and move:
+
+```bash
+git stash
+git switch correct-branch
+git stash pop
+```
+
+**If you already committed**, create the correct branch right where you are — it carries the commit(s) with it — then roll the wrong branch back:
+
+```bash
+git branch correct-branch
+git reset --hard HEAD~1   # repeat for each commit to remove
+git switch correct-branch
+```
+
+`git branch correct-branch` creates the new branch pointing at your *current* commit, so nothing is lost. The `reset --hard` only moves the old branch's pointer backward; the commit still exists and is now reachable from `correct-branch`.
+
+<Callout type="tip">
+Only one commit to move and you'd rather not touch the original branch at all? Use `git cherry-pick <commit-hash>` on the target branch instead, then `git reset --hard HEAD~1` on the original.
+</Callout>

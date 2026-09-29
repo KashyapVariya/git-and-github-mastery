@@ -1,0 +1,54 @@
+---
+title: Closing Keywords
+summary: Words like "Closes #123" in a commit or pull request description automatically close that issue the moment the PR merges.
+level: intermediate
+primaryTab: github
+subtab: project-management
+category: Automation
+tags: [issues, pull-requests, automation, keywords]
+sources:
+  - label: GitHub Docs — Pull requests
+    url: https://docs.github.com/en/pull-requests
+readingTime: 3
+related: [github-issues, pull-requests-basics, milestones-and-tracking]
+order: 5
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Without closing keywords, finishing an issue means two manual steps: merge the fix, then go close the issue yourself. Multiply that by dozens of issues and it's easy to forget — leaving your issue tracker full of things that are actually already done.
+
+## The core idea
+
+If a pull request description (or a commit message on the default branch) contains a recognized phrase followed by an issue reference, GitHub automatically closes that issue the moment the pull request merges into the default branch.
+
+Recognized keywords include:
+
+```text
+close, closes, closed
+fix, fixes, fixed
+resolve, resolves, resolved
+```
+
+Used like this, anywhere in a PR description:
+
+```text
+Fixes #42
+Closes org/other-repo#17
+Resolves #8, resolves #9
+```
+
+You can reference issues in the same repository with just `#42`, or in a different repository with `owner/repo#42`. Multiple keyword/issue pairs in one description all take effect independently.
+
+<Callout type="warning">
+The keyword has to appear in the **pull request description** (or a commit that lands directly on the default branch) — putting it only in a code comment or a regular issue comment won't trigger the automatic close.
+</Callout>
+
+<Callout type="tip">
+Even without a closing keyword, typing `#` followed by a number in any comment creates a live link to that issue or PR — useful for cross-referencing without triggering an auto-close.
+</Callout>
+
+## Try it yourself
+
+Open a small pull request against a test repository, add "Closes #1" to its description (assuming issue #1 exists), and merge it — watch the issue close itself automatically with a link back to the PR.

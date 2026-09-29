@@ -1,0 +1,58 @@
+---
+title: Creating a Repository
+summary: A GitHub repository is a project's home online — create one from scratch, or push an existing local Git repo up to a new one.
+level: beginner
+primaryTab: github
+subtab: basics
+category: Repositories
+tags: [repository, setup, github-basics]
+sources:
+  - label: GitHub Docs — Repositories
+    url: https://docs.github.com/en/repositories
+readingTime: 4
+related: [readme-files, choosing-a-license, repository-visibility]
+order: 5
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+A repository is the unit everything else on GitHub hangs off — issues, pull requests, Actions, releases all belong to one. Creating one is the first concrete step in putting a project online.
+
+## Starting from GitHub
+
+Click the "+" in GitHub's top navigation and choose "New repository." You'll pick a name, an optional description, and visibility (see [Repository Visibility](/github/basics/repository-visibility)). GitHub can optionally initialize it with a README, a `.gitignore` template for your language, and a license — handy for a brand-new project with nothing local yet.
+
+Once created, GitHub shows you the exact commands to connect it to a fresh local repository:
+
+```bash
+git init
+git add README.md
+git commit -m "Initial commit"
+git branch -M main
+git remote add origin git@github.com:your-username/your-repo.git
+git push -u origin main
+```
+
+## Starting from an existing local project
+
+If you already have a Git repository on your machine, skip straight to connecting it: create an **empty** repository on GitHub (no README, no license — GitHub would otherwise create a commit that conflicts with your existing history), then:
+
+```bash
+git remote add origin git@github.com:your-username/your-repo.git
+git push -u origin main
+```
+
+`-u` sets your local `main` to track `origin/main`, so future `git push` and `git pull` calls don't need to specify the remote and branch every time.
+
+<Callout type="warning">
+Only let GitHub auto-create a README/.gitignore/license when starting completely from scratch. Doing it alongside an existing local repo creates two unrelated histories that need merging before you can push.
+</Callout>
+
+<Callout type="golden">
+A repository name should be short, lowercase-with-hyphens, and describe the project — it becomes part of the clone URL everyone types, so clarity beats cleverness.
+</Callout>
+
+## Try it yourself
+
+Create a new empty repository on GitHub, then connect an existing local project to it and push.

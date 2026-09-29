@@ -1,0 +1,72 @@
+---
+title: Force-With-Lease
+summary: Plain git push --force can silently erase a teammate's work on a shared branch. --force-with-lease refuses to push if the remote has moved since you last looked.
+level: advanced
+primaryTab: git
+subtab: advanced
+category: Safety
+tags: [push, force-push, safety, rebase, remote]
+sources:
+  - label: Git — git-push
+    url: https://git-scm.com/docs/git-push
+  - label: Atlassian — Merging vs. Rebasing
+    url: https://www.atlassian.com/git/tutorials/merging-vs-rebasing
+readingTime: 5
+related: [rebase-basics, interactive-rebase, the-reflog]
+order: 11
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+After an interactive rebase, your local branch has new commit SHAs, and pushing it normally fails: the remote has commits your local branch no longer contains a matching history for. `git push --force` fixes that by overwriting the remote branch with your local one, no questions asked. That "no questions asked" part is the danger: if a teammate pushed new commits to that same branch since you last fetched, `--force` throws their work away without any warning, permanently, from the remote's perspective. `--force-with-lease` is the safer version of the same idea.
+
+## The problem with plain `--force`
+
+```bash
+git push --force origin feature
+```
+
+This unconditionally sets `origin/feature` to match your local `feature`, no matter what's currently there. If someone else pushed a commit to `feature` five minutes ago and you haven't fetched it, that commit is now gone from the remote — overwritten, with no error, no confirmation. It's still recoverable via *their* reflog if they act fast, but that's a bad way to find out.
+
+## How `--force-with-lease` protects you
+
+```bash
+git push --force-with-lease origin feature
+```
+
+Before pushing, Git checks: does the remote branch's current tip match what **you last saw it as** (from your local `origin/feature` tracking ref)? If it matches, the push proceeds — your rebase is exactly what you intended to overwrite. If it doesn't match — because someone else pushed in the meantime — Git refuses:
+
+```text
+! [rejected]        feature -> feature (stale info)
+error: failed to push some refs
+```
+
+That rejection is the entire point. It's telling you: "the remote changed since you last looked — fetch first, and figure out whether you'd still be overwriting something you care about."
+
+## Using it safely
+
+```bash
+git fetch origin
+git push --force-with-lease origin feature
+```
+
+Fetching first keeps your local tracking ref current, so the lease check is meaningful. If the push is rejected even after fetching, someone genuinely added new commits — stop and check `git log origin/feature` before deciding how to proceed, rather than forcing through it.
+
+For extra precision, you can pin the exact expected SHA instead of relying on your tracking ref:
+
+```bash
+git push --force-with-lease=feature:a1b2c3d origin feature
+```
+
+<Callout type="warning">
+`--force-with-lease` protects against overwriting commits you haven't seen — it does **not** ask for confirmation, and it will still happily overwrite commits you *have* seen. It's a safety check on staleness, not a general "are you sure?" prompt.
+</Callout>
+
+<Callout type="golden">
+A good habit: never use plain `--force` on a branch anyone else might push to. Make `--force-with-lease` your default, and reserve plain `--force` for branches you're certain are yours alone.
+</Callout>
+
+## Try it yourself
+
+Simulate the danger safely: clone a repo twice into two folders (as if you and a teammate). Push a commit from the second clone, then in the first clone, without fetching, rebase and try `git push --force-with-lease`. Watch it get rejected — then `git fetch` and see the teammate's commit before deciding what to do next.

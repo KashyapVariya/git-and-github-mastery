@@ -1,0 +1,80 @@
+---
+title: Reusable Workflows
+summary: A reusable workflow lets one workflow file call another with workflow_call, so multiple repositories (or jobs) can share the same CI logic instead of copy-pasting it.
+level: advanced
+primaryTab: github
+subtab: automation-cicd
+category: CI/CD
+tags: [github-actions, reusable-workflows, dry]
+sources:
+  - label: GitHub Docs — Actions
+    url: https://docs.github.com/en/actions
+readingTime: 5
+related: [workflow-syntax, environments-and-approvals, jobs-and-steps]
+order: 10
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Once you maintain more than a couple of repositories with similar CI needs, you'll notice the same workflow YAML copy-pasted everywhere — and every time you improve it, you have to update every copy. Reusable workflows fix this the same way a function fixes duplicated code.
+
+## Defining a reusable workflow
+
+Add `workflow_call` as a trigger, and optionally declare typed inputs and secrets it needs:
+
+```yaml
+# .github/workflows/reusable-test.yml
+name: Reusable Test
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        type: string
+        default: "20"
+    secrets:
+      NPM_TOKEN:
+        required: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+      - run: npm ci
+      - run: npm test
+```
+
+This file does nothing on its own — it only runs when something else calls it.
+
+## Calling it
+
+From another workflow, in the same repository or a different one:
+
+```yaml
+jobs:
+  call-shared-test:
+    uses: my-org/my-repo/.github/workflows/reusable-test.yml@main
+    with:
+      node-version: "22"
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+```
+
+`uses:` here points at a workflow file instead of an action — that's the tell that this is a reusable workflow call, not a regular job.
+
+## vs. composite actions
+
+Reusable workflows and composite actions solve a similar problem at different levels: a **composite action** bundles a handful of *steps* to reuse inside one job; a **reusable workflow** bundles entire *jobs* (with their own `runs-on`, their own matrix, potentially several of them) to reuse across workflows or repositories.
+
+<Callout type="tip">
+Pin the `@main` in `uses:` to a specific tag or commit SHA (`@v1`, or a full SHA) once the reusable workflow stabilizes — otherwise every caller silently picks up changes the moment you push to `main`.
+</Callout>
+
+## Try it yourself
+
+Extract a job you've written into its own file with `on: workflow_call`, then call it from your main workflow with `uses:` pointing at that file's path.

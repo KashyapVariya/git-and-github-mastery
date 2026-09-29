@@ -1,0 +1,64 @@
+---
+title: Inside the .git Folder
+summary: Every Git repository's entire state — history, branches, config, and staging area — lives in one plain folder called .git.
+level: expert
+primaryTab: git
+subtab: expert
+category: Internals
+tags: [dot-git, internals, refs, index, config]
+sources:
+  - label: Pro Git — Git Objects
+    url: https://git-scm.com/book/en/v2/Git-Internals-Git-Objects
+  - label: Git — git config
+    url: https://git-scm.com/docs/git-config
+readingTime: 5
+related: [git-objects-blob-tree-commit-tag, refs-and-head, plumbing-commands]
+order: 2
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+`git init` creates one thing: a folder named `.git`. That folder *is* the repository — delete it, and Git history is gone even though your files remain; copy it elsewhere, and you've copied the entire project history. Knowing what's inside demystifies a lot of "where does Git keep that?" questions.
+
+## A quick tour
+
+Run `ls -la .git` in any repository and you'll see roughly this:
+
+```text
+.git/
+├── HEAD          # a pointer to your current branch
+├── config        # this repo's local settings
+├── description   # unused outside GitWeb, safe to ignore
+├── index         # the staging area, in binary form
+├── hooks/        # scripts that run on certain events
+├── info/         # local excludes, not shared via .gitignore
+├── objects/      # every blob, tree, commit, and tag object
+└── refs/
+    ├── heads/    # one file per local branch
+    └── tags/     # one file per tag
+```
+
+## The pieces that matter most
+
+**`HEAD`** is a plain text file. Open it — on a normal branch, it contains something like `ref: refs/heads/main`. It's a pointer to a pointer: HEAD points at a branch, and the branch points at a commit.
+
+**`refs/heads/<branch>`** is, for a simple repo, literally a text file containing one commit hash. That's the entire implementation of a branch — a 41-byte file. This is why creating a branch is instant regardless of how large your project is.
+
+**`index`** is the staging area from "Staging with add" — but stored as a single binary file, not human-readable. `git status` and `git diff --staged` are really just comparisons between this file, the last commit's tree, and your working directory.
+
+**`objects/`** holds every blob, tree, commit, and tag your repo has ever created, addressed by hash, usually compressed into packfiles over time (see [Packfiles & GC](/git/expert/packfiles-and-gc)).
+
+**`config`** is where `git config` (without `--global`) writes — this repo's own settings, including remotes.
+
+<Callout type="warning">
+Never hand-edit files inside `.git/objects` — they're compressed and hashed, so a manual edit just corrupts the repository. `refs/` and `config` are plain text and generally safe to *read*, but prefer Git commands for editing them too.
+</Callout>
+
+<Callout type="tip">
+`git rev-parse --git-dir` prints the path to `.git` for the current repository — handy in scripts, and in worktrees where `.git` is actually a file pointing elsewhere.
+</Callout>
+
+## Try it yourself
+
+Open `.git/HEAD` in a text editor and see which branch it points to. Then open `.git/refs/heads/<that-branch>` and compare the hash you see there to the output of `git rev-parse HEAD` — they should match exactly.

@@ -1,0 +1,49 @@
+---
+title: My remote points to the wrong URL
+symptom: "git push or git pull fails, or goes to the wrong repository, because origin is set up incorrectly."
+summary: Check the current URL with git remote -v, then update it with git remote set-url.
+severity: minor
+tags: [remotes, origin, ssh]
+sources:
+  - label: Git — git remote
+    url: https://git-scm.com/docs/git-remote
+related: [push-rejected]
+order: 11
+lastReviewed: 2026-01-15
+---
+
+## Diagnosis
+
+Common causes: you cloned from a fork instead of the main repo, the repository was renamed or transferred, or you're mixing HTTPS and SSH URLs and authentication is failing as a result.
+
+## Fix
+
+**Check what's currently configured:**
+
+```bash
+git remote -v
+```
+
+**Update it to the correct URL:**
+
+```bash
+git remote set-url origin git@github.com:owner/repo.git
+```
+
+(Swap in an `https://github.com/owner/repo.git` URL if you authenticate over HTTPS instead of SSH.)
+
+**Remote missing entirely?** Add it instead of updating:
+
+```bash
+git remote add origin git@github.com:owner/repo.git
+```
+
+**Want a second remote** — for example, `upstream` pointing at the original repo you forked from — without replacing `origin`:
+
+```bash
+git remote add upstream git@github.com:original-owner/repo.git
+```
+
+<Callout type="tip">
+After changing the URL, run `git fetch` to confirm it connects correctly before doing anything else.
+</Callout>

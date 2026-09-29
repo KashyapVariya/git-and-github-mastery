@@ -1,0 +1,89 @@
+---
+title: Resolving Merge Conflicts
+summary: When Git can't auto-merge two changes, it marks the conflict directly in the file and waits for you to decide — here's how to read and resolve that.
+level: intermediate
+primaryTab: git
+subtab: intermediate
+category: Merging
+tags: [merge-conflicts, merging, collaboration]
+sources:
+  - label: Git — git diff
+    url: https://git-scm.com/docs/git-diff
+  - label: Pro Git — Undoing Things
+    url: https://git-scm.com/book/en/v2/Git-Basics-Undoing-Things
+readingTime: 6
+related: [fast-forward-vs-merge-commit, diffing-changes, restore-vs-reset-vs-revert]
+order: 9
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Git merges most changes automatically without you ever noticing — it's genuinely good at combining edits to different parts of a file, or even different files entirely. A conflict only happens when two branches changed the **same lines** in ways Git can't reconcile on its own. At that point, Git stops and asks you: it doesn't guess. Learning to read what it's asking is most of what "resolving a conflict" actually is.
+
+## What a conflict looks like
+
+Run `git merge feature-branch`, and if there's a real conflict, Git tells you plainly:
+
+```text
+Auto-merging src/config.js
+CONFLICT (content): Merge conflict in src/config.js
+Automatic merge failed; fix conflicts and then commit the result.
+```
+
+`git status` lists the file under "Unmerged paths," marked **both modified**. Open it, and inside you'll find conflict markers dropped right into the code:
+
+```text
+<<<<<<< HEAD
+const timeout = 3000;
+=======
+const timeout = 5000;
+>>>>>>> feature-branch
+```
+
+Read this as two competing answers to the same question. Everything between `<<<<<<< HEAD` and `=======` is what's on your current branch. Everything between `=======` and `>>>>>>> feature-branch` is what's coming in from the branch you're merging.
+
+## Resolving it
+
+Edit the file down to what it *should* actually say — that might mean keeping one side, keeping both, or writing something new entirely:
+
+```js
+const timeout = 5000;
+```
+
+Then delete the marker lines themselves (`<<<<<<<`, `=======`, `>>>>>>>`) — they're not part of your code, just Git's way of flagging the spot. Stage the resolved file and finish the merge like a normal commit:
+
+```bash
+git add src/config.js
+git commit
+```
+
+Git pre-fills a merge commit message for you; editing it is optional but often worth a line noting how the conflict was resolved.
+
+If there are several conflicted files, resolve and `git add` each one — `git status` keeps you updated on what's left.
+
+## Backing out entirely
+
+If a merge turns out messier than expected and you'd rather start over — or you realize you merged the wrong branch — abandon it and return to exactly how things were beforehand:
+
+```bash
+git merge --abort
+```
+
+This is completely safe: it undoes the in-progress merge, clears the conflict markers, and leaves your branch untouched, as if you'd never run `git merge` at all.
+
+<Callout type="tip">
+A visual merge tool (`git mergetool`, or the one built into your editor) shows "yours," "theirs," and the result side by side, which is often far easier to reason about than scrolling raw markers in a plain text editor.
+</Callout>
+
+<Callout type="warning">
+It's easy to resolve the *logic* of a conflict but forget to delete one of the marker lines. Always re-read the file (or run `git diff` before committing) to make sure no stray `<<<<<<<`, `=======`, or `>>>>>>>` line survived into your commit.
+</Callout>
+
+<Callout type="golden">
+There's no penalty for aborting. If a conflict resolution is going sideways, `git merge --abort` and try again with a clearer head — it costs you nothing but a few minutes.
+</Callout>
+
+## Try it yourself
+
+Create two branches from the same starting point, edit the same line of the same file differently on each, and merge one into the other. Read the conflict markers Git leaves behind, resolve them by hand, then `git add` and `git commit` to complete the merge.

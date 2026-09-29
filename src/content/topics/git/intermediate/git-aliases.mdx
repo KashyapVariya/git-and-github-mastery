@@ -1,0 +1,78 @@
+---
+title: Git Aliases
+summary: Turn long, frequent commands into short ones you actually type — from simple shortcuts to full shell commands with the ! prefix.
+level: intermediate
+primaryTab: git
+subtab: intermediate
+category: Config
+tags: [aliases, config, productivity, shell]
+sources:
+  - label: Git — git config
+    url: https://git-scm.com/docs/git-config
+  - label: Pro Git — Git Aliases
+    url: https://git-scm.com/book/en/v2/Git-Basics-Git-Aliases
+readingTime: 4
+related: [config-levels, git-blame-and-show]
+order: 5
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Some Git commands you type dozens of times a day; others are long enough that you have to think about the flags every time. Aliases let you rename the first kind to two letters and turn the second kind into a single word — Git doesn't care what you call a command, as long as it knows what to run underneath.
+
+## Basic aliases
+
+Set one with `git config`, same way you'd set any other setting:
+
+```bash
+git config --global alias.co checkout
+git config --global alias.st status
+git config --global alias.br branch
+```
+
+Now `git co main` does exactly what `git checkout main` does. These are stored as plain text under `[alias]` in your `~/.gitconfig`, and you can edit them there directly too:
+
+```ini
+[alias]
+    co = checkout
+    st = status
+    br = branch
+    last = log -1 HEAD
+```
+
+An alias can expand to a command *with* flags built in, which is where they start saving real effort:
+
+```bash
+git config --global alias.unstage "reset HEAD --"
+git config --global alias.graph "log --oneline --graph --decorate --all"
+```
+
+`git graph` now gives you a compact, branching visual history in one word instead of remembering four flags.
+
+## Shell-level aliases with `!`
+
+A plain alias can only run other Git subcommands. Prefix the value with `!` and it runs as a full shell command instead — meaning it can chain commands, use pipes, or call other CLI tools entirely.
+
+```bash
+git config --global alias.unstage-all "!git reset HEAD -- . && git status"
+git config --global alias.cleanup "!git branch --merged | grep -v '\\*\\|main' | xargs -n 1 git branch -d"
+```
+
+That second one is a real example: it finds every local branch already merged into your current branch (skipping `main` and the branch you're on) and deletes them. It's not a Git subcommand at all — it's a small shell pipeline that an alias just happens to trigger.
+
+<Callout type="tip">
+Start simple. `co`, `st`, `br`, and a `git log --oneline --graph` alias cover most of what people actually reach for daily — you can always add more once you notice yourself typing the same long command repeatedly.
+</Callout>
+
+<Callout type="warning">
+Aliases live in *your* Git config, not the repository. They won't exist on a teammate's machine, a CI server, or a fresh clone — never rely on an alias inside a script or documentation meant for anyone but you.
+</Callout>
+
+<Callout type="golden">
+If an alias needs anything beyond a single Git subcommand — chaining, piping, other tools — that's your signal to prefix it with `!` and write it as a shell command rather than fighting to express it as plain Git flags.
+</Callout>
+
+## Try it yourself
+
+Run `git config --global alias.lg "log --oneline --graph --all -10"`, then try `git lg` in any repo with a bit of history. Compare it to typing the full `git log` command out — that gap is the whole point of aliases.

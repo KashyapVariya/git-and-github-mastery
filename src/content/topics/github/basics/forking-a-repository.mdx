@@ -1,0 +1,47 @@
+---
+title: Forking a Repository
+summary: A fork is your own copy of someone else's repository, letting you make changes freely and propose them back without needing write access to the original.
+level: beginner
+primaryTab: github
+subtab: basics
+category: Repositories
+tags: [fork, open-source, collaboration]
+sources:
+  - label: GitHub Docs — Repositories
+    url: https://docs.github.com/en/repositories
+readingTime: 3
+related: [pull-requests-basics, keeping-a-fork-in-sync, stars-and-watching]
+order: 9
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Most repositories on GitHub belong to someone else, and you don't have permission to push directly to them — nor should you, for a project you don't maintain. Forking solves this: it creates a full copy under *your* account that you fully control, while staying linked to the original so you can propose changes back.
+
+## How it works
+
+Click "Fork" on any repository's page. GitHub creates a copy in your account (`your-username/repo-name`) with the entire history intact. From there:
+
+```bash
+git clone git@github.com:your-username/repo-name.git
+cd repo-name
+```
+
+You now have a normal local clone of *your* fork. Make changes, commit, and push to your fork exactly as you would any repository you own — because you do own it.
+
+## Proposing changes back
+
+Once you've pushed a change to your fork, open a pull request from your fork's branch into the original repository's branch. The maintainers review it, and if they merge it, your change becomes part of the original project — all without you ever having write access to it directly. See [Pull requests, basics](/github/collaboration/pull-requests-basics) for the full flow.
+
+<Callout type="golden">
+A fork and the repository it came from can drift apart over time as the original gets updates you don't have. Regularly syncing your fork keeps your changes based on current code — see [Keeping a fork in sync](/github/open-source/keeping-a-fork-in-sync).
+</Callout>
+
+<Callout type="tip">
+Forking isn't only for open source contribution — some teams fork internal repos to experiment freely without affecting the shared original.
+</Callout>
+
+## Try it yourself
+
+Fork any public repository you're curious about, clone your fork locally, and confirm `git remote -v` shows your fork's URL as `origin`.

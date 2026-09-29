@@ -1,0 +1,58 @@
+---
+title: GitHub Apps vs. OAuth Apps
+summary: Both let outside tools connect to GitHub on someone's behalf, but they were built for different jobs — one impersonates a user, the other acts as its own identity.
+level: advanced
+primaryTab: github
+subtab: admin-teams
+category: Integrations
+tags: [github-apps, oauth, integrations, authentication]
+sources:
+  - label: GitHub Docs — Building GitHub Apps
+    url: https://docs.github.com/en/apps
+readingTime: 6
+related: [webhooks, github-api-basics, oidc-basics]
+order: 5
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+When a third-party tool — a CI service, a project-management integration, a code-review bot — needs to talk to GitHub on your behalf, it has to authenticate somehow. GitHub offers two different mechanisms for this, **OAuth Apps** and **GitHub Apps**, and picking the wrong one leads to either annoying limitations or way more access than the tool actually needs.
+
+## OAuth Apps: acting as you
+
+An OAuth App authenticates *as the user who authorized it*. When you click "Authorize" on an OAuth App, it gets a token that can do anything **you** can do, scoped only by broad categories like `repo` or `read:org` — not by specific repositories. If you have admin access to fifty repositories, an OAuth App you authorize can too, whether it needs to or not.
+
+This made OAuth Apps simple to reason about early on, but coarse-grained in practice: there's no way to say "this tool may touch exactly these three repositories and nothing else."
+
+## GitHub Apps: acting as themselves
+
+A GitHub App is its own identity, separate from any individual user. An organization *installs* it, choosing exactly which repositories it can see — "all repositories" or a hand-picked subset — and exactly which permissions it gets, down to granular categories like "read pull requests, write issues, no access to code."
+
+When a GitHub App acts, it can post as "AppName bot" rather than impersonating a person, and its access travels with the *installation*, not with whoever happened to set it up. If that person leaves the company, the app keeps working.
+
+## The practical difference, side by side
+
+| | OAuth App | GitHub App |
+|---|---|---|
+| Acts as | The authorizing user | Its own bot identity |
+| Access scope | Broad categories, all-or-nothing per scope | Fine-grained, per-repository |
+| Survives the installer leaving | No — tied to their account | Yes — tied to the installation |
+| Rate limits | Shared with the user | Its own, higher limit |
+| Typical use | Simple personal integrations, CLIs | CI tools, bots, marketplace integrations |
+
+<Callout type="golden">
+If you're building something new that needs to integrate with GitHub, default to a GitHub App. It's more setup up front, but the fine-grained permissions and independent identity are almost always what you actually want — OAuth Apps exist mainly for backward compatibility and the simplest personal use cases.
+</Callout>
+
+## Where this shows up day to day
+
+Every "Install" button you click on GitHub Marketplace — for a CI provider, a linting bot, a security scanner — is installing a GitHub App, and the permission screen it shows you (exactly which repositories, exactly which access) is this fine-grained model in action. When you instead see a generic "Authorize [App Name]" screen offering broad account access, that's the older OAuth App flow.
+
+<Callout type="warning">
+Because an OAuth App's token can do anything the authorizing user can do, revoking access means checking Settings → Applications on your personal account, not just uninstalling something from a repository. A forgotten authorized OAuth App is a standing, broad-access credential until you explicitly revoke it.
+</Callout>
+
+## Try it yourself
+
+Open your personal Settings → Applications on GitHub and look at both tabs — "Authorized OAuth Apps" and "Installed GitHub Apps." Compare what each one lists as its access: OAuth Apps will show broad scopes, GitHub Apps will show specific repositories and specific permissions.

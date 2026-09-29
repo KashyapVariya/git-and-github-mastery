@@ -1,0 +1,50 @@
+---
+title: Creating a GitHub Account
+summary: A GitHub account is your identity for hosting repositories, opening pull requests, and collaborating — free for individuals, with a username you'll want to pick carefully.
+level: beginner
+primaryTab: github
+subtab: basics
+category: Account setup
+tags: [account, signup, github-basics]
+sources:
+  - label: GitHub Docs — Get started
+    url: https://docs.github.com/en/get-started
+readingTime: 3
+related: [two-factor-authentication, ssh-keys, creating-a-repository]
+order: 1
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Git works entirely without an account — it's just software on your computer. GitHub is different: it's a hosted service, so you need an account before you can push code there, open a pull request, or star a project.
+
+## Signing up
+
+Head to [github.com](https://github.com/) and create an account with an email address and a username. Free personal accounts include unlimited public and private repositories, which is plenty for learning and most personal projects.
+
+Pick your username with a little care. It becomes part of your profile URL (`github.com/your-username`) and often shows up in commit history, so something professional and easy to say out loud tends to age better than something cute you'll want to change later. GitHub lets you rename it afterward, but old links to your old username stop working.
+
+## Verify your email
+
+GitHub asks you to confirm your email address right after signup. Do this immediately — an unverified email can quietly block things later, like pushing to a repository from certain workflows or receiving notifications on issues you're tagged in.
+
+<Callout type="tip">
+Use an email address you'll have access to for years, not a temporary work or school address. Your commits are permanently associated with the email you used when you made them.
+</Callout>
+
+## Fill out your profile
+
+None of this is required to start using GitHub, but a name, a short bio, and an avatar make your account recognizable to collaborators — especially useful once you start opening pull requests on other people's projects.
+
+<Callout type="golden">
+Your GitHub account and your Git commit identity (set with `git config user.email`) are separate systems that GitHub quietly links together. To get "verified" green checkmarks and have your commits correctly attributed to your profile, the email in your Git config needs to match an email address verified on your GitHub account.
+</Callout>
+
+## What's next
+
+A brand-new account is not very secure by default — the very next thing worth doing is turning on two-factor authentication, covered in [Two-Factor Authentication](/github/basics/two-factor-authentication).
+
+## Try it yourself
+
+Create your account if you haven't already, then open your profile settings and check that your email shows as verified.

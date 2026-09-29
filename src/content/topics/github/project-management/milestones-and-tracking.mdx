@@ -1,0 +1,41 @@
+---
+title: Milestones and Tracking Progress
+summary: A milestone groups issues and pull requests around a shared goal or date, and shows you a live completion percentage.
+level: intermediate
+primaryTab: github
+subtab: project-management
+category: Planning
+tags: [milestones, tracking, releases]
+sources:
+  - label: GitHub Docs — Issues (includes Milestones)
+    url: https://docs.github.com/en/issues
+readingTime: 3
+related: [github-projects, closing-keywords, github-issues]
+order: 3
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Some work doesn't belong to one issue — it belongs to a goal: "Ship v2.0," "Fix everything blocking launch," "Q3 accessibility pass." A milestone is GitHub's way of grouping issues and pull requests around exactly that kind of goal, with an optional due date and a progress bar that updates itself.
+
+## The core idea
+
+A milestone lives inside a single repository. You create one with a title, an optional description, and an optional due date, then assign issues and pull requests to it — the same way you'd add a label. As items get closed, GitHub automatically recalculates the completion percentage; there's nothing to update by hand.
+
+This makes milestones great for release tracking: create a "v2.0" milestone, assign every issue that must land before release, and the milestone page becomes a live "are we ready to ship" view.
+
+## Working with milestones
+
+- **Create one:** from a repository's Issues tab, open Milestones → New milestone.
+- **Assign items:** from any issue or pull request's sidebar, pick a milestone the same way you'd pick a label or assignee.
+- **Track progress:** the milestone list shows an automatically updated percentage and open/closed counts.
+- **Filter by it:** search `milestone:"v2.0"` in the issue search bar to see everything tied to it.
+
+<Callout type="tip">
+Milestones and Projects solve overlapping problems at different scopes — a milestone is a due-date-flavored grouping within *one* repository; a Project can span *many* repositories with much richer custom fields. Small, single-repo release tracking often just needs a milestone.
+</Callout>
+
+## Try it yourself
+
+Create a milestone called "Cleanup" with a due date two weeks out, assign two or three open issues to it, and close one — watch the completion percentage update automatically.

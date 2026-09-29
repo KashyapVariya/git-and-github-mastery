@@ -1,0 +1,82 @@
+---
+title: Cleaning the Working Directory
+summary: git clean permanently deletes untracked files — always preview with -n before you ever run it for real.
+level: intermediate
+primaryTab: git
+subtab: intermediate
+category: Cleanup
+tags: [clean, untracked-files, working-directory]
+sources:
+  - label: Git — git clean
+    url: https://git-scm.com/docs/git-clean
+  - label: Pro Git — Stashing and Cleaning
+    url: https://git-scm.com/book/en/v2/Git-Tools-Stashing-and-Cleaning
+readingTime: 4
+related: [restore-vs-reset-vs-revert, ignoring-vs-excluding-files]
+order: 8
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Build tools, test runs, and stray experiments leave clutter behind — generated files, log output, half-finished scratch files you never `git add`ed. `git restore` and `git reset` can't touch any of it, because those commands only deal with files Git is already tracking. `git clean` is the tool for the rest: it sweeps away files Git has never been told to track, and it does it for real, no recycle bin involved.
+
+Because of that, `git clean` is one of the few Git commands that can destroy work with zero chance of recovery through Git itself. It deserves a little extra caution.
+
+## Always preview first
+
+```bash
+git clean -n
+```
+
+`-n` (or `--dry-run`) lists exactly what *would* be deleted, without deleting anything. This is not optional caution — it's the whole safety net for this command, since there's no `git clean --undo`.
+
+## Actually deleting
+
+Once the preview looks right, Git still refuses to run for real without an explicit `-f`:
+
+```bash
+git clean -f
+```
+
+By default, this only removes untracked *files* sitting directly wherever you run it — not directories. Add `-d` to also remove untracked directories (and everything inside them):
+
+```bash
+git clean -fd
+```
+
+## Including ignored files
+
+By default, `git clean` leaves anything matched by `.gitignore` alone — it assumes you ignored those files on purpose. Add `-x` to sweep those up too, which is useful for wiping out build artifacts and dependency folders to get back to a truly pristine checkout:
+
+```bash
+git clean -nfx     # preview, including ignored files
+git clean -fx      # actually remove them
+```
+
+Be deliberate with `-x` in particular — it will happily delete an entire `node_modules/` or `dist/` folder along with everything else ignored.
+
+## A common combo
+
+Before a from-scratch build or a "why does this only fail on CI" investigation, people often stash tracked changes and clean untracked ones together, to get as close as possible to a fresh clone:
+
+```bash
+git stash -u
+git clean -fdx
+```
+
+<Callout type="warning">
+Untracked files have never been committed, so nothing about `git clean` is recoverable through Git — there's no commit to restore from, no reflog entry, nothing. Treat `-n` as mandatory, not optional, every single time.
+</Callout>
+
+<Callout type="tip">
+Run `git status` first. Untracked files already show up there under "Untracked files," so you often already know roughly what `git clean -n` is about to confirm.
+</Callout>
+
+<Callout type="golden">
+The two-step habit that makes this command safe forever: `git clean -n` (or `-nd`, or `-nfx`) to look, then re-run the exact same flags swapping `n` for `f` once you're sure. Never type `-f` first.
+</Callout>
+
+## Try it yourself
+
+In a test repo, create a throwaway file that isn't tracked — `touch scratch.txt` — then run `git clean -n`. Confirm `scratch.txt` shows up in the preview, then run `git clean -f` and watch it disappear.

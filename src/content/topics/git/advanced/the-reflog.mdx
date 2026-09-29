@@ -1,0 +1,82 @@
+---
+title: The Reflog — Your Safety Net
+summary: git reflog quietly records every place HEAD and your branches have pointed, letting you recover commits that look lost after a reset, rebase, or bad branch delete.
+level: advanced
+primaryTab: git
+subtab: advanced
+category: Recovery
+tags: [reflog, recovery, safety-net, head]
+sources:
+  - label: Git — git-reflog
+    url: https://git-scm.com/docs/git-reflog
+  - label: Atlassian — Rewriting Git History
+    url: https://www.atlassian.com/git/tutorials/rewriting-history
+readingTime: 5
+related: [rebase-basics, bisecting-bugs, force-with-lease]
+order: 4
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+The scariest feeling in Git is realizing a commit is gone — after a `git reset --hard`, a botched rebase, or deleting a branch you needed. In almost every case, it isn't actually gone. Git doesn't delete commit objects the moment nothing points at them; it keeps them around until garbage collection eventually cleans up, which can be days or weeks later. The reflog is the map that tells you where those "lost" commits still live.
+
+## What the reflog tracks
+
+Every time `HEAD` moves — a commit, checkout, branch switch, reset, rebase, or merge — Git logs it locally in the reflog. Think of it as a running diary of everywhere your `HEAD` has been, kept separately from the commit history itself.
+
+```bash
+git reflog
+```
+
+```text
+a1b2c3d HEAD@{0}: commit: Add validation logic
+e4f5g6h HEAD@{1}: rebase (finish): returning to refs/heads/main
+i7j8k9l HEAD@{2}: rebase (pick): Fix typo
+m1n2o3p HEAD@{3}: checkout: moving from feature to main
+q4r5s6t HEAD@{4}: reset: moving to HEAD~2
+```
+
+Each entry has its own address, `HEAD@{n}`, where `0` is the most recent. This is local-only — the reflog lives in your `.git` directory and is never pushed or shared, and each clone has its own.
+
+## Recovering a "lost" commit
+
+Say you ran `git reset --hard HEAD~3` and realize you needed one of those commits. The commit object still exists; only the branch pointer moved. Find it:
+
+```bash
+git reflog
+# spot the entry just before the reset, e.g. HEAD@{4}
+git show HEAD@{4}
+```
+
+If that's the commit you want back, you can point your branch at it directly:
+
+```bash
+git reset --hard HEAD@{4}
+```
+
+Or, safer if you're not sure, create a new branch there without touching your current one:
+
+```bash
+git branch recovered-work HEAD@{4}
+```
+
+## Recovering a deleted branch
+
+Deleting a branch with `git branch -D` doesn't delete its commits either — it just removes the pointer. If you know (or can guess) the last commit the branch pointed to, either from the reflog or from `git reflog show <old-branch-name>` right after deletion, you can recreate it:
+
+```bash
+git branch feature-restored a1b2c3d
+```
+
+<Callout type="golden">
+The reflog is your local undo history for `HEAD` itself. Before panicking over a bad rebase, force-push, or reset, run `git reflog` first — the commit is very likely still there.
+</Callout>
+
+<Callout type="warning">
+Reflog entries expire eventually — 90 days by default for reachable commits, 30 for unreachable ones (`gc.reflogExpire` / `gc.reflogExpireUnreachable`). It's a safety net, not permanent storage.
+</Callout>
+
+## Try it yourself
+
+Make a few commits in a scratch repo, then run `git reset --hard HEAD~2` to "lose" them. Run `git reflog`, find the entry from before the reset, and recover the commits into a new branch with `git branch recovered <hash>`. Confirm they're back with `git log recovered --oneline`.

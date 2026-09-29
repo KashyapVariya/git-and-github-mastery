@@ -1,0 +1,64 @@
+---
+title: Teams & Permissions
+summary: Teams let you grant and revoke repository access to groups of people at once, instead of managing everyone's permissions one by one.
+level: advanced
+primaryTab: github
+subtab: admin-teams
+category: Access control
+tags: [teams, permissions, organizations, access-control]
+sources:
+  - label: GitHub Docs — Organizations
+    url: https://docs.github.com/en/organizations
+readingTime: 5
+related: [organizations-overview, permissions-and-roles, repository-settings]
+order: 2
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Imagine an organization with 40 repositories and 25 engineers. Granting access repository-by-repository, person-by-person, means 1,000 individual decisions to get right — and to keep right as people join, move teams, and leave. Nobody manages that by hand reliably.
+
+**Teams** fix this by adding one layer of indirection: you grant a *team* access to a repository once, then add and remove *people* from the team as needed. Permissions update automatically for everyone in it.
+
+## How teams work
+
+A team is a named group of organization members — `backend`, `design`, `on-call`, whatever groupings make sense for how you actually work. Each team is given a permission level (read, triage, write, maintain, or admin — see [Permissions & Roles](/github/security/permissions-and-roles)) on one or more repositories.
+
+```
+Team: backend
+Members: alice, bob, carla
+Repositories:
+  api-server    → write
+  infra-scripts → maintain
+```
+
+Add `dana` to the `backend` team, and she instantly has write access to `api-server` and maintain access to `infra-scripts` — no separate steps per repository.
+
+## Nested teams
+
+Teams can have parent-child relationships. A `platform` parent team might contain `backend` and `data` as child teams. Permissions granted to the parent team apply to everyone in every child team too, which mirrors how most orgs are actually structured — broad groups that break down into specialized ones.
+
+## Team vs. individual access
+
+You can still add a specific person directly to a repository outside of any team — useful for a one-off contributor. But as a rule of thumb: if more than one or two people need the same access, that's a team, not a pile of individual grants. Individual grants are easy to forget about; team membership is visible in one place and easy to audit.
+
+<Callout type="tip">
+Mention a team the same way you'd mention a person — `@acme-inc/backend` in an issue or PR notifies every member and is a fast way to request a review from "whoever's available" on that team.
+</Callout>
+
+## Team-level defaults
+
+Beyond repository access, a team can also have:
+
+- A **description** and visibility (visible to the whole org, or secret)
+- **Team discussions**, a lightweight space for team-only conversations
+- A **default code review assignment**, so reviews get spread across members automatically instead of always landing on the same person
+
+<Callout type="warning">
+Removing someone from the organization removes them from every team automatically — but removing someone from just one team leaves their *other* team memberships and any directly-granted repository access untouched. Offboarding someone fully means removing them from the organization, not just their main team.
+</Callout>
+
+## Try it yourself
+
+In an organization you manage, create a team, add one repository to it with write access, then add yourself and one other member. Check that repository's Settings → Collaborators and teams page — you'll see the team listed as a single access grant, not as individual rows per person.

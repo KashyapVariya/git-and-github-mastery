@@ -1,0 +1,43 @@
+---
+title: I'm in a detached HEAD state
+symptom: "Git printed a warning about 'detached HEAD' after I checked out a commit or tag, and now I'm not sure what branch I'm on."
+summary: You're not on any branch — you're looking at a specific commit directly. Save any new work to a real branch before switching away.
+severity: moderate
+tags: [detached-head, checkout, branches]
+sources:
+  - label: Git — git checkout
+    url: https://git-scm.com/docs/git-checkout
+related: [committed-to-wrong-branch, recover-deleted-branch]
+order: 3
+lastReviewed: 2026-01-15
+---
+
+## Diagnosis
+
+This happens whenever you check out something that isn't a branch name — a commit hash, a tag, or `origin/main` directly. `HEAD` now points straight at a commit instead of at a branch, which means any new commits you make won't belong to a branch and can become hard to find later.
+
+Run `git status` — it will say `HEAD detached at a1b2c3d`, confirming you're in this state.
+
+## Fix
+
+**If you haven't made any commits here**, just switch to a real branch — nothing is at risk:
+
+```bash
+git switch main
+```
+
+**If you already made commits you want to keep**, save them to a new branch before doing anything else:
+
+```bash
+git switch -c save-my-work
+```
+
+That single command creates a branch pointing at your current (detached) commit and moves you onto it — your commits are now safely reachable from a named branch.
+
+<Callout type="warning">
+If you switch away from a detached HEAD *without* saving to a branch first, those commits become unreachable from any branch. They're not deleted immediately, but Git will eventually garbage-collect them. If this already happened, see [Recover a deleted branch](/fix-it/recover-deleted-branch) — the same reflog trick applies.
+</Callout>
+
+<Callout type="tip">
+Detached HEAD isn't a mistake by itself — it's exactly how you're supposed to browse old commits or try out a tag. It only becomes a problem if you forget you're there and start committing.
+</Callout>

@@ -1,0 +1,49 @@
+---
+title: Branch Protection Rules
+summary: Branch protection rules stop people (including you) from pushing straight to important branches without review or passing checks.
+level: advanced
+primaryTab: github
+subtab: security
+category: Access control
+tags: [branch-protection, security, pull-requests]
+sources:
+  - label: GitHub Docs — Code security
+    url: https://docs.github.com/en/code-security
+readingTime: 4
+related: [rulesets, permissions-and-roles, code-scanning-codeql]
+order: 1
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Without any rules, anyone with write access can push straight to `main` — no review, no tests, no safety net. Branch protection rules let you say, in plain settings, "nothing gets onto this branch unless it's been reviewed and it passes CI."
+
+## What you can require
+
+In a repository's Settings → Branches, you add a rule for a branch name pattern (like `main`, or `release/*`) and turn on any combination of:
+
+- **Require a pull request before merging** — no direct pushes at all
+- **Require approvals** — at least N people must approve
+- **Require status checks to pass** — your CI workflow must succeed first
+- **Require branches to be up to date** before merging — forces people to pull in the latest `main` first
+- **Require conversation resolution** — every review comment thread must be marked resolved
+- **Require signed commits**
+- **Include administrators** — even repo admins have to follow the rule (turn this on; exceptions defeat the point)
+- **Restrict who can push** — limit direct pushes to specific people or teams, even when a PR isn't strictly required
+
+## A sane default for a small team
+
+Require a pull request, require at least one approval, require your CI status check to pass, and include administrators. That alone stops the two most common accidents: an untested change landing on `main`, and someone merging their own unreviewed work under time pressure.
+
+<Callout type="tip">
+Status checks only appear as an option in this settings screen after they've run at least once on the repository. Push a commit through a workflow first, then come back to require it.
+</Callout>
+
+<Callout type="warning">
+Protection rules apply per branch name pattern. Protecting `main` does nothing for `release/1.0` — add a separate rule (or a pattern like `release/*`) for every branch that matters.
+</Callout>
+
+## Try it yourself
+
+On a repository you own, protect `main`: require a pull request and one approval. Then try pushing directly to `main` from your terminal — Git will let the push start, but GitHub will reject it with a message explaining exactly which rule blocked you.

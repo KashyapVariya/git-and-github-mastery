@@ -1,0 +1,46 @@
+---
+title: Permissions & Roles
+summary: GitHub grants access through roles — at the repository level and the organization level — that decide exactly what each person can see and do.
+level: advanced
+primaryTab: github
+subtab: security
+category: Access control
+tags: [permissions, roles, organizations]
+sources:
+  - label: GitHub Docs — Organizations
+    url: https://docs.github.com/en/organizations
+readingTime: 4
+related: [teams-and-permissions, branch-protection-rules, organizations-overview]
+order: 9
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Not everyone who touches a project should be able to do everything to it. A contributor fixing a typo doesn't need the ability to delete the repository or change billing. Roles are how GitHub keeps "can suggest a change" separate from "can destroy the project."
+
+## Repository roles
+
+From least to most access: **Read** (clone, open issues), **Triage** (also manage issues and PRs without write access to code), **Write** (push branches, merge PRs), **Maintain** (also manage some repository settings, without full admin), and **Admin** (everything, including deleting the repository and managing access itself).
+
+For a repository that belongs to an organization, these roles are usually granted through team membership rather than one person at a time — see [Teams & permissions](/github/admin-teams/teams-and-permissions).
+
+## Organization roles
+
+Separately, every member of an organization has an org-wide role: **Member** (the default — can be added to teams and repositories), **Moderator** (can additionally manage some community-health features org-wide), and **Owner** (full control — billing, security settings, who else is an owner). Owner is powerful and should be held by very few people.
+
+## A practical rule of thumb
+
+Grant the *lowest* role that lets someone do their actual job. A new contributor gets Write on the specific repository they're working in, not Admin "to be safe." Reserve Admin and Owner for people who genuinely need to change settings, manage access, or handle billing — and review who holds those roles periodically, since access has a way of accumulating and never getting cleaned up.
+
+<Callout type="golden">
+This is the principle of least privilege, and it's not just theoretical caution — it directly limits the damage from a compromised account. If a Write-level account is compromised, an attacker can push bad code. If an Owner-level account is compromised, they can change security settings, add themselves elsewhere, and cover their tracks.
+</Callout>
+
+<Callout type="tip">
+Audit organization owners at least twice a year. It's common for someone to be made an owner "temporarily" and never demoted.
+</Callout>
+
+## Try it yourself
+
+If you manage an organization, list everyone with the Owner role (Settings → People, filter by role) and confirm each one still genuinely needs it.

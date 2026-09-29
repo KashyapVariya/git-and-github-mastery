@@ -1,0 +1,47 @@
+---
+title: Project Views — Board, Table, and Roadmap
+summary: The same Project data can be viewed as a kanban board, a spreadsheet-style table, or a date-based roadmap — pick whichever answers your current question.
+level: intermediate
+primaryTab: github
+subtab: project-management
+category: Planning
+tags: [projects, views, roadmap, table]
+sources:
+  - label: GitHub Docs — Issues (includes Projects)
+    url: https://docs.github.com/en/issues
+readingTime: 4
+related: [github-projects, milestones-and-tracking]
+order: 2
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+"What's the status of everything?" and "What's shipping in the next two weeks?" are different questions, and they deserve different layouts. Instead of forcing you into one format, a GitHub Project lets you create multiple *views* of the same underlying items — each with its own filters, grouping, and sort order.
+
+## The three main shapes
+
+**Board view** groups cards into columns by a field you choose — usually Status. It's the classic kanban layout: drag a card from "In Progress" to "Done" and the field updates. Best for a quick, visual sense of what's moving.
+
+**Table view** looks like a spreadsheet: one row per item, one column per field, fully sortable and filterable. Best when you need to scan many items at once, bulk-edit a field, or group by something other than status (like assignee or priority).
+
+**Roadmap view** lays items out on a timeline, using date fields you define (like "Start date" and "Target date"). Best for answering "what's landing when" across a quarter, especially when items span multiple weeks.
+
+## Building a view
+
+Every view is just a saved combination of:
+
+- **Layout** — board, table, or roadmap
+- **Filter** — e.g. only show items where Status is not Done
+- **Group by** — e.g. group board columns by Status, or table rows by Assignee
+- **Sort** — e.g. table sorted by Priority, then Target date
+
+You can create as many views as you want on one Project — a "Sprint board" view for daily standups and a separate "Quarterly roadmap" view for planning, both pulling from the exact same items.
+
+<Callout type="tip">
+Save a view per audience. A dense table view is great for you triaging issues; a simple two-column board ("Todo" / "Done") is friendlier when you share the link with someone outside the team.
+</Callout>
+
+## Try it yourself
+
+On a Project you've created, add a second view set to Table layout, group it by Assignee instead of Status, and compare how differently it reads from the default board.

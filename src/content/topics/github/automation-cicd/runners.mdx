@@ -1,0 +1,60 @@
+---
+title: Runners — GitHub-Hosted vs Self-Hosted
+summary: A runner is the actual machine that executes your workflow's jobs — GitHub provides free ones, or you can register your own hardware.
+level: intermediate
+primaryTab: github
+subtab: automation-cicd
+category: CI/CD
+tags: [github-actions, runners, self-hosted]
+sources:
+  - label: GitHub Docs — Actions
+    url: https://docs.github.com/en/actions
+readingTime: 4
+related: [jobs-and-steps, environments-and-approvals]
+order: 5
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Every job has to execute somewhere. `runs-on:` is where you say where — and the choice affects speed, cost, and what your workflow is allowed to access.
+
+## GitHub-hosted runners
+
+By default, every job runs on a fresh, temporary virtual machine that GitHub provisions, runs your job on, and destroys afterward:
+
+```yaml
+runs-on: ubuntu-latest    # also available: windows-latest, macos-latest
+```
+
+Each run starts completely clean — no leftover state from a previous run, no risk of one job's mess affecting the next. Public repositories get GitHub-hosted runners for free; private repositories get a generous monthly quota of free minutes, then pay per minute beyond that (macOS and Windows runners cost more per minute than Linux).
+
+## Self-hosted runners
+
+You can also register your own machine — a server, a beefy desktop, a cloud VM you manage — as a runner:
+
+```yaml
+runs-on: self-hosted
+```
+
+or target a specific one by its labels:
+
+```yaml
+runs-on: [self-hosted, linux, gpu]
+```
+
+Self-hosted runners make sense when you need hardware GitHub doesn't offer (a GPU for ML workloads), need to reach resources inside a private network, or want to avoid per-minute costs at high volume.
+
+<Callout type="warning">
+Never use self-hosted runners on a *public* repository without careful isolation. Anyone can open a pull request, and a workflow that runs on a self-hosted runner for pull requests could let an attacker execute arbitrary code on your machine.
+</Callout>
+
+## Choosing
+
+<Callout type="tip">
+Default to GitHub-hosted runners. They're zero-maintenance, isolated by design, and cover the vast majority of CI needs. Reach for self-hosted only when you have a specific reason — special hardware, private network access, or cost at real scale.
+</Callout>
+
+## Try it yourself
+
+Compare `runs-on: ubuntu-latest` and `runs-on: windows-latest` on the same simple job (like printing the OS name) and look at how the available shell and default tools differ between the two.

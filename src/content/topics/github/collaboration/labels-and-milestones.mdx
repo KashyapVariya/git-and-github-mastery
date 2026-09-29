@@ -1,0 +1,63 @@
+---
+title: Labels and Milestones
+summary: Labels sort issues and pull requests by type or status; milestones group them toward a shared deadline or release.
+level: beginner
+primaryTab: github
+subtab: collaboration
+category: Issues
+tags: [labels, milestones, organization, issues]
+sources:
+  - label: GitHub Docs — Issues
+    url: https://docs.github.com/en/issues
+readingTime: 3
+related: [github-issues, pull-requests-basics, issue-and-pr-templates]
+order: 2
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+A repository with fifty open issues is unreadable without some way to filter it. Labels and milestones are GitHub's two built-in tools for that — one sorts issues sideways by category, the other groups them forward toward a goal.
+
+## Labels
+
+A label is a small colored tag you attach to an issue or pull request — `bug`, `enhancement`, `good first issue`, `needs-triage`. Every new repository ships with a small default set, which you can edit, delete, or add to from the **Labels** page under the Issues tab.
+
+Labels exist so you can filter. On the Issues tab, click a label to see only matching issues, or build a query directly in the search bar:
+
+```text
+is:issue is:open label:bug label:"help wanted"
+```
+
+Good label sets tend to separate concerns instead of piling everything into one list — for example, a *type* label (`bug`, `docs`, `feature`), a *status* label (`needs-triage`, `blocked`), and a *difficulty* label (`good first issue`) can all apply to the same issue at once, because an issue can carry as many labels as you like.
+
+<Callout type="tip">
+`good first issue` and `help wanted` are conventional labels that tools like GitHub's own contribution finder look for. Using them consistently makes your project easier to discover for new contributors.
+</Callout>
+
+## Milestones
+
+A milestone groups issues and pull requests around a shared target — usually a release version or a deadline, like `v2.0` or `Q3 launch`. Create one from the **Milestones** page under Issues, give it a title and an optional due date, then assign issues to it individually.
+
+Every milestone shows a live progress bar — open items versus closed — so at a glance you can see how close `v2.0` is to done without reading every linked issue.
+
+```text
+milestone:"v2.0" is:open
+```
+
+## Labels vs. milestones, at a glance
+
+| | Labels | Milestones |
+|---|---|---|
+| Purpose | Categorize | Group toward a target |
+| Can an item have more than one? | Yes, many | No, just one |
+| Has a due date? | No | Optional |
+| Shows progress? | No | Yes, a completion bar |
+
+<Callout type="info">
+Projects (the GitHub Projects board feature) can layer on top of labels and milestones for a richer, kanban-style view — that's covered separately, since it's a bigger feature in its own right.
+</Callout>
+
+## Try it yourself
+
+Pick a repository you maintain or contribute to. Create one new label that captures a category your issues don't currently distinguish (something like `needs-repro` or `discussion`), and apply it to a couple of existing open issues.

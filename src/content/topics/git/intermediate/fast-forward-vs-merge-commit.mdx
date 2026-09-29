@@ -1,0 +1,78 @@
+---
+title: Fast-Forward vs. Merge Commit
+summary: Two different things can happen when you merge — a simple pointer move, or a new commit that ties two histories together. Here's what decides which one you get.
+level: intermediate
+primaryTab: git
+subtab: intermediate
+category: Merging
+tags: [merging, fast-forward, branching, history]
+sources:
+  - label: Git — git diff
+    url: https://git-scm.com/docs/git-diff
+readingTime: 5
+related: [resolving-merge-conflicts, tagging-releases, diffing-changes]
+order: 10
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Run `git merge` twice on two seemingly similar branches, and you can get two completely different results: sometimes nothing new appears in the log at all, just your branch pointer sliding forward; other times a new commit shows up with two parents, visibly stitching two lines of history together. Neither is wrong — they're Git's two honest answers to the same question, and which one you get depends entirely on whether the branches actually diverged.
+
+## Fast-forward: nothing to reconcile
+
+Picture `main` sitting still while you make three commits on `feature`. `main` never moved — every commit on `feature` already comes *after* the point where the two branches split, in a straight line.
+
+```text
+main:     A---B
+                \
+feature:         C---D---E
+```
+
+Merge `feature` into `main` here, and there's genuinely nothing to combine. `main` is missing commits C, D, and E, and it has nothing of its own that `feature` doesn't already include. So Git takes the simplest path: it just moves `main`'s pointer forward to E. No new commit, no merge to reconcile — this is a **fast-forward** merge, and it's Git's default behavior whenever it's possible.
+
+## Merge commit: two histories, tied together
+
+Now picture `main` also picking up a commit of its own while `feature` was being worked on:
+
+```text
+main:     A---B---F
+                \
+feature:         C---D---E
+```
+
+`main` has commit F that `feature` doesn't have; `feature` has C, D, E that `main` doesn't have. The branches have genuinely diverged, and there's no single straight line through both. Git's only option is to create a new **merge commit** — one with two parents, F and E — that represents "these two histories, combined."
+
+```bash
+git merge feature
+```
+
+This is automatic too: Git reaches for a merge commit whenever a fast-forward genuinely isn't possible, no extra flags needed.
+
+## Forcing the choice explicitly
+
+You can override Git's default judgment in either direction.
+
+```bash
+git merge --no-ff feature
+```
+
+Forces a merge commit even when a fast-forward was possible. Many teams use this on purpose for feature branches — a fast-forward leaves *no trace* that a feature branch ever existed, while `--no-ff` keeps a visible marker in the log: "this group of commits was `feature`, merged in right here."
+
+```bash
+git merge --ff-only feature
+```
+
+The opposite: refuses to merge at all unless a fast-forward is possible, erroring out otherwise. Useful in scripts or workflows where you want to be alerted the moment a branch has diverged, rather than silently getting a merge commit.
+
+<Callout type="tip">
+On GitHub, the "Squash and merge" and "Rebase and merge" buttons are separate from this entirely — they rewrite the incoming commits first. The plain "Merge" button is the one that follows fast-forward-or-merge-commit logic described here, and repository settings can force it to always create a merge commit.
+</Callout>
+
+<Callout type="golden">
+A fast-forward merge is Git's way of saying "there was nothing to actually merge." That's not a lesser outcome — it just means the target branch hadn't changed since you branched off.
+</Callout>
+
+## Try it yourself
+
+Create a branch, make one commit on it, and merge it straight back into `main` with no other changes in between — watch `git log --oneline --graph` show a flat, straight line with no merge commit. Then repeat the experiment, but this time make a commit on `main` too before merging, and compare the graph.

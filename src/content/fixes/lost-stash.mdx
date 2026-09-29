@@ -1,0 +1,47 @@
+---
+title: I can't find my stash
+symptom: "I ran git stash earlier and now git stash list shows nothing, or I dropped one by mistake."
+summary: A dropped stash is a dangling commit — it can usually be found and restored with git fsck.
+severity: moderate
+tags: [stash, recovery]
+sources:
+  - label: Git — git stash
+    url: https://git-scm.com/docs/git-stash
+related: [recover-deleted-branch]
+order: 10
+lastReviewed: 2026-01-15
+---
+
+## Diagnosis
+
+`git stash pop` removes the stash entry once it's applied — that's expected. But if you ran `git stash drop` by mistake, or `git stash clear` wiped the whole list, the work isn't necessarily gone: a stash is really just a couple of special commits, and dropping it only removes the reference to them.
+
+## Fix
+
+Search for dangling commits that look like stashes:
+
+```bash
+git fsck --no-reflog | awk '/dangling commit/ {print $3}'
+```
+
+Inspect each hash it prints with:
+
+```bash
+git show <hash>
+```
+
+Once you recognize the right one, either apply it directly:
+
+```bash
+git stash apply <hash>
+```
+
+or turn it back into a normal stash entry first:
+
+```bash
+git stash store -m "recovered stash" <hash>
+```
+
+<Callout type="warning">
+This only works if garbage collection hasn't run yet. The longer you wait after dropping a stash, the less likely this recovery is to work — try it as soon as you notice.
+</Callout>

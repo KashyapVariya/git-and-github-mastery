@@ -1,0 +1,62 @@
+---
+title: Merging Basics
+summary: git merge combines the history of two branches into one — usually by adding a merge commit that ties both timelines together.
+level: beginner
+primaryTab: git
+subtab: fundamentals
+category: Branching
+tags: [git-merge, branches, merge-commit]
+sources:
+  - label: Pro Git — Basic Branching and Merging
+    url: https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging
+  - label: Git — git merge
+    url: https://git-scm.com/docs/git-merge
+readingTime: 4
+related: [branching-basics, switching-branches, fast-forward-vs-merge-commit]
+order: 15
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+A branch is only useful temporarily on its own — eventually you want its work back in `main`. Merging is how that happens: Git combines two branches' histories into one.
+
+## The basic flow
+
+```bash
+git switch main
+git merge feature/dark-mode
+```
+
+Notice the order: you switch to the branch you want to **receive** the changes, then merge the other branch **into** it. `git merge feature/dark-mode` while on `main` means "bring dark-mode's work into main" — not the other way around.
+
+If nothing else changed on `main` since the branch was created, Git usually creates a **merge commit** — a special commit with two parents, one from each branch — that ties the two timelines together:
+
+```text
+*   a1b2c3d Merge branch 'feature/dark-mode'
+|\
+| * 9f8e7d6 Add dark mode toggle
+| * 7c6b5a4 Add dark color palette
+|/
+* 1234567 Initial commit
+```
+
+## When there's no conflict
+
+If the two branches changed different, unrelated parts of the project, Git merges them completely automatically — no input needed from you at all. This is the common case for most day-to-day merges.
+
+## When there is a conflict
+
+If both branches changed the *same lines* of the *same file*, Git can't guess which version is correct and pauses, asking you to decide. This is completely normal and not something to worry about — see [I have a merge conflict](/fix-it/merge-conflict-basics) for exactly how to resolve one.
+
+<Callout type="tip">
+Not every merge creates a merge commit — if your current branch has no new commits of its own since the other branch split off, Git can just move the pointer forward instead. That's called a fast-forward, and it's covered in detail in [Fast-forward vs merge commit](/git/intermediate/fast-forward-vs-merge-commit).
+</Callout>
+
+<Callout type="golden">
+Merging never deletes the branch you merged in. `feature/dark-mode` still exists after merging it into `main` — you clean it up separately with `git branch -d feature/dark-mode` once you're sure you don't need it anymore.
+</Callout>
+
+## Try it yourself
+
+Create a branch, make a commit on it, switch back to `main`, and merge the branch in. Run `git log --oneline --graph --all` before and after — watching the graph change is the clearest way to understand what a merge actually did.

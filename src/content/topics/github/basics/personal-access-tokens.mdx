@@ -1,0 +1,49 @@
+---
+title: Personal Access Tokens
+summary: A personal access token stands in for your password when you authenticate over HTTPS or call GitHub's API — scoped, revocable, and never your actual account password.
+level: beginner
+primaryTab: github
+subtab: basics
+category: Account setup
+tags: [tokens, authentication, api, security]
+sources:
+  - label: GitHub Docs — Authentication
+    url: https://docs.github.com/en/authentication
+readingTime: 4
+related: [ssh-keys, two-factor-authentication]
+order: 4
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+GitHub stopped accepting your actual account password for Git operations and API calls years ago — for good reason: a password grants full access and can't easily be limited or individually revoked. A personal access token (PAT) replaces it: a long random string that acts like a password but can be scoped to specific permissions and deleted independently, without changing your real password.
+
+## When you need one
+
+If you clone or push over **HTTPS** (rather than SSH), Git will prompt for a username and password — and that "password" needs to be a personal access token. If you use **SSH** instead (see [SSH Keys](/github/basics/ssh-keys)), you generally don't need a token for everyday Git commands at all. Tokens are also how third-party tools and scripts authenticate against GitHub's REST or GraphQL API.
+
+## Fine-grained vs classic tokens
+
+GitHub offers two kinds:
+
+- **Fine-grained tokens** (recommended) let you limit access to specific repositories and specific permissions — read-only on issues, but no access to code, for example. They also expire automatically after a date you choose.
+- **Classic tokens** are simpler but broader: once created, a classic token typically has access to everything covered by the scopes you picked, across all your repositories.
+
+For anything new, prefer a fine-grained token scoped as narrowly as the task actually needs.
+
+## Creating one
+
+In GitHub, go to Settings → Developer settings → Personal access tokens, choose "Fine-grained tokens," pick an expiration date, select the repositories it should apply to, and choose the minimum permissions required (e.g. "Contents: Read and write" for pushing code).
+
+<Callout type="warning">
+Treat a token exactly like a password: never commit it to a repository, paste it into a public chat, or hardcode it into source code. If one leaks, revoke it immediately from the same settings page — that instantly invalidates it everywhere.
+</Callout>
+
+<Callout type="tip">
+Using a token for `git push` over HTTPS constantly? Let a credential manager (Git for Windows and macOS both include one) securely remember it, so you're not pasting it in every time.
+</Callout>
+
+## Try it yourself
+
+Create a fine-grained personal access token scoped to just one test repository with read/write on Contents, and use it once to clone that repo over HTTPS.

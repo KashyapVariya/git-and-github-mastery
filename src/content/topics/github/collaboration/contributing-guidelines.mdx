@@ -1,0 +1,65 @@
+---
+title: Contributing Guidelines
+summary: A CONTRIBUTING file tells new contributors exactly how to set up, propose, and submit changes — so they don't have to reverse-engineer your process.
+level: beginner
+primaryTab: github
+subtab: collaboration
+category: Community
+tags: [contributing, community, documentation]
+sources:
+  - label: GitHub Docs — Building communities
+    url: https://docs.github.com/en/communities
+readingTime: 4
+related: [issue-and-pr-templates, github-discussions, codeowners, readme-files]
+order: 11
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+A README tells people what your project does. It rarely tells them how to actually contribute to it — what to install, which branch to target, how tests get run, whether you even want outside pull requests at all. Without that information written down somewhere, every new contributor has to ask, or worse, guess. A `CONTRIBUTING.md` file exists to answer those questions once, in writing, instead of repeatedly in conversation.
+
+## Where it lives
+
+Place it at the repository root, or inside a `.github/` or `docs/` folder — GitHub checks all three. Once found, GitHub automatically links it from a banner shown when someone opens a new issue or pull request, so contributors see it at exactly the right moment.
+
+## What to include
+
+A useful CONTRIBUTING file usually answers, in order:
+
+1. **How to set up the project locally** — install steps, required tools, how to run it
+2. **How to run tests** — the exact command, and what "passing" looks like
+3. **The branch or workflow to use** — fork-and-PR, feature branches, a specific naming convention
+4. **Code style expectations** — a linter to run, a formatter, or just "match the existing style"
+5. **How commits and PRs should look** — commit message conventions, whether small PRs are preferred
+6. **Who to ask** — a Discussions category, a chat channel, or specific maintainers to tag
+
+```markdown
+## Setting up
+
+1. Clone your fork: `git clone git@github.com:you/project.git`
+2. Install dependencies: `npm install`
+3. Run tests: `npm test`
+
+## Submitting a change
+
+- Create a branch off `main`: `git checkout -b fix/short-description`
+- Keep pull requests focused on one change
+- Reference the issue number in your PR description if one exists
+```
+
+<Callout type="tip">
+Write the setup section by actually following it on a clean checkout. It's the section most likely to have quietly gone stale — a dependency that changed, a command that got renamed — and it's the very first thing a new contributor tries.
+</Callout>
+
+## Setting expectations, not just steps
+
+The most useful CONTRIBUTING files also set expectations, not just mechanics: is this project actively looking for outside contributions, or mostly maintained internally with occasional external fixes accepted? Are large feature PRs welcome, or should those start as a discussion first? Being upfront here saves a contributor from spending a weekend on a pull request that was never going to be accepted.
+
+<Callout type="golden">
+The kindest thing a CONTRIBUTING file can do is set expectations early — "please open an issue before starting work on a large change" prevents far more frustration than any amount of code review after the fact.
+</Callout>
+
+## Try it yourself
+
+Pick a project you'd like to contribute to. Look for its CONTRIBUTING file (or the banner GitHub shows when opening a new issue) before writing a single line of code, and follow its setup steps exactly as written.

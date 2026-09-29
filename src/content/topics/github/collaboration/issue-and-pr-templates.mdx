@@ -1,0 +1,105 @@
+---
+title: Issue and Pull Request Templates
+summary: Templates pre-fill new issues and pull requests with the questions you actually need answered, so contributors don't have to guess.
+level: intermediate
+primaryTab: github
+subtab: collaboration
+category: Community
+tags: [templates, issues, pull-requests, community]
+sources:
+  - label: GitHub Docs — Building communities
+    url: https://docs.github.com/en/communities
+readingTime: 4
+related: [github-issues, contributing-guidelines, codeowners]
+order: 10
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+"It doesn't work" is a bug report with almost no useful information in it. The maintainer has to reply and ask what browser, what version, what steps — a round trip that a template could have skipped entirely. Issue and pull request templates pre-fill that blank text box with the specific questions your project actually needs answered, before a contributor even starts typing.
+
+## Issue templates
+
+Live in `.github/ISSUE_TEMPLATE/` as either plain Markdown files or, more flexibly, YAML forms. A Markdown template is just pre-written text:
+
+```markdown
+---
+name: Bug report
+about: Report something that's broken
+title: "[Bug]: "
+labels: bug
+---
+
+**Describe the bug**
+A clear description of what went wrong.
+
+**Steps to reproduce**
+1.
+2.
+
+**Expected behavior**
+
+
+**Environment**
+- OS:
+- Version:
+```
+
+A YAML form (`bug_report.yml`) goes further, rendering actual structured fields — dropdowns, checkboxes, required text inputs — instead of a single Markdown blob:
+
+```yaml
+name: Bug report
+description: Report something that's broken
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Version
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+```
+
+With multiple templates in that folder, GitHub shows a chooser when someone clicks **New issue**, so "bug report" and "feature request" can ask for completely different information.
+
+## Pull request templates
+
+A single file, most simply `.github/PULL_REQUEST_TEMPLATE.md`, whose contents pre-fill the description box every time someone opens a PR:
+
+```markdown
+## What does this change do?
+
+
+## How was it tested?
+
+
+## Checklist
+- [ ] Tests pass locally
+- [ ] Docs updated if needed
+```
+
+Unlike issue templates, there's no built-in chooser for multiple PR templates without extra configuration — most repositories just use one.
+
+<Callout type="tip">
+Keep the checklist short. A ten-item checklist gets rubber-stamped without being read; three or four items people can genuinely self-verify actually get used.
+</Callout>
+
+## Why this matters more than it seems
+
+Templates aren't about bureaucracy — they're a quiet form of documentation. A well-written bug report template teaches a first-time contributor what "enough detail" looks like for your project, without anyone having to explain it to them individually.
+
+<Callout type="info">
+A repository can also add a `.github/config.yml` alongside issue templates to add extra links in the chooser — pointing people to a Discussions Q&A category or a support forum instead of opening an issue for a question.
+</Callout>
+
+## Try it yourself
+
+Add a simple `.github/PULL_REQUEST_TEMPLATE.md` to a repository you maintain with two or three questions you genuinely want every contributor to answer, then open a test PR to see it appear pre-filled.

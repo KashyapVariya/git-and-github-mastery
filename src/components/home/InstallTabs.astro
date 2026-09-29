@@ -1,0 +1,77 @@
+---
+import Icon from '../ui/Icon.astro';
+
+const panels = [
+  {
+    id: 'mac',
+    label: 'macOS',
+    steps: [
+      { cmd: 'xcode-select --install', note: 'Fastest path — installs Apple’s Command Line Tools, which include Git.' },
+      { cmd: 'brew install git', note: 'Or, if you use Homebrew, install the latest Git directly.' },
+    ],
+  },
+  {
+    id: 'windows',
+    label: 'Windows',
+    steps: [
+      { cmd: 'winget install --id Git.Git -e --source winget', note: 'Installs Git for Windows via the built-in winget package manager.' },
+      { cmd: '', note: 'No winget? Download the installer from git-scm.com/download/win and keep the defaults — they include Git Bash, a solid terminal for Git on Windows.' },
+    ],
+  },
+  {
+    id: 'linux',
+    label: 'Linux',
+    steps: [
+      { cmd: 'sudo apt install git', note: 'Debian, Ubuntu, and derivatives.' },
+      { cmd: 'sudo dnf install git', note: 'Fedora and RHEL-based distributions.' },
+      { cmd: 'sudo pacman -S git', note: 'Arch and Arch-based distributions.' },
+    ],
+  },
+];
+---
+
+<div class="install-tabs">
+  {panels.map((p, i) => <input type="radio" name="install-os" id={`os-${p.id}`} class="sr-only" checked={i === 0} />)}
+
+  <div class="mb-4 flex gap-1.5" role="tablist">
+    {panels.map((p) => (
+      <label for={`os-${p.id}`} class="tab-label chip cursor-pointer select-none" data-target={p.id}>
+        {p.label}
+      </label>
+    ))}
+  </div>
+
+  {panels.map((p) => (
+    <div class="panel space-y-3" data-panel={p.id}>
+      {p.steps.map((s) => (
+        <div class="rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-elevated)] p-3">
+          {s.cmd && (
+            <div class="mb-1.5 flex items-center justify-between gap-2 rounded-md bg-[var(--color-bg)] px-3 py-2 font-mono text-[13px] text-[var(--color-git-orange-soft)]">
+              <code>{s.cmd}</code>
+              <button type="button" data-copy="self" data-copy-text={s.cmd} class="shrink-0 text-[var(--color-ink-faint)] hover:text-[var(--color-ink)]" aria-label="Copy command">
+                <Icon name="copy" size={13} />
+              </button>
+            </div>
+          )}
+          <p class="text-[13px] leading-relaxed text-[var(--color-ink-muted)]">{s.note}</p>
+        </div>
+      ))}
+    </div>
+  ))}
+</div>
+
+<style>
+  .install-tabs .panel { display: none; }
+  .install-tabs:has(#os-mac:checked) .panel[data-panel='mac'] { display: block; }
+  .install-tabs:has(#os-windows:checked) .panel[data-panel='windows'] { display: block; }
+  .install-tabs:has(#os-linux:checked) .panel[data-panel='linux'] { display: block; }
+
+  .install-tabs .tab-label { transition: all 0.2s ease; }
+  .install-tabs:has(#os-mac:checked) label[data-target='mac'],
+  .install-tabs:has(#os-windows:checked) label[data-target='windows'],
+  .install-tabs:has(#os-linux:checked) label[data-target='linux'] {
+    border-color: color-mix(in srgb, var(--color-git-orange) 50%, var(--color-border));
+    background: color-mix(in srgb, var(--color-git-orange) 12%, var(--color-bg-elevated));
+    color: var(--color-git-orange-soft);
+  }
+</style>

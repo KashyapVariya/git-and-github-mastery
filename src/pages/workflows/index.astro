@@ -1,0 +1,45 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import TopicCard from '../../components/topic/TopicCard.astro';
+import ProgressRing from '../../components/ui/ProgressRing.tsx';
+
+const topics = (await getCollection('topics', ({ data }) => data.primaryTab === 'workflows' && !data.draft)).sort(
+  (a, b) => a.data.order - b.data.order || a.data.title.localeCompare(b.data.title),
+);
+const slugs = topics.map((t) => t.id);
+---
+
+<Layout
+  title="Workflows"
+  description="Branching strategies, commit conventions, versioning, and the team habits that keep a codebase healthy."
+  primaryTab="workflows"
+>
+  <div class="mx-auto max-w-[1400px] px-4 py-10 sm:px-6 sm:py-14">
+    <div data-reveal class="mb-10 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <h1 class="text-3xl font-bold tracking-tight text-[var(--color-ink)] sm:text-4xl">Workflows</h1>
+        <p class="mt-3 max-w-2xl text-[15px] leading-relaxed text-[var(--color-ink-muted)]">
+          Git gives you the tools; workflows are the agreements your team makes about how to use them — branching strategy, commit style, releases, and review culture.
+        </p>
+      </div>
+      {slugs.length > 0 && (
+        <div class="glass-card shrink-0 px-4 py-3">
+          <ProgressRing slugs={slugs} label="workflows read" client:visible />
+        </div>
+      )}
+    </div>
+
+    {topics.length === 0 ? (
+      <p class="rounded-xl border border-dashed border-[var(--color-border)] px-4 py-10 text-center text-sm text-[var(--color-ink-faint)]">
+        Workflow guides are being written — check back soon.
+      </p>
+    ) : (
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {topics.map((t) => (
+          <TopicCard title={t.data.title} summary={t.data.summary} level={t.data.level} href={`/workflows/${t.id.split('/').pop()}`} readingTime={t.data.readingTime} category={t.data.category} />
+        ))}
+      </div>
+    )}
+  </div>
+</Layout>

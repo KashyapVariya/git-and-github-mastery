@@ -1,0 +1,92 @@
+---
+title: Tagging Releases
+summary: Tags mark a specific commit permanently, most commonly to record a release like v1.2.0 — unlike branches, they don't move.
+level: intermediate
+primaryTab: git
+subtab: intermediate
+category: Releases
+tags: [tags, releases, versioning]
+sources:
+  - label: Git — git tag
+    url: https://git-scm.com/docs/git-tag
+  - label: Pro Git — Tagging
+    url: https://git-scm.com/book/en/v2/Git-Basics-Tagging
+readingTime: 4
+related: [amending-commits, diffing-changes, fast-forward-vs-merge-commit]
+order: 2
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Branches are great for ongoing work, but they're moving targets — every new commit shifts where `main` points. Sometimes you need the opposite: a permanent, unmoving label on one exact commit, so you can always find "this is what we shipped as v1.2.0" no matter how much history piles up after it. That's what a tag is.
+
+Think of a branch as a sticky note that follows you around as you work, and a tag as a label stuck to a specific page in a notebook — it stays put forever, pointing at that one page.
+
+## Lightweight tags
+
+The simplest tag is just a name pointing at a commit:
+
+```bash
+git tag v1.2.0
+```
+
+This tags the current `HEAD`. It's called a *lightweight* tag because it's nothing more than a pointer — no extra metadata, no message. It's fine for quick, personal bookmarks, but it's not what you want for anything you're going to publish as an official release.
+
+## Annotated tags
+
+For anything meaningful — a public release, a version you'll refer back to — use an *annotated* tag instead:
+
+```bash
+git tag -a v1.2.0 -m "Release 1.2.0: adds CSV export"
+```
+
+An annotated tag is a full object in Git's database: it stores the tagger's name and email, the date, and a message, and it can optionally be cryptographically signed. It shows up with its own entry when you run `git show v1.2.0`, complete with that message, before the commit's own diff.
+
+If you forgot the `-m` and want to tag an older commit rather than `HEAD`, just add the commit hash at the end:
+
+```bash
+git tag -a v1.1.0 -m "Release 1.1.0" a1b2c3d
+```
+
+## Pushing tags
+
+Here's the part that catches people out: `git push` does **not** push tags by default. You have to say so explicitly.
+
+```bash
+git push origin v1.2.0        # push one tag
+git push origin --tags        # push every tag you have locally
+```
+
+## Listing, deleting, and checking out tags
+
+```bash
+git tag                       # list all tags
+git tag -l "v1.*"             # filter with a pattern
+git tag -d v1.1.0             # delete a tag locally
+git push origin --delete v1.1.0   # delete it from the remote too
+```
+
+You can also check out a tag to look at the project exactly as it was at that release:
+
+```bash
+git switch --detach v1.2.0
+```
+
+This puts you in a **detached HEAD** state — you're looking at history, not on a branch. It's perfectly safe to browse or build from here; just create a new branch (`git switch -c hotfix-1.2.1`) before you start committing new work.
+
+<Callout type="golden">
+For anything you'd call a "release," use an annotated tag, not a lightweight one. The metadata is cheap to add and genuinely useful six months later when you're trying to remember why v1.2.0 exists.
+</Callout>
+
+<Callout type="tip">
+Most projects follow [Semantic Versioning](https://semver.org) — `MAJOR.MINOR.PATCH` — so a glance at the tag name tells you whether an update is safe to pull in or likely to break something.
+</Callout>
+
+<Callout type="warning">
+Deleting a tag locally doesn't remove it from the remote, and vice versa — the two commands above are separate on purpose. If a tag's already been pulled by others, treat it like a published fact and avoid moving it to a different commit.
+</Callout>
+
+## Try it yourself
+
+In a test repository, make a commit, then run `git tag -a v0.1.0 -m "first tag"`. Run `git show v0.1.0` to see the tag's own metadata sitting above the commit diff, then `git tag` to see it listed.

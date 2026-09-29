@@ -1,0 +1,84 @@
+---
+title: Signing Commits
+summary: A signed commit cryptographically proves who created it, using either GPG or a plain SSH key — GitHub shows the result as a "Verified" badge.
+level: expert
+primaryTab: git
+subtab: expert
+category: Internals
+tags: [signing, gpg, ssh, verification, security]
+sources:
+  - label: Pro Git — Signing Your Work
+    url: https://git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work
+  - label: Git — git commit
+    url: https://git-scm.com/docs/git-commit
+readingTime: 6
+related: [git-objects-blob-tree-commit-tag, git-hooks, refs-and-head]
+order: 13
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Anyone can set `user.name` and `user.email` to whatever they like — Git trusts you at your word. A commit's author field alone proves nothing. Signing a commit adds a cryptographic signature that *does* prove something: that whoever holds a specific private key approved this exact content. That's the "Verified" badge you see next to commits on GitHub.
+
+## What actually gets signed
+
+Recall that a commit object is just text: a tree hash, parent hash(es), author, committer, and message (see [Git Objects](/git/expert/git-objects-blob-tree-commit-tag)). Signing a commit means running that exact content through a signing key and embedding the resulting signature as an extra field inside the commit object itself. Change a single character of the commit — even just the message — and the signature no longer matches, because the signature covers the commit's full content.
+
+```bash
+git cat-file -p HEAD
+```
+
+On a signed commit, you'll see a `gpgsig` field containing a block of signature data, right alongside `tree`, `parent`, and `author`.
+
+## Signing with GPG
+
+The traditional route uses a GPG key:
+
+```bash
+git config --global user.signingkey <your-key-id>
+git config --global commit.gpgsign true
+git commit -m "a signed commit"
+```
+
+`commit.gpgsign true` makes every commit signed by default, so you don't need to remember `-S` on each one. Verify a specific commit's signature with:
+
+```bash
+git log --show-signature -1
+```
+
+## Signing with SSH (the simpler modern option)
+
+Since Git 2.34, you can sign with a plain SSH key instead — much less setup if you already have one for pushing:
+
+```bash
+git config --global gpg.format ssh
+git config --global user.signingkey ~/.ssh/id_ed25519.pub
+git config --global commit.gpgsign true
+```
+
+Verification works against an "allowed signers" file you maintain locally, mapping email addresses to public keys — GitHub and GitLab handle this automatically for their own verification badge once you've added the same public key to your account.
+
+## Tags get signed too
+
+```bash
+git tag -s v1.0.0 -m "Release 1.0.0"
+```
+
+An **annotated** tag can carry a signature exactly like a commit can, which is why signed release tags are common practice — it proves the release itself, not just individual commits, came from someone holding the right key.
+
+<Callout type="tip">
+`git verify-commit <hash>` and `git verify-tag <tag>` check a signature directly from the command line, without needing to look at a hosting provider's UI.
+</Callout>
+
+<Callout type="warning">
+Signing proves *who created the commit object*, not that its content is good or safe. A malicious but validly signed commit still verifies successfully — signing is about authorship and integrity, not code review.
+</Callout>
+
+<Callout type="golden">
+A "Verified" badge only means what the underlying key exchange means: that the signature matches content, using a key someone previously uploaded to the platform. If you never bothered to add your key, none of your commits will show as verified even though nothing is actually wrong with them.
+</Callout>
+
+## Try it yourself
+
+Run `git config commit.gpgsign true` after setting up either a GPG or SSH signing key, make a commit, then run `git log --show-signature -1` — you'll see Git report whether the signature is good, and against which key.

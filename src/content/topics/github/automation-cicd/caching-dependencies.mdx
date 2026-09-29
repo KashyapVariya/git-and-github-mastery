@@ -1,0 +1,65 @@
+---
+title: Caching Dependencies
+summary: actions/cache saves slow-to-rebuild files like installed packages between workflow runs, turning a two-minute install into a ten-second cache restore.
+level: intermediate
+primaryTab: github
+subtab: automation-cicd
+category: CI/CD
+tags: [github-actions, caching, performance]
+sources:
+  - label: GitHub Docs — Actions
+    url: https://docs.github.com/en/actions
+readingTime: 4
+related: [jobs-and-steps, runners, matrix-builds]
+order: 8
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Every GitHub-hosted runner starts completely empty. Without caching, `npm install` (or your language's equivalent) downloads every dependency from scratch, every single run — slow, and wasteful, since the same dependencies rarely change between runs.
+
+## The core idea
+
+`actions/cache` saves a folder (or file) at the end of a successful run, keyed by something that identifies its contents — usually a hash of your lockfile. On the next run, if a cache with a matching key already exists, it's restored instead of rebuilt.
+
+```yaml
+steps:
+  - uses: actions/checkout@v4
+
+  - uses: actions/cache@v4
+    with:
+      path: ~/.npm
+      key: npm-${{ hashFiles('package-lock.json') }}
+      restore-keys: |
+        npm-
+
+  - run: npm ci
+```
+
+The `key` includes a hash of `package-lock.json` — as soon as that file changes (a dependency was added, updated, or removed), the key changes too, and a fresh cache is built instead of restoring stale packages. `restore-keys` is a fallback prefix: if there's no exact match, GitHub restores the most recent cache starting with `npm-` anyway, which is often still a useful head start.
+
+## The easy shortcut
+
+Many official setup actions bake this pattern in directly — no separate `actions/cache` step needed:
+
+```yaml
+- uses: actions/setup-node@v4
+  with:
+    node-version: 20
+    cache: npm          # handles the cache step for you
+```
+
+`setup-node`, `setup-python`, `setup-java`, and others all support a `cache:` input like this.
+
+<Callout type="warning">
+Caching speeds up installs, not correctness. Never cache in a way that could let a stale, vulnerable dependency silently persist across runs — the lockfile-hash key pattern above avoids exactly that problem by invalidating automatically when dependencies change.
+</Callout>
+
+<Callout type="tip">
+Caches are scoped per-branch by default with fallback to the base branch, so a pull request's first run can still benefit from `main`'s cache via `restore-keys`.
+</Callout>
+
+## Try it yourself
+
+Add the `cache: npm` (or your ecosystem's equivalent) input to a `setup-node`/`setup-python` step in a real workflow, and compare the install step's duration before and after on a second run.

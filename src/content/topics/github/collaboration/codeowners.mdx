@@ -1,0 +1,70 @@
+---
+title: CODEOWNERS
+summary: A CODEOWNERS file automatically requests review from the right people whenever a pull request touches the files they're responsible for.
+level: intermediate
+primaryTab: github
+subtab: collaboration
+category: Code review
+tags: [codeowners, code-review, automation]
+sources:
+  - label: GitHub Docs — Pull requests
+    url: https://docs.github.com/en/pull-requests
+readingTime: 4
+related: [code-review-on-github, pull-requests-basics, issue-and-pr-templates]
+order: 9
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+On a small project, "who should review this?" is obvious — there are only two or three of you. On a larger one, it isn't. A pull request touching the billing service and one touching the marketing website probably need completely different reviewers, and nobody wants to manually remember and re-assign that on every single PR. A `CODEOWNERS` file automates it: GitHub reads the file and requests review from the right people the instant a matching pull request opens.
+
+## Where it lives
+
+Create a plain text file named `CODEOWNERS` in one of these locations (GitHub checks them in order):
+
+```text
+.github/CODEOWNERS
+CODEOWNERS
+docs/CODEOWNERS
+```
+
+## The syntax
+
+Each line pairs a file pattern with one or more owners — a GitHub username or a team, both prefixed with `@`:
+
+```text
+# Default owner for everything in the repo
+*                       @kashyap
+
+# The billing service has its own team
+/services/billing/      @conversio/billing-team
+
+# A specific file needs a specific person
+/docs/security.md       @kashyap-v
+
+# Frontend code owned by two people
+/src/components/        @alice @bob
+```
+
+Patterns work like `.gitignore` — later matching lines override earlier ones, so put your broadest rule (often `*`) at the top and more specific overrides below it.
+
+## What happens automatically
+
+When a pull request changes a file matching a pattern, GitHub automatically adds the listed owner as a requested reviewer — no one has to remember to do it by hand. If the repository has branch protection requiring a **CODEOWNERS review**, that PR can't merge until one of the matched owners approves it, regardless of how many other people already approved.
+
+<Callout type="tip">
+Combine CODEOWNERS with branch protection's "Require review from Code Owners" setting for anything sensitive — configuration files, deployment scripts, security-related code — so those paths always get a specific person's eyes on them, even if the author forgets to ask.
+</Callout>
+
+## Keeping it accurate
+
+A stale CODEOWNERS file is worse than none at all — it either pings someone who left the team, or silently owns nothing because a path changed and no rule matches it anymore.
+
+<Callout type="warning">
+Only usernames and teams that actually have write access to the repository can be listed as owners. GitHub will flag a CODEOWNERS entry as invalid (with a small warning icon on the file) if it references someone without the right access level.
+</Callout>
+
+## Try it yourself
+
+If you maintain a repository with more than one contributor, add a `.github/CODEOWNERS` file with at least one rule — even just a catch-all `* @your-username` — and open a small test pull request to watch the review request get added automatically.

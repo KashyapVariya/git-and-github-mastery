@@ -1,0 +1,35 @@
+---
+title: I staged a file by mistake
+symptom: "I ran git add and now git status shows a file staged that I don't want to include in this commit."
+summary: Use git restore --staged to move a file out of the staging area without touching its actual edits.
+severity: minor
+tags: [staging, restore, add]
+sources:
+  - label: Git — git restore
+    url: https://git-scm.com/docs/git-restore
+related: [undo-last-commit]
+order: 9
+lastReviewed: 2026-01-15
+---
+
+## Diagnosis
+
+The file's *content* is fine — you just don't want it included in the next commit yet. This only affects the staging area, not your actual edits.
+
+## Fix
+
+```bash
+git restore --staged path/to/file.js
+```
+
+The file moves back to "modified, not staged" — your edits are untouched, `git status` just stops listing it under "Changes to be committed."
+
+**Using an older Git version without `restore`?** The equivalent is:
+
+```bash
+git reset HEAD path/to/file.js
+```
+
+<Callout type="tip">
+Want to unstage *everything* at once? Run `git restore --staged .` — it clears the whole staging area in one go.
+</Callout>

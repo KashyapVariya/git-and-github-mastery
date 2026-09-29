@@ -1,0 +1,60 @@
+---
+title: Code Review Culture
+summary: Good code review is fast, specific, and kind — it catches real problems without turning every pull request into a personal test.
+level: beginner
+primaryTab: workflows
+subtab: guides
+category: Collaboration
+tags: [workflows, code-review, collaboration, culture]
+sources:
+  - label: GitHub Docs — Pull requests
+    url: https://docs.github.com/en/pull-requests
+readingTime: 5
+related: [commit-message-conventions, github-flow, team-git-rules-checklist]
+order: 9
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+A pull request sitting unreviewed for a week doesn't just delay one change — it delays everyone who's building on top of it, and it teaches the author that shipping is slow, so why bother splitting work into small pieces? The mechanics of code review (leaving comments, approving, requesting changes) are easy to learn. The culture around it is what actually determines whether review helps or hurts your team.
+
+## What effective review looks like
+
+- **It's fast.** A first response within a day, even just "looks reasonable, will do a full pass tomorrow," keeps momentum. Silence is worse than a slow "no."
+- **It's specific.** "This could be cleaner" helps no one. "This loop re-fetches the user on every iteration — pulling it above the loop would avoid N extra requests" gives the author something to act on.
+- **It separates blocking from optional.** Not every comment needs to hold up the merge. Marking something "nit: " or "non-blocking:" tells the author it's a suggestion, not a requirement.
+- **It reviews the right things.** Correctness, security, and maintainability matter more than formatting — and formatting should usually be handled by a linter, not a human, so reviewers don't waste attention on it.
+
+## What erodes it
+
+- **Reviewing style the linter should catch.** If a human keeps commenting "missing semicolon," that's a tooling gap, not a review win.
+- **Vague rejection.** "This doesn't feel right" without a follow-up question forces the author to guess what you actually meant.
+- **Rewriting instead of requesting.** Silently pushing your own version of someone's change over theirs, instead of explaining what you'd change and why, teaches people to stop trying.
+- **Treating review as a gate to guard, not a second pair of eyes.** The goal is a better change landing sooner, not proving the reviewer is smarter than the author.
+
+## Giving feedback well
+
+Frame comments around the code, not the person, and ask rather than assert when you're not sure:
+
+```text
+Instead of: "Why would you do it this way?"
+Try:        "What's the reasoning for handling retries here instead
+             of in the client? Curious if I'm missing something."
+```
+
+<Callout type="tip">
+Approve with an optional comment when a PR is good but not perfect. Requesting changes should be reserved for things that genuinely need to change before merge — reflexively requesting changes for minor preferences trains people to dread your reviews.
+</Callout>
+
+## Receiving feedback well
+
+Treat review comments as being about the code, not a verdict on your ability. Responding "good catch, fixed" costs nothing and keeps the exchange moving. If you disagree, explain your reasoning once, clearly — most disagreements resolve in a sentence or two.
+
+<Callout type="golden">
+The best sign of a healthy review culture isn't the absence of disagreement — it's that disagreement stays about the code, gets resolved quickly, and nobody dreads opening their next pull request.
+</Callout>
+
+## Try it yourself
+
+Look back at the last review comment you left. Was it specific enough that the author knew exactly what to do next, and was it clear whether it was blocking or just a suggestion? Rewrite it if not — the habit sticks faster than you'd expect.

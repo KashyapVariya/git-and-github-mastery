@@ -1,0 +1,79 @@
+---
+title: Stashing Changes
+summary: git stash shelves your uncommitted work temporarily, so you can switch context with a clean working directory and bring it back later.
+level: intermediate
+primaryTab: git
+subtab: intermediate
+category: Undo
+tags: [stash, context-switching, wip]
+sources:
+  - label: Pro Git — Stashing and Cleaning
+    url: https://git-scm.com/book/en/v2/Git-Tools-Stashing-and-Cleaning
+  - label: Git — git stash
+    url: https://git-scm.com/docs/git-stash
+readingTime: 4
+related: [restore-vs-reset-vs-revert, patch-staging]
+order: 1
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+You're halfway through a change, nothing is ready to commit, and suddenly you need to switch branches — a bug just came in, or you need to pull a teammate's fix. Committing half-finished work feels wrong, but Git won't let you switch branches cleanly if it would overwrite your edits. `git stash` is the escape hatch: it takes your uncommitted changes off to the side, giving you a clean working directory, and lets you bring them back exactly as they were whenever you're ready.
+
+Think of it like a laundry basket for edits you're not done with yet — out of the way, but not gone.
+
+## How it works
+
+Stash your current changes:
+
+```bash
+git stash
+```
+
+Git records both staged and unstaged changes to tracked files, then resets your working directory back to match the last commit. Your files look untouched — but the work is saved.
+
+Want to also stash new, untracked files (ones you haven't `git add`ed yet)?
+
+```bash
+git stash -u
+```
+
+Later, bring the most recent stash back:
+
+```bash
+git stash pop
+```
+
+`pop` reapplies the changes **and** removes that entry from the stash list. If you'd rather keep it in the list too (useful if you want to apply the same stash to more than one branch), use `apply` instead:
+
+```bash
+git stash apply
+```
+
+## Working with multiple stashes
+
+Stashes stack up — you can stash more than once before popping anything. See what's waiting:
+
+```bash
+git stash list
+```
+
+Each entry gets a label like `stash@{0}`, with the most recent at index 0. Apply or drop a specific one:
+
+```bash
+git stash apply stash@{2}
+git stash drop stash@{2}
+```
+
+<Callout type="tip">
+Give a stash a name you'll actually recognize later: `git stash push -m "half-done login validation"`. `git stash list` gets confusing fast once you have three unlabeled entries.
+</Callout>
+
+<Callout type="warning">
+A stash isn't a commit, and it doesn't get pushed anywhere. It lives only in your local repository. Don't rely on it as backup for anything you can't afford to lose — a `git stash drop` (or `git stash clear`) will discard it for good.
+</Callout>
+
+## Try it yourself
+
+Make a change to a file but don't commit it. Run `git stash`, confirm with `git status` that your working directory is clean, then run `git stash pop` and watch the change reappear exactly as you left it.

@@ -1,0 +1,75 @@
+---
+title: Conventional Commits, In Depth
+summary: A structured commit format — type(scope) colon description — that machines can parse to generate changelogs and version bumps automatically.
+level: intermediate
+primaryTab: workflows
+subtab: guides
+category: Conventions
+tags: [workflows, conventional-commits, changelogs, semver]
+sources:
+  - label: Conventional Commits specification
+    url: https://www.conventionalcommits.org
+readingTime: 5
+related: [commit-message-conventions, semantic-versioning]
+order: 6
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+[Good commit messages](/workflows/commit-message-conventions) are written for humans. Conventional Commits adds a light structure on top so *tools* can read them too — generating changelogs, bumping version numbers, and even triggering releases automatically, based on nothing but your commit history.
+
+## The format
+
+```text
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+The most common types:
+
+| Type | Meaning |
+|---|---|
+| `feat` | A new feature |
+| `fix` | A bug fix |
+| `docs` | Documentation only |
+| `refactor` | Neither fixes a bug nor adds a feature |
+| `test` | Adding or correcting tests |
+| `chore` | Build process, tooling, dependencies |
+
+Examples:
+
+```text
+feat(auth): add password reset flow
+fix(api): handle null response from payment gateway
+docs: clarify installation steps for Windows
+```
+
+## Breaking changes
+
+Add `!` after the type/scope, or a `BREAKING CHANGE:` footer, to flag a breaking API change:
+
+```text
+feat(api)!: remove deprecated v1 endpoints
+
+BREAKING CHANGE: the /v1/users endpoint has been removed; use /v2/users instead.
+```
+
+## Why this enables automation
+
+Tools like `semantic-release` read your commit history and decide the next version number automatically: any `fix` bumps a patch version, any `feat` bumps a minor version, any breaking change bumps a major version — matching [Semantic Versioning](/workflows/semantic-versioning) exactly. The same tools generate a changelog grouped by type, with zero manual writing.
+
+<Callout type="tip">
+You don't need special tooling to get value from this convention — even without automation, a `git log --oneline` that reads `feat: ...`, `fix: ...`, `docs: ...` is far easier to scan than an unstructured one.
+</Callout>
+
+<Callout type="golden">
+Consistency matters more than perfect type selection. A team that agrees on 5 types and uses them reliably gets more value than one that argues over 15 types and applies them inconsistently.
+</Callout>
+
+## Try it yourself
+
+Rewrite your last 3 commit messages in Conventional Commits format. Notice how it forces you to decide, upfront, exactly what kind of change you're making.

@@ -1,0 +1,72 @@
+---
+title: GitHub Actions, Overview
+summary: GitHub Actions runs automated jobs — tests, builds, deployments — directly inside your repository whenever something happens, like a push or a pull request.
+level: intermediate
+primaryTab: github
+subtab: automation-cicd
+category: CI/CD
+tags: [github-actions, ci-cd, automation, workflows]
+sources:
+  - label: GitHub Docs — Actions
+    url: https://docs.github.com/en/actions
+readingTime: 6
+related: [workflow-syntax, events-and-triggers, jobs-and-steps, runners]
+order: 1
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Every serious project needs to run things automatically — tests on every pull request, a build on every push, a deploy on every release. You could do this by remembering to run commands yourself, or you could let GitHub do it every single time, without fail. That's GitHub Actions: automation that lives in your repository and reacts to what happens in it.
+
+## The core idea
+
+You describe what to run in a YAML file inside `.github/workflows/`. GitHub watches for the events you specify — a push, a pull request, a schedule, a manual button click — and when one happens, it spins up a fresh virtual machine (a "runner"), checks out your code, and executes the steps you defined.
+
+Nothing about this is exotic: a workflow is really just "when X happens, run these shell commands, in order, on a clean machine." The power comes from how easy it is to trigger, combine, and share.
+
+## A minimal example
+
+```yaml
+# .github/workflows/ci.yml
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npm test
+```
+
+Read that top to bottom: on every push to `main`, and on every pull request, spin up an Ubuntu machine, check out the code, install Node 20, install dependencies, and run the test suite. If any step fails, the whole run is marked failed — and GitHub shows that failure right on the pull request.
+
+## The vocabulary
+
+- A **workflow** is the whole YAML file
+- A **job** is a group of steps that runs on one machine (`test` above)
+- A **step** is one action — either a shell command (`run:`) or a reusable **action** (`uses:`) someone else already published
+- A **runner** is the actual machine executing the job
+
+Every other Actions topic on this site — triggers, secrets, caching, matrices, reusable workflows — is really just a deeper look at one of these four pieces.
+
+<Callout type="golden">
+Actions are triggered by what happens in the repository, not by a schedule you have to maintain elsewhere. That's the whole value proposition: automation that lives with the code it automates.
+</Callout>
+
+<Callout type="tip">
+The Actions tab on any repository shows every run, with full logs per step — that's your first stop whenever a workflow doesn't behave the way you expected.
+</Callout>
+
+## Try it yourself
+
+Add the minimal workflow above to a repository you control (swap in a real test command, or just `echo "hello from Actions"` if you don't have tests yet), push it, and open the Actions tab to watch it run.

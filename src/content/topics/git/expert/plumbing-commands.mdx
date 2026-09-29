@@ -1,0 +1,64 @@
+---
+title: Plumbing Commands
+summary: Git splits its commands into user-facing "porcelain" and low-level "plumbing" — the plumbing is what porcelain is built from, and it's scriptable and exact.
+level: expert
+primaryTab: git
+subtab: expert
+category: Internals
+tags: [plumbing, porcelain, scripting, cat-file, rev-parse]
+sources:
+  - label: Pro Git — Plumbing and Porcelain
+    url: https://git-scm.com/book/en/v2/Git-Internals-Plumbing-and-Porcelain
+  - label: Git — git rev-parse
+    url: https://git-scm.com/docs/git-rev-parse
+readingTime: 5
+related: [git-objects-blob-tree-commit-tag, refs-and-head, inside-the-git-folder]
+order: 5
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Commands like `git status`, `git log`, and `git commit` are **porcelain**: friendly, human-oriented, with formatted and often colorized output that can change between Git versions. Underneath, they're all built from a smaller set of **plumbing** commands: low-level, stable, exact, and built for scripts rather than humans. Knowing a few plumbing commands lets you inspect exactly what Git is doing, and write reliable automation.
+
+## The core plumbing commands
+
+**`git cat-file`** — prints the raw content of any object, given its hash.
+
+```bash
+git cat-file -p <hash>   # pretty-print
+git cat-file -t <hash>   # just print the object type
+```
+
+**`git hash-object`** — computes (and optionally stores) the hash a piece of content would get as a blob.
+
+```bash
+git hash-object path/to/file        # just compute the hash
+git hash-object -w path/to/file     # compute AND store it as a blob
+```
+
+**`git rev-parse`** — resolves any reference expression (a branch name, `HEAD~2`, a short hash) down to its full commit hash. Extremely useful in scripts, since it accepts every shorthand Git understands.
+
+```bash
+git rev-parse HEAD
+git rev-parse main
+git rev-parse HEAD~3
+```
+
+**`git update-ref`** — directly sets a ref to point at a specific hash, bypassing the usual commit/merge machinery. This is what commands like `git branch` and `git reset` use internally.
+
+```bash
+git update-ref refs/heads/main <commit-hash>
+```
+
+<Callout type="tip">
+`git rev-parse --show-toplevel` prints the absolute path to your repository root — genuinely useful in shell scripts that need to work no matter which subdirectory they're run from.
+</Callout>
+
+<Callout type="golden">
+If you ever want to know exactly what a porcelain command "really" did, there's almost always a plumbing equivalent that shows it with nothing hidden.
+</Callout>
+
+## Try it yourself
+
+Run `git rev-parse HEAD` and `git log -1 --format=%H` side by side — they should print the identical hash, one via plumbing and one via porcelain.

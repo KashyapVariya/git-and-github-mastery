@@ -1,0 +1,84 @@
+---
+title: ".gitignore vs. .git/info/exclude"
+summary: .gitignore is shared with your team; .git/info/exclude is the local-only equivalent for your own personal ignore rules.
+level: intermediate
+primaryTab: git
+subtab: intermediate
+category: Ignoring
+tags: [gitignore, exclude, config, untracked-files]
+sources:
+  - label: Git — gitignore
+    url: https://git-scm.com/docs/gitignore
+  - label: Pro Git — Stashing and Cleaning
+    url: https://git-scm.com/book/en/v2/Git-Tools-Stashing-and-Cleaning
+readingTime: 4
+related: [cleaning-the-working-directory, config-levels]
+order: 12
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Every project generates files Git shouldn't track — build output, dependency folders, `.env` files with secrets. Most people know `.gitignore` for this. Fewer know there's a second, quieter ignore file that works identically but never leaves your machine — useful for the ignore rules that are personal to you, not the team.
+
+## .gitignore: shared, committed, repo-wide
+
+`.gitignore` is a plain text file, usually sitting at the root of your repository, listing patterns Git should never track:
+
+```text
+node_modules/
+dist/
+*.log
+.env
+```
+
+Because it's just another file in the project, you `git add` and commit it like anything else — which means every teammate who clones the repo gets the same ignore rules automatically. This is exactly why it's the right place for anything the *whole team* agrees shouldn't be tracked: build artifacts, dependency folders, secrets.
+
+You can also drop a `.gitignore` inside any subdirectory, and its rules apply from that folder downward — handy for ignoring patterns specific to one part of a larger project.
+
+## .git/info/exclude: local, personal, never shared
+
+Inside every repository's `.git` folder sits `info/exclude` — same exact pattern syntax as `.gitignore`, but it lives inside `.git/`, which is never committed and never leaves your machine.
+
+```text
+# .git/info/exclude
+scratch-notes.txt
+.idea/
+*.swp
+```
+
+This is the right home for ignore rules that are about *you*, not the project — your editor's swap files, a personal scratch file, a local-only debug config. Nobody else needs those rules, and putting them in the shared `.gitignore` would just add noise to a file that's supposed to represent the team's agreement.
+
+## A global option too
+
+For patterns you want ignored in *every* repository on your machine — OS files like `.DS_Store` or `Thumbs.db` — set a global ignore file once instead of repeating it everywhere:
+
+```bash
+git config --global core.excludesFile ~/.gitignore_global
+```
+
+## What neither of these does
+
+Both only stop Git from tracking files it **doesn't already know about**. If a file was committed before you added it to either ignore file, it stays tracked — ignoring it now has no effect on history already recorded. Untrack it explicitly first:
+
+```bash
+git rm --cached accidentally-committed.env
+```
+
+Then commit that removal, and the ignore rule takes over from there.
+
+<Callout type="tip">
+Rule of thumb: if every teammate needs the same ignore rule, it belongs in `.gitignore`. If it's about your setup specifically, it belongs in `.git/info/exclude`.
+</Callout>
+
+<Callout type="warning">
+Adding a file to `.gitignore` does not remove it if it's already tracked — `git status` will keep showing it as modified until you `git rm --cached` it explicitly.
+</Callout>
+
+<Callout type="golden">
+`.gitattributes` sounds like a cousin of `.gitignore` but solves a different problem entirely — it controls *how* Git handles tracked files (line endings, diff behavior, merge strategy), not whether they're tracked at all. Worth knowing they're not interchangeable, even though this page doesn't cover `.gitattributes` in depth.
+</Callout>
+
+## Try it yourself
+
+Create a file called `scratch.txt`, add it to `.git/info/exclude` rather than `.gitignore`, and confirm with `git status` that it's invisible — while still being nowhere in the committed `.gitignore` for teammates to see.

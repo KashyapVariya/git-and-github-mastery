@@ -1,0 +1,63 @@
+---
+title: Codespaces & Dev Containers
+summary: A Codespace is a full development environment running in the cloud, preconfigured so "clone and it works" is actually true for every contributor.
+level: advanced
+primaryTab: github
+subtab: admin-teams
+category: Developer environment
+tags: [codespaces, dev-containers, cloud-development, onboarding]
+sources:
+  - label: GitHub Docs — Codespaces
+    url: https://docs.github.com/en/codespaces
+readingTime: 5
+related: [github-copilot-overview, repository-settings, organizations-overview]
+order: 6
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+"Works on my machine" is a running joke because every developer's machine is subtly different — different OS, different tool versions, different environment variables nobody wrote down. New hires often lose their first day or two just getting a project to build locally. **Codespaces** removes that entirely: instead of setting up an environment on your laptop, GitHub spins one up in the cloud, already configured exactly the way the project needs, and you connect to it through your browser or your local editor.
+
+## Dev containers: the configuration underneath
+
+Codespaces are built on **dev containers** — a Docker-based specification for a development environment, defined in a `.devcontainer/devcontainer.json` file committed to the repository itself. This file describes the base image, tools to install, VS Code extensions to preinstall, ports to forward, and setup commands to run.
+
+```json
+{
+  "name": "api-server",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:20",
+  "postCreateCommand": "npm install",
+  "forwardPorts": [3000],
+  "customizations": {
+    "vscode": {
+      "extensions": ["dbaeumer.vscode-eslint"]
+    }
+  }
+}
+```
+
+Because this file lives in the repository, the environment definition is version-controlled right alongside the code it serves — when the project starts needing Node 22 instead of Node 20, that's a one-line change everyone gets automatically, not a Slack message asking everyone to reinstall something.
+
+## What a Codespace actually is
+
+When you create a Codespace, GitHub builds a container from that `devcontainer.json`, clones the repository into it, runs any setup commands, and gives you a ready-to-code environment — reachable through a browser-based VS Code, the desktop VS Code app, or a terminal via the `gh` CLI. It's genuinely running on GitHub's infrastructure, not your machine, so a contributor on an underpowered laptop or a locked-down corporate device can still work on a full-spec environment.
+
+<Callout type="tip">
+Dev containers aren't Codespaces-only — VS Code's Dev Containers extension can build and open the same `.devcontainer/devcontainer.json` locally, on your own machine, using Docker. Writing one file gets you both a reproducible local setup and instant cloud environments.
+</Callout>
+
+## Where this matters for a team
+
+- **Onboarding** — a new hire opens a Codespace instead of following a setup doc that's slightly out of date
+- **Consistent environments** — "it works in my Codespace" is a much stronger statement than "it works on my machine," because everyone's Codespace is the same
+- **Ephemeral experiments** — spin one up to try something risky, then delete it, without touching your real machine at all
+- **Org-level control** — organizations can restrict who may create Codespaces, cap spending, and choose which machine sizes are available
+
+<Callout type="warning">
+Codespaces bill by compute time while running and by storage while stopped. They stop automatically after a period of inactivity, but it's worth explicitly deleting ones you're done with — a pile of forgotten Codespaces quietly adds up on an organization's bill.
+</Callout>
+
+## Try it yourself
+
+On any repository, click the green "Code" button and look for the "Codespaces" tab — even one without a `.devcontainer` file will offer to create one from a default image. Launch it and notice the terminal is already inside a cloned copy of the repo, ready to run.

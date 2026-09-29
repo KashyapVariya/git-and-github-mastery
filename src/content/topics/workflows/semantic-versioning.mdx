@@ -1,0 +1,61 @@
+---
+title: Semantic Versioning
+summary: Version numbers follow MAJOR.MINOR.PATCH — increment MAJOR for breaking changes, MINOR for new features, PATCH for bug fixes.
+level: beginner
+primaryTab: workflows
+subtab: guides
+category: Conventions
+tags: [workflows, semver, versioning, releases]
+sources:
+  - label: Semantic Versioning specification
+    url: https://semver.org
+readingTime: 4
+related: [conventional-commits-deep-dive, hotfix-and-release-process]
+order: 7
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+A version number should tell you something before you even read the changelog. Semantic Versioning (SemVer) gives every number in `MAJOR.MINOR.PATCH` a specific meaning, so upgrading from `2.4.1` to `2.4.2` is a very different decision than upgrading to `3.0.0`.
+
+## The three numbers
+
+Given a version `MAJOR.MINOR.PATCH`, for example `2.4.1`:
+
+- **MAJOR** (`2`) — increments when you make a breaking, backward-incompatible change.
+- **MINOR** (`4`) — increments when you add functionality in a backward-compatible way.
+- **PATCH** (`1`) — increments when you make a backward-compatible bug fix.
+
+```text
+1.0.0  → first stable release
+1.1.0  → added a new feature, nothing broke
+1.1.1  → fixed a bug, nothing broke
+2.0.0  → changed or removed something in a way that could break existing users
+```
+
+## Pre-release and build versions
+
+SemVer also allows suffixes for versions before a stable release, or that carry build metadata:
+
+```text
+2.0.0-beta.1
+2.0.0-rc.1
+1.4.2+build.20260115
+```
+
+## Why consumers rely on it
+
+When a library follows SemVer, dependency managers can express safe ranges — `^2.4.0` means "anything compatible with 2.4.0, up to but not including 3.0.0." That only works because MAJOR is a promise: if you bump it, something broke on purpose. Bumping MAJOR for a non-breaking change (or worse, not bumping it for a breaking one) erodes trust in every version range that depends on your package.
+
+<Callout type="warning">
+Before version `1.0.0`, SemVer explicitly allows anything to change at any time — that's what "unstable" means. Once you tag `1.0.0`, you're making a public promise to follow the rules above.
+</Callout>
+
+<Callout type="golden">
+[Conventional Commits](/workflows/conventional-commits-deep-dive) map directly onto SemVer: `fix:` → patch, `feat:` → minor, a breaking-change footer → major. That's exactly what lets release automation compute the next version with no human input.
+</Callout>
+
+## Try it yourself
+
+Look at your project's last three version bumps. For each one, decide: was it actually a MAJOR, MINOR, or PATCH change based on what really happened — and did the version number reflect that correctly?

@@ -1,0 +1,60 @@
+---
+title: Monorepo vs. Multirepo
+summary: A monorepo keeps every project in one repository with shared history; a multirepo splits each into its own — the right choice depends on how tightly your projects are coupled.
+level: advanced
+primaryTab: workflows
+subtab: guides
+category: Repository structure
+tags: [workflows, monorepo, multirepo, architecture]
+sources:
+  - label: Atlassian — Comparing Git workflows
+    url: https://www.atlassian.com/git/tutorials/comparing-workflows
+readingTime: 6
+related: [trunk-based-development, git-flow, team-git-rules-checklist]
+order: 8
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+At some point every growing codebase splits into multiple pieces — a frontend, a backend, a shared library, maybe a mobile app. The question is whether those pieces live in one Git repository or several, and that decision shapes how your team branches, reviews, releases, and even how fast `git clone` runs, for years afterward.
+
+## Two shapes
+
+A **multirepo** gives each project its own repository, its own history, its own issue tracker, its own access controls. A **monorepo** puts everything — sometimes dozens of services or packages — inside a single repository, sharing one commit history and one set of branches.
+
+```text
+Multirepo:                    Monorepo:
+  frontend/  (own repo)         repo/
+  backend/   (own repo)           frontend/
+  shared-lib/ (own repo)          backend/
+                                   shared-lib/
+```
+
+## Where each one wins
+
+**Monorepos** make cross-project changes trivial: renaming a function in `shared-lib` and updating every caller in `frontend` and `backend` can happen in a single commit, reviewed as one unit, tested together before merge. There's no "which version of `shared-lib` is `frontend` actually using right now" question — it's always the one in the same commit.
+
+**Multirepos** give each project a clean boundary. Teams can version, release, and deploy independently without touching code they don't own. Access control is simpler too: a contractor working only on the mobile app never needs to see the backend's history at all.
+
+## What each one costs
+
+A monorepo needs real tooling investment as it grows — naive `git clone` and CI runs get slow across millions of files, so teams adopt sparse checkouts, build-system caching (Bazel, Nx, Turborepo), and code-ownership rules to keep it usable. Change review also gets noisier: a pull request that touches five services at once can be harder to reason about than five focused ones.
+
+A multirepo pays a different cost: coordinating a change that spans repositories means juggling multiple pull requests, pinning compatible versions of each dependency, and often a slow "bump the version, wait, bump the consumer" cycle just to ship one logical change.
+
+<Callout type="tip">
+There's no universally correct answer here — companies you'd consider highly sophisticated run successfully with both. Google and Meta famously use giant monorepos; Amazon has historically run one of the largest multirepo setups in the industry.
+</Callout>
+
+## A rough rule of thumb
+
+If your projects change together constantly and share a lot of code, a monorepo removes friction. If your projects are genuinely independent — different teams, different release cadences, different lifecycles — a multirepo keeps that independence real instead of just nominal.
+
+<Callout type="golden">
+Watch for the tell: if you keep needing to make the "same" change across several multirepo repositories in lockstep, that's a strong signal those repos actually behave like one project pretending to be several.
+</Callout>
+
+## Try it yourself
+
+List the repositories your team owns. For each pair, ask: "when one changes, how often does the other need to change too?" If the answer is "almost always" for two repos, that's worth a conversation about whether they should be one.

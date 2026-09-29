@@ -1,0 +1,78 @@
+---
+title: Partial and Shallow Clones
+summary: git clone --depth and --filter=blob:none trade away parts of a repository's history or file contents up front, dramatically speeding up clones of huge repositories.
+level: advanced
+primaryTab: git
+subtab: advanced
+category: Performance
+tags: [clone, shallow-clone, partial-clone, performance, large-repos]
+sources:
+  - label: Git — git-clone
+    url: https://git-scm.com/docs/git-clone
+  - label: Git — git-sparse-checkout
+    url: https://git-scm.com/docs/git-sparse-checkout
+readingTime: 6
+related: [sparse-checkout, git-worktrees]
+order: 13
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+A normal `git clone` downloads every commit, every tree, and every file's every historical version, ever recorded — the complete object database. For a young project that's nothing. For a ten-year-old repository with a large binary asset history, it can mean gigabytes of data and a clone that takes minutes just to get a working copy on disk. Shallow and partial clones let you download less up front, and fetch more only if and when you actually need it.
+
+## Shallow clones: limiting history depth
+
+```bash
+git clone --depth 1 <url>
+```
+
+This downloads only the most recent commit on each branch — no history behind it at all. It's ideal for situations where you never need history, like a CI job that just needs to build the current code:
+
+```bash
+git clone --depth 1 --branch main <url>
+```
+
+The tradeoff: commands that need history — `git log` beyond the fetched commits, `git blame`, most merges and rebases — either fail or behave oddly, because the earlier commits genuinely aren't there. You can deepen a shallow clone later if needed:
+
+```bash
+git fetch --deepen 50   # pull 50 more commits of history
+git fetch --unshallow   # pull the entire remaining history
+```
+
+## Partial clones: limiting file contents
+
+```bash
+git clone --filter=blob:none <url>
+```
+
+This is a different tradeoff: **all** commit and tree metadata is downloaded — full history, full structure — but the actual file contents (blobs) are fetched **on demand**, only when you check out a commit that needs them. `git log` works immediately across the whole history, since commit metadata is all present; it's only the file contents that stream in lazily as you touch them.
+
+```bash
+git clone --filter=tree:0 <url>
+```
+
+`tree:0` goes further, deferring tree objects too, fetching almost nothing but commit objects up front — useful for extremely large histories where even walking the tree structure is expensive, at the cost of more on-demand fetches later.
+
+## Choosing between them
+
+| | Shallow (`--depth`) | Partial (`--filter=blob:none`) |
+|---|---|---|
+| History available | Only recent commits | Full history |
+| File contents | Full, for included commits | Fetched on demand |
+| Best for | CI builds, one-off checkouts | Everyday dev work on a huge repo |
+| `git log`, `blame` on old commits | Broken | Works normally |
+
+For day-to-day development on a genuinely huge repository, `--filter=blob:none` is usually the better tradeoff — you keep full history navigation, and only pay the download cost for file contents you actually check out. Shallow clones are better suited to throwaway, history-irrelevant use like a build pipeline.
+
+<Callout type="tip">
+Combine a partial clone with [sparse checkout](/git/advanced/sparse-checkout) for the best of both: `git clone --filter=blob:none <url>` followed by `git sparse-checkout set <folder>` fetches blobs only for the files inside the folders you actually check out.
+</Callout>
+
+<Callout type="warning">
+Both shallow and partial clones depend on the server supporting them — most modern hosts (GitHub, GitLab, Bitbucket) do, but older or self-hosted Git servers might not, and will error out or silently ignore the flag.
+</Callout>
+
+## Try it yourself
+
+Time a full clone of a large public repository, then time `git clone --depth 1 <url>` and `git clone --filter=blob:none <url>` of the same repository. Compare both the download time and the size of the resulting `.git` folder with `du -sh .git`.

@@ -1,0 +1,56 @@
+---
+import { primaryTabs, url } from '../../lib/nav';
+import Icon from '../ui/Icon.astro';
+---
+
+<footer class="mt-24 border-t border-[var(--color-border)] bg-[var(--color-bg-raised)]">
+  <div class="mx-auto max-w-[1400px] px-4 py-12 sm:px-6">
+    <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+      <div>
+        <a href={url('/')} class="mb-3 flex items-center gap-2 font-semibold">
+          <span class="grid h-7 w-7 place-items-center rounded-lg bg-gradient-to-br from-[var(--color-git-orange)] to-[var(--color-violet)] text-black">
+            <Icon name="git-branch" size={15} />
+          </span>
+          Git <span class="text-gradient">Mastery</span>
+        </a>
+        <p class="max-w-xs text-sm leading-relaxed text-[var(--color-ink-muted)]">
+          A single dark, animated home for learning Git and GitHub — from your first commit to internals and CI/CD.
+        </p>
+      </div>
+
+      <div>
+        <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">Explore</p>
+        <ul class="space-y-2 text-sm">
+          {primaryTabs.map((tab) => (
+            <li><a href={url(tab.href)} class="text-[var(--color-ink-muted)] transition hover:text-[var(--color-git-orange-soft)]">{tab.label}</a></li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">Official sources</p>
+        <ul class="space-y-2 text-sm text-[var(--color-ink-muted)]">
+          <li><a class="hover:text-[var(--color-git-orange-soft)]" href="https://git-scm.com/doc" target="_blank" rel="noopener">Git documentation</a></li>
+          <li><a class="hover:text-[var(--color-git-orange-soft)]" href="https://git-scm.com/book" target="_blank" rel="noopener">Pro Git book</a></li>
+          <li><a class="hover:text-[var(--color-git-orange-soft)]" href="https://docs.github.com" target="_blank" rel="noopener">GitHub Docs</a></li>
+          <li><a class="hover:text-[var(--color-git-orange-soft)]" href="https://cli.github.com/manual" target="_blank" rel="noopener">GitHub CLI manual</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-ink-faint)]">Keyboard</p>
+        <ul class="space-y-2 text-sm text-[var(--color-ink-muted)]">
+          <li class="flex items-center gap-2"><kbd class="rounded border border-[var(--color-border)] bg-[var(--color-bg-elevated)] px-1.5 py-0.5 font-mono text-[11px]">⌘K</kbd> Open search</li>
+          <li class="flex items-center gap-2"><kbd class="rounded border border-[var(--color-border)] bg-[var(--color-bg-elevated)] px-1.5 py-0.5 font-mono text-[11px]">←</kbd><kbd class="rounded border border-[var(--color-border)] bg-[var(--color-bg-elevated)] px-1.5 py-0.5 font-mono text-[11px]">→</kbd> Switch tabs</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mt-10 flex flex-col gap-3 border-t border-[var(--color-border-soft)] pt-6 text-xs text-[var(--color-ink-faint)] sm:flex-row sm:items-center sm:justify-between">
+      <p class="max-w-2xl leading-relaxed">
+        Content is original and based on official Git and GitHub documentation. Always check the official docs for the latest changes.
+      </p>
+      <p>Built with Astro, Tailwind CSS &amp; GSAP.</p>
+    </div>
+  </div>
+</footer>

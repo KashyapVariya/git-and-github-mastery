@@ -1,0 +1,12 @@
+---
+// Overrides Shiki's rendered <pre> in MDX content: wraps it with a copy button.
+const { class: className, ...rest } = Astro.props;
+---
+
+<div class="code-block-wrapper gradient-border group relative my-5" data-codeblock>
+  <button type="button" class="copy-btn absolute right-2.5 top-2.5 z-10 flex items-center gap-1.5 rounded-md border border-[var(--color-border)] bg-[var(--color-bg-elevated)]/90 px-2 py-1 text-[11px] font-medium text-[var(--color-ink-muted)] opacity-0 backdrop-blur transition hover:text-[var(--color-ink)] group-hover:opacity-100 data-[copied=true]:!opacity-100 data-[copied=true]:text-[var(--color-success)]" data-copy="closest-pre" aria-label="Copy code">
+    <svg data-copy-icon width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="9" y="9" width="11" height="11" rx="1.5"/><path d="M5 15V5a1.5 1.5 0 0 1 1.5-1.5H15"/></svg>
+    <span data-copy-label>Copy</span>
+  </button>
+  <pre class:list={[className, '!m-0 overflow-x-auto !bg-transparent p-4 text-[13px] leading-relaxed']} {...rest}><slot /></pre>
+</div>

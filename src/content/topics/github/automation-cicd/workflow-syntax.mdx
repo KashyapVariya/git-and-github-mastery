@@ -1,0 +1,73 @@
+---
+title: Workflow File Syntax
+summary: Every GitHub Actions workflow is built from the same handful of YAML keys — name, on, jobs, steps — arranged the same way every time.
+level: intermediate
+primaryTab: github
+subtab: automation-cicd
+category: CI/CD
+tags: [github-actions, yaml, syntax]
+sources:
+  - label: GitHub Docs — Actions
+    url: https://docs.github.com/en/actions
+readingTime: 5
+related: [github-actions-overview, events-and-triggers, jobs-and-steps]
+order: 2
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Actions YAML looks intimidating the first time, but it's built from a very small vocabulary repeated consistently. Once the shape clicks, you can read (and write) almost any workflow file, even ones far more complex than a basic CI check.
+
+## The shape, piece by piece
+
+```yaml
+name: My Workflow          # shown in the Actions tab — optional but recommended
+
+on:                        # what triggers this workflow
+  push:
+    branches: [main]
+
+env:                       # optional: variables available to every job
+  NODE_ENV: production
+
+jobs:                      # one or more independent units of work
+  build:
+    runs-on: ubuntu-latest  # which machine type runs this job
+    steps:                  # an ordered list, top to bottom
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run build
+        run: npm run build
+```
+
+- **`name`** — a human label for the workflow, shown in the Actions tab. Optional; GitHub falls back to the file path if you skip it.
+- **`on`** — the event(s) that trigger a run. Can be a single event, a list, or an object with filters (like `branches:`).
+- **`env`** — key/value pairs available as environment variables to every step in every job, unless overridden at the job or step level.
+- **`jobs`** — a map of job IDs (`build` here) to their configuration. Jobs run in parallel by default unless you connect them with `needs:`.
+- **`runs-on`** — which virtual machine image runs this job (`ubuntu-latest`, `windows-latest`, `macos-latest`, or a self-hosted label).
+- **`steps`** — an ordered list within a job. Each step is either `uses:` (run someone else's published action) or `run:` (run a shell command directly).
+
+## Two kinds of steps
+
+```yaml
+- uses: actions/checkout@v4        # run a published, reusable action
+  with:
+    fetch-depth: 0                  # inputs specific to that action
+
+- run: echo "Hello from a shell step"   # run a raw command
+```
+
+`uses:` always points to `owner/repo@ref` (or a local path). `with:` passes named inputs that action expects — every published action documents its own.
+
+<Callout type="warning">
+YAML is indentation-sensitive. A step that's indented one level wrong silently becomes part of the wrong job, or breaks the file entirely — if a workflow won't even start, check indentation before anything else.
+</Callout>
+
+## Try it yourself
+
+Take the minimal example from GitHub Actions Overview and add an `env:` block at the workflow level with one variable, then reference it inside a `run:` step as `$MY_VARIABLE` (bash) to confirm it's available.

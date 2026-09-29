@@ -1,0 +1,68 @@
+---
+title: Making Commits
+summary: A commit is a permanent, labeled snapshot of your staged changes — write a clear message, and your history becomes genuinely useful later.
+level: beginner
+primaryTab: git
+subtab: fundamentals
+category: Commands
+tags: [git-commit, commit-messages, daily-workflow]
+sources:
+  - label: Git — git commit
+    url: https://git-scm.com/docs/git-commit
+readingTime: 4
+related: [staging-with-add, viewing-history-with-log, git-status]
+order: 10
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+This is the moment your changes become permanent, official history. Everything staged gets bundled into one snapshot, with your name, the time, and a message explaining what and why.
+
+## The basic command
+
+```bash
+git commit -m "Add login form validation"
+```
+
+`-m` lets you write the message inline. Git confirms with something like:
+
+```text
+[main a1b2c3d] Add login form validation
+ 2 files changed, 14 insertions(+), 1 deletion(-)
+```
+
+That short code (`a1b2c3d`) is the beginning of the commit's SHA — a unique fingerprint you can use later to refer back to this exact snapshot.
+
+## Committing without `-m`
+
+```bash
+git commit
+```
+
+This opens your configured text editor (set in [First-Time Setup](/git/fundamentals/first-time-setup)) for writing a longer message. Use this when a change genuinely needs more explanation than one line — the first line becomes a short summary, and you can add a blank line followed by a longer description below it.
+
+## Writing a good commit message
+
+The habit that pays off the most, long after you've forgotten why you wrote a piece of code: write the message as if explaining it to a confused teammate six months from now.
+
+- **Good**: `Fix off-by-one error in pagination when total is a multiple of page size`
+- **Less useful**: `fix bug`, `update`, `changes`
+
+A widely used convention is **Conventional Commits** — prefixing messages with a type like `feat:`, `fix:`, or `docs:`. It's covered in depth in [Commit message conventions](/workflows/commit-message-conventions).
+
+## Only staged changes get committed
+
+This trips up beginners constantly: `git commit` only includes what's currently *staged*. If you edited a file but forgot to `git add` it, that edit is simply not part of the commit — even though it feels like "I just changed this file, why isn't it there?" Always check `git status` right before committing if you're unsure.
+
+<Callout type="warning">
+An empty commit message, or aborting the editor without saving, cancels the commit entirely — nothing gets recorded and staging stays exactly as it was.
+</Callout>
+
+<Callout type="tip">
+`git commit -am "message"` combines staging and committing for files Git *already tracks* — it skips `git add` for modified files, but it will never pick up brand-new untracked files. Handy as a shortcut once you understand the two steps it's skipping.
+</Callout>
+
+## Try it yourself
+
+Stage a change and commit it with a message describing the *why*, not just the *what* — instead of "update text," try "clarify the pricing copy since users kept missing the free trial." Then look at it again with `git log` and notice how much more useful that is.

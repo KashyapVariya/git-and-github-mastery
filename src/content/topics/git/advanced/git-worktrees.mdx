@@ -1,0 +1,77 @@
+---
+title: Git Worktrees
+summary: git worktree add gives you a second working directory backed by the same repository, so you can have two branches checked out — and buildable — at once.
+level: advanced
+primaryTab: git
+subtab: advanced
+category: Workflow
+tags: [worktree, branching, parallel-work]
+sources:
+  - label: Git — git-worktree
+    url: https://git-scm.com/docs/git-worktree
+  - label: Git — git-clone
+    url: https://git-scm.com/docs/git-clone
+readingTime: 5
+related: [sparse-checkout, partial-and-shallow-clones, rebase-basics]
+order: 6
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+A normal Git repository has exactly one working directory: check out a different branch, and your files on disk change to match. That's fine until you need two branches available *simultaneously* — say, a hotfix needs testing while your feature branch has half-finished, uncommitted changes you don't want to stash. The usual workarounds are stashing constantly or cloning the whole repository a second time. Worktrees solve this properly: one repository, multiple working directories, each checked out to a different branch.
+
+## Adding a worktree
+
+```bash
+git worktree add ../hotfix hotfix-branch
+```
+
+This creates a new directory `../hotfix`, checks out `hotfix-branch` into it, and links it back to your existing repository's history, objects, and config. Nothing is duplicated except the working files themselves — the `.git` object database is shared.
+
+If the branch doesn't exist yet, create it in the same step:
+
+```bash
+git worktree add -b new-feature ../new-feature main
+```
+
+Now you have two independent folders, each with its own checked-out branch, both backed by the same underlying repository. Commit in one, and it's immediately visible in `git log` from the other — because it's the same object store.
+
+## Listing and removing worktrees
+
+```bash
+git worktree list
+```
+
+```text
+/home/user/project         a1b2c3d [main]
+/home/user/hotfix          e4f5g6h [hotfix-branch]
+```
+
+When you're done with one:
+
+```bash
+git worktree remove ../hotfix
+```
+
+This deletes the directory and un-links it. (If you removed the folder manually instead, run `git worktree prune` to clean up the stale reference.)
+
+## Worktree vs. stash vs. a second clone
+
+- **Stashing** works for a quick interruption, but it's fragile for anything longer — one stash pop conflict and you're untangling two features at once.
+- **A second `git clone`** gives you a fully independent working directory too, but it duplicates the entire object database on disk and needs its own `fetch` to stay in sync with the first.
+- **A worktree** gives you the independent working directory *without* duplicating history — both worktrees fetch, push, and share objects through the same repository.
+
+Reach for a worktree when you need to build, run, or test two branches side by side — reviewing a PR while mid-feature, running a long test suite on `main` while you keep coding, or comparing behavior between two branches in two terminal tabs.
+
+<Callout type="tip">
+You can't check out the same branch in two worktrees at once — Git blocks it, since two directories both claiming to *be* that branch would be ambiguous. Use a temporary branch if you need to inspect the same commit twice.
+</Callout>
+
+<Callout type="warning">
+Each worktree has its own index and `HEAD`, but they share hooks, remotes, and config from the main repository. A `.git` file (not folder) inside a worktree just points back to the shared repository data.
+</Callout>
+
+## Try it yourself
+
+In an existing repo, run `git worktree add ../scratch main` to check out `main` into a sibling folder while staying on your current branch in the original one. Edit a file in each, commit in one, and run `git log` from the other to confirm they share history. Clean up with `git worktree remove ../scratch`.

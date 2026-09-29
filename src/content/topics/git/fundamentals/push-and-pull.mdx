@@ -1,0 +1,67 @@
+---
+title: Push and Pull
+summary: git push sends your local commits to a remote; git pull brings the remote's new commits down to you — the two directions that keep everyone in sync.
+level: beginner
+primaryTab: git
+subtab: fundamentals
+category: Remotes
+tags: [git-push, git-pull, remotes, syncing]
+sources:
+  - label: Git — git push
+    url: https://git-scm.com/docs/git-push
+  - label: Git — git pull
+    url: https://git-scm.com/docs/git-pull
+readingTime: 4
+related: [working-with-remotes, fetch-vs-pull]
+order: 17
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Committing only affects your local repository. Push and pull are the two commands that actually move history between your machine and everyone else's — without them, you'd be working in complete isolation.
+
+## Pushing your commits
+
+```bash
+git push
+```
+
+Uploads any commits on your current branch that the remote doesn't already have. The very first time you push a brand-new branch, Git needs to know which remote branch to link it to:
+
+```bash
+git push -u origin feature/dark-mode
+```
+
+The `-u` (short for `--set-upstream`) remembers that link. Every push after this, from this branch, can just be `git push` with no arguments — Git already knows where it goes.
+
+## Pulling new commits
+
+```bash
+git pull
+```
+
+This downloads any new commits from the remote and merges them into your current branch in one step. If a teammate pushed changes since you last synced, `git pull` is how you catch up.
+
+## What can go wrong
+
+If the remote has commits you don't have locally — usually because someone else pushed first — Git refuses your push rather than silently overwriting their work:
+
+```text
+! [rejected]  main -> main (fetch first)
+error: failed to push some refs
+```
+
+This is a safety feature, not a bug. See [My push was rejected](/fix-it/push-rejected) for the fix — it's almost always just "pull, then push again."
+
+<Callout type="golden">
+`git pull` is really two steps happening automatically: fetch the new commits, then merge them into your branch. Understanding that split matters more than it sounds — see [Fetch vs pull](/git/fundamentals/fetch-vs-pull) next.
+</Callout>
+
+<Callout type="tip">
+Before starting new work each day, it's good habit to run `git pull` first — you'll catch teammates' changes early instead of discovering a pile of conflicts hours later.
+</Callout>
+
+## Try it yourself
+
+Push a small commit to a repository you own on GitHub, then refresh the repository's page in your browser and watch your commit appear. That round trip — commit locally, push, see it land remotely — is the entire loop you'll repeat constantly.

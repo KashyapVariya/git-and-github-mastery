@@ -1,0 +1,63 @@
+---
+title: Maintaining an Open-Source Project
+summary: Maintaining is mostly triage — labeling issues, reviewing PRs promptly, and being clear (even when the answer is no).
+level: intermediate
+primaryTab: github
+subtab: open-source
+category: Open source
+tags: [open-source, maintaining, triage, releases]
+sources:
+  - label: GitHub Docs — Communities
+    url: https://docs.github.com/en/communities
+readingTime: 6
+related: [how-to-contribute, code-of-conduct, labels-and-milestones]
+order: 4
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Writing the code is often the easy part. Maintaining a project well means managing a steady stream of issues, pull requests, and questions from people you've never met — with limited time. The projects that stay healthy have a system for this, not just good intentions.
+
+## Triage first, code second
+
+When an issue comes in, quickly decide:
+
+- **Is it a real bug, a question, or a feature request?** Label it accordingly.
+- **Can you reproduce it?** If not, ask for more detail before doing anything else.
+- **Is it a duplicate?** Link it to the original and close it.
+
+Doing this within a day or two — even without fixing anything yet — tells contributors someone is paying attention, which is often what keeps them from giving up.
+
+## Reviewing pull requests
+
+- Respond quickly, even if the response is just "thanks, I'll review this by Friday." Silence is the number one reason contributors don't come back.
+- Review the *intent* before the *style*. Nitpicking formatting on a PR that solves the wrong problem wastes everyone's time — settle the approach first.
+- Use [suggested changes](/github/collaboration/suggested-changes) for small fixes instead of asking the contributor to make them and push again.
+
+## Saying no kindly
+
+Not every proposed change belongs in the project, and that's fine — but how you decline matters:
+
+```text
+Thanks for putting this together! I don't think this fits the project's
+scope right now (see #45 for the earlier discussion on this), but I'd
+be glad to link to it from the README as a community extension if
+you'd like to publish it separately.
+```
+
+<Callout type="tip">
+Write the reasoning down, even briefly. A documented "no, because X" saves you from re-litigating the same request every few months.
+</Callout>
+
+## Releases
+
+Tag meaningful points in history ([Semantic Versioning](/workflows/semantic-versioning) is the standard scheme), and write release notes that answer one question: "what does this change mean for someone using my project?" [Conventional Commits](/workflows/conventional-commits-deep-dive) make this step nearly automatic if you've been using them consistently.
+
+<Callout type="golden">
+Burnout is the most common reason projects go inactive. It's completely acceptable to set expectations — a note in the README saying "maintained in my spare time, response times vary" protects both you and your contributors.
+</Callout>
+
+## Try it yourself
+
+If you maintain (or plan to maintain) a project, write a one-paragraph `CONTRIBUTING.md` covering exactly what you'd want a first-time contributor to know before opening a PR.

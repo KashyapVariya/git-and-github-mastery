@@ -1,0 +1,47 @@
+---
+title: Choosing a License
+summary: Without a license, your code is "all rights reserved" by default — a license is what actually gives others legal permission to use, copy, or modify it.
+level: beginner
+primaryTab: github
+subtab: basics
+category: Repositories
+tags: [license, open-source, legal]
+sources:
+  - label: GitHub Docs — Repositories
+    url: https://docs.github.com/en/repositories
+readingTime: 3
+related: [creating-a-repository, readme-files, code-of-conduct]
+order: 7
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+A common misconception: putting code on a public GitHub repository does **not** automatically make it open source or free to use. Under default copyright law, nobody else has permission to copy, modify, or redistribute your code unless you explicitly grant it — and a license is exactly that grant, in writing.
+
+## Common choices
+
+GitHub lets you pick from a curated list when creating a repository, or add one afterward. A few you'll see constantly:
+
+- **MIT** — extremely permissive; anyone can do almost anything with the code, including using it in closed-source products, as long as they keep the copyright notice.
+- **Apache 2.0** — similar permissiveness to MIT, plus explicit patent grant language, which some companies specifically require.
+- **GPL v3** — "copyleft": anyone who distributes a modified version must also release their changes under GPL, keeping derivatives open.
+- **Unlicense** — dedicates the work to the public domain as closely as legally possible.
+
+For a small personal or learning project where you just want people to freely use your code, MIT is the common, low-friction default.
+
+## Adding one
+
+When creating a new repository, GitHub offers a "Choose a license" dropdown that generates a correctly formatted `LICENSE` file for you. For an existing repository, use the "Add file" button and pick a template, or copy the license text directly into a `LICENSE` file at the repo's root.
+
+<Callout type="warning">
+This is general information, not legal advice — if licensing choices matter for a commercial or company project, involve someone qualified to advise on it.
+</Callout>
+
+<Callout type="tip">
+Not sure which one? [choosealicense.com](https://choosealicense.com) (run by GitHub) walks through a short set of questions and recommends one.
+</Callout>
+
+## Try it yourself
+
+Add a LICENSE file to a repository you own, picking whichever license matches how you'd want others to be able to use your code.

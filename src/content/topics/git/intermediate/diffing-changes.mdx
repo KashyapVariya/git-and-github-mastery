@@ -1,0 +1,88 @@
+---
+title: Diffing Changes
+summary: git diff answers "what changed" — but the exact question changes depending on what you compare it against.
+level: intermediate
+primaryTab: git
+subtab: intermediate
+category: Comparing
+tags: [diff, staging-area, comparison]
+sources:
+  - label: Git — git diff
+    url: https://git-scm.com/docs/git-diff
+  - label: Git — git show
+    url: https://git-scm.com/docs/git-show
+readingTime: 5
+related: [restore-vs-reset-vs-revert, git-blame-and-show, resolving-merge-conflicts]
+order: 11
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+"What did I just change?" sounds like a simple question, but Git actually tracks three different snapshots of your project at once: the working directory, the staging area, and the last commit. `git diff` compares two of them at a time — and which two depends entirely on the flags you give it. Knowing that turns `diff` from a command you vaguely trust into one you can point precisely.
+
+## The default: working directory vs. staging area
+
+```bash
+git diff
+```
+
+With no arguments, this shows only your **unstaged** changes — the difference between your working files right now and whatever's currently sitting in the staging area. Run `git add` on a file, and it disappears from this view, because as far as this comparison is concerned, that file's changes are now "staged," not "different."
+
+## Staged changes: staging area vs. last commit
+
+```bash
+git diff --staged
+```
+
+(`--cached` is an older, identical alias for the same thing.) This shows the opposite half: what you've staged with `git add`, compared against the last commit. This is effectively a preview of exactly what your next `git commit` is about to record.
+
+## Everything at once: working directory vs. last commit
+
+```bash
+git diff HEAD
+```
+
+This combines both — staged and unstaged changes together — compared against the last commit. Useful when you don't care about the staging boundary and just want the full picture of "everything different from the last snapshot."
+
+## Comparing branches and commits
+
+`diff` isn't limited to your current uncommitted work — point it at any two commits, branches, or tags:
+
+```bash
+git diff main feature-branch
+git diff a1b2c3d..e4f5g6h
+git diff v1.0.0 v2.0.0
+```
+
+There's a subtlety worth knowing between two dots and three:
+
+```bash
+git diff main...feature-branch
+```
+
+Two dots (`main..feature-branch`) diffs the exact tips of both branches, whatever they are right now. Three dots (`main...feature-branch`) diffs from their **common ancestor** to `feature-branch` — meaning it only shows what `feature-branch` actually did, ignoring anything `main` picked up separately in the meantime. Three-dot is usually the more useful one for "what does this feature branch actually add," which is also what GitHub's pull request diff view uses under the hood.
+
+## Diffing a single file
+
+Any of the above can be narrowed to one path:
+
+```bash
+git diff HEAD -- src/config.js
+```
+
+<Callout type="tip">
+Add `--stat` to any diff command for a quick summary — file names and a line-count bar — instead of the full line-by-line output. Great for a fast sanity check before committing.
+</Callout>
+
+<Callout type="warning">
+Two-dot and three-dot branch diffs can give noticeably different results once both branches have moved on their own. If a diff looks bigger than expected, check whether you meant three dots instead of two.
+</Callout>
+
+<Callout type="golden">
+Before every commit, run `git diff --staged` as a final read-through of exactly what you're about to record. It catches stray debug lines and half-finished edits far more reliably than trusting memory.
+</Callout>
+
+## Try it yourself
+
+Edit a tracked file but don't stage it, and run `git diff` — note what shows. Then `git add` the file and run `git diff` again (nothing left) followed by `git diff --staged` (there it is). That boundary is the whole idea.

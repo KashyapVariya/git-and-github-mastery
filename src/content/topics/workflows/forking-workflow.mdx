@@ -1,0 +1,53 @@
+---
+title: The Forking Workflow
+summary: Contributors work in their own full copy of the repository (a fork) and propose changes back via pull request — no write access required.
+level: intermediate
+primaryTab: workflows
+subtab: guides
+category: Branching strategy
+tags: [workflows, forking, open-source]
+sources:
+  - label: Atlassian — Comparing Git workflows
+    url: https://www.atlassian.com/git/tutorials/comparing-workflows
+readingTime: 4
+related: [github-flow, how-to-contribute, keeping-a-fork-in-sync]
+order: 4
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+GitHub Flow and Git Flow both assume everyone has push access to one shared repository. The forking workflow removes that assumption entirely — it's how open-source projects accept contributions from thousands of people they've never granted any access to.
+
+## How it works
+
+1. A contributor **forks** the repository — a full copy under their own account.
+2. They clone their fork, branch, and commit exactly as they would in any other workflow.
+3. They push to *their fork*, not the original repository.
+4. They open a pull request from their fork's branch into the original repository's `main`.
+5. A maintainer with write access reviews it and merges — the contributor never needed write access at all.
+
+```bash
+# after forking on GitHub's website:
+git clone git@github.com:your-username/project.git
+git switch -c fix-broken-link
+# ...commit your change...
+git push -u origin fix-broken-link
+# open a pull request: your-fork:fix-broken-link -> original:main
+```
+
+## Where it's used
+
+This is the default model for essentially all public open-source projects on GitHub, and it's also common inside larger companies — even with internal repositories — specifically to keep the list of people with direct write access small and deliberate, while still letting anyone propose changes.
+
+<Callout type="tip">
+The forking workflow isn't mutually exclusive with GitHub Flow or Git Flow — it's really about *access model* (fork vs. shared repo), while the others are about *branch structure*. Plenty of projects combine forking with a GitHub-Flow-style branch structure inside the original repo.
+</Callout>
+
+<Callout type="golden">
+As a maintainer, the forking workflow is also a safety net: nobody can force-push over your history or accidentally delete a shared branch, because they never had write access to begin with.
+</Callout>
+
+## Try it yourself
+
+If you haven't already, walk through [How to Contribute](/github/open-source/how-to-contribute) end to end on a small project — it's the forking workflow in practice.

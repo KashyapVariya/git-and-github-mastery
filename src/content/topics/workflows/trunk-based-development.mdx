@@ -1,0 +1,52 @@
+---
+title: Trunk-Based Development
+summary: Everyone commits small, frequent changes directly to main (or via very short-lived branches), keeping merges tiny and conflicts rare.
+level: advanced
+primaryTab: workflows
+subtab: guides
+category: Branching strategy
+tags: [workflows, trunk-based, continuous-integration]
+sources:
+  - label: Atlassian — Comparing Git workflows
+    url: https://www.atlassian.com/git/tutorials/comparing-workflows
+readingTime: 5
+related: [github-flow, git-flow, code-review-culture]
+order: 3
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Trunk-based development takes the "keep branches short" idea in GitHub Flow to its logical extreme: branches (if used at all) live for hours, not days. Everyone integrates into `main` ("the trunk") constantly, which is what makes true continuous integration possible.
+
+## What it looks like in practice
+
+- Branches, when they exist, typically live less than a day.
+- Large features are built incrementally behind **feature flags**, merged into `main` in small, safe pieces rather than as one big branch.
+- Automated tests run on every single commit to `main` — this is non-negotiable, since there's no long-lived branch acting as a safety buffer.
+- Some teams commit directly to `main` with no branch at all, relying entirely on tests and fast review.
+
+```bash
+git pull
+git switch -c quick-fix
+# ...a small, self-contained change...
+git commit -m "fix: correct off-by-one in pagination"
+git push -u origin quick-fix
+# open PR, get a fast review, merge within hours
+```
+
+## Why smaller is genuinely better here
+
+The core insight: **merge conflicts grow with how long a branch has diverged from main.** A branch open for 3 hours rarely conflicts with anything. A branch open for 3 weeks almost always does, and by the time you resolve it, you've half-forgotten the original code. Trunk-based development just refuses to let branches get old enough for that to happen.
+
+<Callout type="warning">
+This model demands strong automated testing and, usually, feature flags for anything that takes longer than a day to build. Without those, "commit small and often" just means "ship broken things often."
+</Callout>
+
+<Callout type="golden">
+Trunk-based development and [GitHub Flow](/workflows/github-flow) aren't opposites — GitHub Flow with a strict "branches live less than a day" rule basically *is* trunk-based development.
+</Callout>
+
+## Try it yourself
+
+Look at your last five merged pull requests. How long was each branch open, from first commit to merge? If most are over a few days, you're not really practicing trunk-based development yet, even if you'd like to be.

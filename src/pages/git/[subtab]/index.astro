@@ -1,0 +1,18 @@
+---
+import { getCollection } from 'astro:content';
+import SubtabIndexView from '../../../components/topic/SubtabIndexView.astro';
+import { gitSubtabs } from '../../../lib/nav';
+
+export async function getStaticPaths() {
+  const topics = await getCollection('topics', ({ data }) => data.primaryTab === 'git' && !data.draft);
+  return gitSubtabs.map((tab) => ({
+    params: { subtab: tab.slug },
+    props: { entries: topics.filter((t) => t.data.subtab === tab.slug) },
+  }));
+}
+
+const { subtab } = Astro.params;
+const { entries } = Astro.props;
+---
+
+<SubtabIndexView primaryTab="git" subtab={subtab!} entries={entries} />

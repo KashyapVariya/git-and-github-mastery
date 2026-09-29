@@ -1,0 +1,82 @@
+---
+title: Config Levels — System, Global, Local
+summary: Git config lives at three levels that override each other in order, so the same setting can mean something different per machine, user, or repo.
+level: intermediate
+primaryTab: git
+subtab: intermediate
+category: Config
+tags: [config, git-config, precedence]
+sources:
+  - label: Git — git config
+    url: https://git-scm.com/docs/git-config
+readingTime: 5
+related: [git-aliases, ignoring-vs-excluding-files]
+order: 6
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+You've probably run `git config --global user.email "you@example.com"` and thought that was the whole story. It's not quite — Git actually reads settings from three separate files, stacked on top of each other, and the most specific one wins. Understanding the stack is what lets you do useful things like using your work email automatically in work repos and your personal email everywhere else.
+
+## The three levels
+
+From broadest to narrowest:
+
+- **System** — `/etc/gitconfig` (or equivalent). Applies to every user on the machine. Set with `git config --system`. Rarely touched outside shared/managed machines.
+- **Global** — `~/.gitconfig`. Applies to everything *you* do across every repository on your machine. Set with `git config --global`. This is where `user.name` and `user.email` usually live.
+- **Local** — `.git/config`, inside a single repository. Applies only there. Set with `git config --local`, or just `git config` with no scope flag — local is the default.
+
+```bash
+git config --system core.autocrlf true
+git config --global user.email "you@example.com"
+git config --local user.email "you@work-org.com"
+```
+
+## Precedence: local beats global beats system
+
+If the same setting is defined at more than one level, the narrowest one wins: **local > global > system**. Set `user.email` globally to your personal address, then override it locally inside one work repository, and commits made in that repository alone use the work address — everywhere else keeps using your global default.
+
+## Seeing where a setting actually comes from
+
+When a value seems wrong and you're not sure which file set it, ask Git directly:
+
+```bash
+git config --list --show-origin
+```
+
+Every line is prefixed with the exact file it came from — `file:/etc/gitconfig`, `file:/home/you/.gitconfig`, or `file:.git/config` — so there's no guessing which level won.
+
+To check just one key:
+
+```bash
+git config --show-origin --get user.email
+```
+
+## A practical use: separate identities per directory
+
+Rather than manually setting `user.email` locally in every work repo, modern Git supports `includeIf`, added to your global config, to switch settings automatically based on where a repo lives on disk:
+
+```ini
+# in ~/.gitconfig
+[includeIf "gitdir:~/work/"]
+    path = ~/.gitconfig-work
+```
+
+Any repo under `~/work/` then also picks up `~/.gitconfig-work`, which might set `user.email` to your work address — no per-repo setup needed.
+
+<Callout type="tip">
+`git config --list --show-origin` is the fastest way to debug "why is my commit using the wrong email" — it removes the guesswork entirely.
+</Callout>
+
+<Callout type="warning">
+Local config lives inside `.git/`, which is never committed or shared. A teammate cloning your repository gets none of your local settings — don't rely on a local config value for anything the whole team needs.
+</Callout>
+
+<Callout type="golden">
+Set sensible defaults globally, then override locally only for the specific repos that genuinely need something different. That keeps the override the exception, not the rule you have to remember everywhere.
+</Callout>
+
+## Try it yourself
+
+Run `git config --global user.email` to see your default, then inside one test repo run `git config --local user.email "test@example.com"`. Run `git config --list --show-origin | grep user.email` and see both values listed, each tagged with the file it came from.

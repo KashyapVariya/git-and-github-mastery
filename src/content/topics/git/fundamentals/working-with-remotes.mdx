@@ -1,0 +1,74 @@
+---
+title: Working with Remotes
+summary: A remote is just a named reference to a copy of your repository living somewhere else — origin is the conventional name for the main one.
+level: beginner
+primaryTab: git
+subtab: fundamentals
+category: Remotes
+tags: [remotes, origin, git-remote]
+sources:
+  - label: Pro Git — Working with Remotes
+    url: https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes
+  - label: Git — git remote
+    url: https://git-scm.com/docs/git-remote
+readingTime: 4
+related: [git-clone, push-and-pull, fetch-vs-pull]
+order: 16
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+So far, everything has happened only on your machine. Remotes are what connect your local repository to the outside world — teammates, backups, and platforms like GitHub.
+
+## What "origin" means
+
+When you `git clone` a repository, Git automatically creates a remote named `origin` pointing back at the URL you cloned from. `origin` isn't a special keyword — it's just the conventional default name, the same way `main` is the conventional default branch name. You could rename it, but almost nobody does.
+
+## Viewing your remotes
+
+```bash
+git remote -v
+```
+
+```text
+origin  https://github.com/you/project.git (fetch)
+origin  https://github.com/you/project.git (push)
+```
+
+## Adding a remote manually
+
+If you ran `git init` locally instead of cloning, there's no remote yet — you connect one yourself once you've created an empty repository on GitHub:
+
+```bash
+git remote add origin https://github.com/you/project.git
+```
+
+## Multiple remotes
+
+A repository can have more than one remote. A common pattern when working with a fork is having both `origin` (your own fork) and `upstream` (the original project you forked from):
+
+```bash
+git remote add upstream https://github.com/original-owner/project.git
+```
+
+This lets you pull in the original project's latest changes via `upstream` while pushing your own work to `origin` — covered fully in [Keeping a fork in sync](/github/open-source/keeping-a-fork-in-sync).
+
+## Removing or renaming
+
+```bash
+git remote rename origin upstream
+git remote remove origin
+```
+
+<Callout type="tip">
+Cloned via HTTPS but want to switch to SSH later, or vice versa? You don't need to re-clone — `git remote set-url origin <new-url>` changes it in place. See [My remote points to the wrong URL](/fix-it/wrong-remote-url).
+</Callout>
+
+<Callout type="golden">
+Adding a remote doesn't transfer any data by itself — it just records a name and a URL. Nothing actually moves until you `push`, `pull`, or `fetch`.
+</Callout>
+
+## Try it yourself
+
+Run `git remote -v` in any repository you've cloned and read the output. Then try adding a second, fake remote with `git remote add test https://example.com/fake.git` and remove it again — safe to experiment with since it's just a label.

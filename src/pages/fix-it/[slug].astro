@@ -1,0 +1,92 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import Icon from '../../components/ui/Icon.astro';
+import Callout from '../../components/ui/Callout.astro';
+import Pre from '../../components/ui/Pre.astro';
+import { url } from '../../lib/nav';
+
+export async function getStaticPaths() {
+  const fixes = await getCollection('fixes');
+  return fixes.map((entry) => ({ params: { slug: entry.id.split('/').pop() }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { title, symptom, summary, severity, sources, related, lastReviewed } = entry.data;
+const { Content } = await render(entry);
+
+const allFixes = await getCollection('fixes');
+const relatedEntries = allFixes.filter((f) => related.includes(f.id.split('/').pop()!));
+const formattedDate = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(lastReviewed);
+
+const severityMeta = {
+  minor: { label: 'Minor — quick fix', color: 'var(--color-level-beginner)' },
+  moderate: { label: 'Moderate — take a moment', color: 'var(--color-warning)' },
+  scary: { label: 'Scary-sounding, but fixable', color: 'var(--color-danger)' },
+}[severity];
+
+const mdxComponents = { Callout, pre: Pre };
+---
+
+<Layout title={title} description={summary} primaryTab="fix-it">
+  <article class="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
+    <nav aria-label="Breadcrumb" class="mb-6 flex items-center gap-1.5 text-[13px] text-[var(--color-ink-faint)]">
+      <a href={url('/fix-it')} class="transition hover:text-[var(--color-git-orange-soft)]">Fix It</a>
+      <Icon name="chevron-right" size={12} />
+      <span class="truncate text-[var(--color-ink-muted)]">{title}</span>
+    </nav>
+
+    <header data-reveal class="mb-8">
+      <span class="chip mb-4 inline-flex" style={`color:${severityMeta.color}; border-color: color-mix(in srgb, ${severityMeta.color} 40%, var(--color-border)); background: color-mix(in srgb, ${severityMeta.color} 10%, var(--color-bg-elevated));`}>
+        <Icon name="wrench" size={12} /> {severityMeta.label}
+      </span>
+      <h1 class="text-[2rem] font-bold leading-tight tracking-tight text-[var(--color-ink)] sm:text-[2.5rem]">{title}</h1>
+      <p class="mt-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] px-4 py-3 text-[15px] leading-relaxed text-[var(--color-ink-muted)]">
+        <strong class="text-[var(--color-ink)]">Symptom:</strong> {symptom}
+      </p>
+    </header>
+
+    <div
+      data-reveal
+      class="prose-topic max-w-none text-[15.5px] leading-[1.75] text-[var(--color-ink-muted)]
+        [&_h2]:mt-9 [&_h2]:mb-3 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-[var(--color-ink)]
+        [&_p]:mb-4 [&_ul]:mb-4 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1.5 [&_ol]:mb-4 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:space-y-2
+        [&_a]:text-[var(--color-git-orange-soft)] [&_a]:underline [&_a]:underline-offset-2
+        [&_strong]:text-[var(--color-ink)] [&_strong]:font-semibold
+        [&_:not(pre)>code]:inline-code"
+    >
+      <Content components={mdxComponents} />
+    </div>
+
+    <div data-reveal class="mt-10 gradient-border p-5">
+      <p class="mb-3 flex items-center gap-2 text-[13px] font-semibold uppercase tracking-wide text-[var(--color-ink-faint)]">
+        <Icon name="book" size={14} /> Learn more
+      </p>
+      <ul class="space-y-2">
+        {sources.map((s) => (
+          <li>
+            <a href={s.url} target="_blank" rel="noopener" class="flex items-center gap-1.5 text-[14px] text-[var(--color-git-orange-soft)] underline underline-offset-2 hover:text-[var(--color-git-orange)]">
+              {s.label} <Icon name="external-link" size={12} />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    {relatedEntries.length > 0 && (
+      <section data-reveal class="mt-10">
+        <h2 class="mb-4 text-lg font-bold text-[var(--color-ink)]">Related fixes</h2>
+        <div class="grid gap-3 sm:grid-cols-2">
+          {relatedEntries.map((f) => (
+            <a href={url(`/fix-it/${f.id.split('/').pop()}`)} class="glass-card p-4">
+              <p class="text-[14px] font-medium text-[var(--color-ink)]">{f.data.title}</p>
+              <p class="mt-1 line-clamp-2 text-[12.5px] text-[var(--color-ink-muted)]">{f.data.symptom}</p>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <p class="mt-8 text-xs text-[var(--color-ink-faint)]">Last reviewed {formattedDate}.</p>
+  </article>
+</Layout>

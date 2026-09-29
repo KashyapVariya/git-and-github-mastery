@@ -1,0 +1,62 @@
+---
+title: Subtrees
+summary: git subtree merges another repository's history directly into a folder of yours, so collaborators get the code with no extra setup step.
+level: expert
+primaryTab: git
+subtab: expert
+category: Multi-repo
+tags: [subtree, dependencies, multi-repo]
+sources:
+  - label: Pro Git — Submodules
+    url: https://git-scm.com/book/en/v2/Git-Tools-Submodules
+  - label: Git — git submodule
+    url: https://git-scm.com/docs/git-submodule
+readingTime: 5
+related: [submodules, git-lfs, performance-tuning]
+order: 10
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Subtrees solve the same problem as submodules — including one project inside another — with the opposite tradeoff: instead of a lightweight pointer to an external repo, the other project's files and history are actually merged into your repository. Nothing extra to initialize, nothing to forget to update.
+
+## How it differs from a submodule
+
+With a submodule, `git clone` gives collaborators an empty folder until they run an extra command. With a subtree, the files are just... there, immediately, like any other part of your project — because they genuinely were merged in. The tradeoff is that your repository's history and size grow to include the dependency's history too.
+
+## Adding a subtree
+
+```bash
+git subtree add --prefix=vendor/shared-lib https://github.com/example/shared-lib main --squash
+```
+
+`--prefix` sets where it lands in your project. `--squash` collapses the dependency's entire history into a single commit instead of importing every commit it ever had — almost always what you want, unless you specifically need its full history inline.
+
+## Pulling in upstream updates later
+
+```bash
+git subtree pull --prefix=vendor/shared-lib https://github.com/example/shared-lib main --squash
+```
+
+This merges in whatever changed upstream since your last pull, as a normal merge commit in your history.
+
+## Pushing your changes back upstream
+
+If you've modified files inside the subtree folder and want to contribute them back to the original project:
+
+```bash
+git subtree push --prefix=vendor/shared-lib https://github.com/example/shared-lib contribution-branch
+```
+
+<Callout type="tip">
+No extra Git version or plugin is required — `git subtree` has shipped as part of Git's contrib tooling and most standard installations for years, unlike some third-party alternatives.
+</Callout>
+
+<Callout type="golden">
+Choose based on who's doing the work: submodules suit dependencies you rarely touch and just want pinned precisely. Subtrees suit code you'll actively edit inline as part of your own project, with occasional syncing in both directions.
+</Callout>
+
+## Try it yourself
+
+If you maintain any small reusable snippet of code, try `git subtree add`-ing it into a throwaway test repository with `--squash`, and notice that unlike a submodule, `git clone`-ing that test repo elsewhere gives you the full content immediately, no extra step needed.

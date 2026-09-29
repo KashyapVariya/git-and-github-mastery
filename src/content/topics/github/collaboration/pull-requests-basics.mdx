@@ -1,0 +1,62 @@
+---
+title: Pull Requests Basics
+summary: A pull request proposes a code change and opens a conversation about it before it ever touches the main branch.
+level: intermediate
+primaryTab: github
+subtab: collaboration
+category: Pull requests
+tags: [pull-requests, collaboration, branches]
+sources:
+  - label: GitHub Docs — Pull requests
+    url: https://docs.github.com/en/pull-requests
+readingTime: 5
+related: [code-review-on-github, draft-pull-requests, merge-methods, forking-a-repository]
+order: 3
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+You could, in theory, push directly to `main` and skip all of this. Some solo projects do. But the moment more than one person touches a codebase, you need a checkpoint: a place to see exactly what's about to change, discuss it, run automated checks against it, and only then let it merge. That checkpoint is the pull request — usually shortened to **PR**.
+
+A pull request isn't a Git concept at all. Git only knows about commits and branches; the pull request is a GitHub feature built on top, comparing one branch against another.
+
+## The basic flow
+
+1. Create a branch and commit your changes to it, then push the branch to GitHub.
+
+```bash
+git checkout -b add-search-filter
+# ... make changes, commit them ...
+git push -u origin add-search-filter
+```
+
+2. On GitHub, open **Pull requests → New pull request**, and pick your branch as the *compare* branch against `main` (the *base*). GitHub usually offers a "Compare & pull request" button right after you push, which shortcuts this step.
+3. Write a title and description explaining *what* changed and *why*. Good PR descriptions save reviewers from having to reverse-engineer your reasoning from the diff alone.
+4. Open the PR. This doesn't merge anything — it starts a review, and any checks configured on the repository (tests, linting, CI) run automatically against your branch.
+
+## What a PR gives you
+
+Once open, a pull request page shows three things worth knowing:
+
+- **Conversation** — comments, review discussion, and status of any checks
+- **Commits** — every commit on your branch, in order
+- **Files changed** — the actual diff, where reviewers leave line-by-line comments
+
+You can keep pushing new commits to the same branch after opening the PR, and they'll appear automatically — a PR isn't a snapshot, it's a live view of the branch.
+
+<Callout type="tip">
+Keep pull requests small and focused on one thing. A PR that changes 40 files across three unrelated features is exhausting to review honestly, and bugs hide easily in that kind of noise.
+</Callout>
+
+## Fork-based vs. same-repository PRs
+
+If you have write access to a repository, you open PRs from a branch within it. If you don't — say, you're contributing to an open source project you don't maintain — you first [fork the repository](/github/basics/forking-a-repository), push your branch there, and open a PR *from your fork back to the original*. GitHub handles the cross-repository comparison the same way either way.
+
+<Callout type="golden">
+A pull request title and description become permanent project history once merged — they show up in `git log` and in the merge commit itself. Write them for someone reading the history a year from now, not just for today's reviewer.
+</Callout>
+
+## Try it yourself
+
+In a repository you control, create a small branch, push it, and open a pull request against `main` — even if you're the only collaborator. Read through the "Files changed" tab before merging; it's the same view your future reviewers will use.

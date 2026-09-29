@@ -1,0 +1,56 @@
+---
+title: Git Flow
+summary: A structured model with long-lived main and develop branches, plus dedicated feature, release, and hotfix branches — built for scheduled releases.
+level: advanced
+primaryTab: workflows
+subtab: guides
+category: Branching strategy
+tags: [workflows, git-flow, branching, releases]
+sources:
+  - label: Atlassian — Comparing Git workflows
+    url: https://www.atlassian.com/git/tutorials/comparing-workflows
+readingTime: 6
+related: [github-flow, trunk-based-development, hotfix-and-release-process]
+order: 2
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Git Flow was designed for projects with scheduled, versioned releases — think desktop software or mobile apps shipped in batches, not a website deployed continuously. It's more structured than GitHub Flow, with more branch types, each with a specific job.
+
+## The branches
+
+- **`main`** — always reflects the latest *released* version. Every commit here corresponds to a tagged release.
+- **`develop`** — the integration branch where finished features accumulate between releases.
+- **`feature/*`** — branched from `develop`, merged back into `develop` when done.
+- **`release/*`** — branched from `develop` when you're preparing a release: final testing, version bumps, and bug fixes happen here, then it merges into both `main` (tagged) and back into `develop`.
+- **`hotfix/*`** — branched from `main` for urgent production fixes, merged into both `main` and `develop` so the fix isn't lost on the next release.
+
+```bash
+git switch develop
+git switch -c feature/payment-retry
+# ...work, merge back into develop when done...
+
+git switch develop
+git switch -c release/2.4.0
+# ...final polish...
+git switch main && git merge release/2.4.0 && git tag v2.4.0
+git switch develop && git merge release/2.4.0
+```
+
+## The tradeoff
+
+Git Flow's structure is genuinely useful when you need to support multiple versions in production at once, or prepare a release over days or weeks while development continues elsewhere. That same structure is overhead if you deploy daily — merging into two long-lived branches for every hotfix adds ceremony [GitHub Flow](/workflows/github-flow) simply doesn't need.
+
+<Callout type="warning">
+Git Flow predates modern continuous deployment practices. Plenty of teams that adopted it by default would actually be better served by GitHub Flow or trunk-based development today — pick it because your release process genuinely needs it, not out of habit.
+</Callout>
+
+<Callout type="golden">
+The giveaway that Git Flow fits: you can name a real reason you need to freeze a release while `develop` keeps moving. If you can't, you probably don't need it.
+</Callout>
+
+## Try it yourself
+
+Map your current release process onto Git Flow's branches. If "release," "hotfix," and "develop" don't naturally correspond to anything you actually do, that's a strong signal a simpler model would serve you better.

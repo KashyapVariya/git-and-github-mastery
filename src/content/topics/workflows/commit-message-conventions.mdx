@@ -1,0 +1,55 @@
+---
+title: Commit Message Conventions
+summary: A good commit message explains why a change was made, written in the imperative mood, so history stays useful months later.
+level: beginner
+primaryTab: workflows
+subtab: guides
+category: Conventions
+tags: [workflows, commits, best-practices]
+sources:
+  - label: Pro Git — Commit Guidelines
+    url: https://git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project
+readingTime: 4
+related: [conventional-commits-deep-dive, code-review-culture]
+order: 5
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Six months from now, `git log` is the only person in the room who remembers why a change was made — and it only knows what you told it. A commit history full of "fix stuff" and "wip" is nearly useless for debugging, writing changelogs, or understanding a decision later.
+
+## The shape of a good message
+
+- **A short summary line**, under about 50 characters, written in the imperative mood: "Add retry logic" not "Added retry logic" or "Adds retry logic." Think of it as completing the sentence "If applied, this commit will ___."
+- **A blank line**, then an optional body explaining *why*, not just *what* — the diff already shows what changed.
+
+```text
+Fix pagination skipping the last page
+
+The page-size calculation rounded down instead of up, so any
+result count not evenly divisible by the page size silently
+dropped its final page. Switched to Math.ceil().
+```
+
+## What makes a message bad
+
+- Vague: "fix bug," "update code," "changes"
+- Missing context: "fix null check" without saying *which* null check, or why it was wrong
+- Batching unrelated changes into one commit with a message that can't describe all of them
+
+<Callout type="tip">
+If your commit message needs "and" to describe it — "fix login and update styles" — it's probably two commits, not one. Split it with `git add -p` and commit each piece separately.
+</Callout>
+
+## A structured option
+
+Many teams adopt a prefix convention like [Conventional Commits](/workflows/conventional-commits-deep-dive) — `feat:`, `fix:`, `docs:` — which adds a layer of machine-readable structure on top of these same good-writing principles. It's optional, but it pairs well with everything above.
+
+<Callout type="golden">
+Write the message for the next person who has to `git blame` this line at 2am during an incident — including future you.
+</Callout>
+
+## Try it yourself
+
+Look back at your last five commit messages. Rewrite any that don't explain *why* the change happened, as if you were leaving a note for a teammate.

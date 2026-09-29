@@ -1,0 +1,63 @@
+---
+title: Code Scanning with CodeQL
+summary: Code scanning analyzes your source code for security vulnerabilities on every push, using GitHub's semantic engine, CodeQL.
+level: advanced
+primaryTab: github
+subtab: security
+category: Security
+tags: [codeql, code-scanning, static-analysis, security]
+sources:
+  - label: GitHub Docs — Code security
+    url: https://docs.github.com/en/code-security
+readingTime: 5
+related: [secret-scanning, dependabot, security-advisories]
+order: 5
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Dependabot protects you from vulnerabilities in code you *imported*. Code scanning protects you from vulnerabilities in code you *wrote* — things like SQL injection, cross-site scripting, or unsafe deserialization that a normal test suite won't catch because the code "works," it's just also exploitable.
+
+## What CodeQL actually does
+
+CodeQL treats your source code like a database you can query. Instead of matching text patterns, it builds a semantic model of how data flows through your program — so it can trace "user input enters here" all the way to "and reaches a database query there, unescaped" across functions and files. GitHub maintains a large library of these queries for common vulnerability classes, covering most major languages.
+
+## Setting it up
+
+The simplest path is the "Default setup" option under Settings → Code security → Code scanning: GitHub detects your languages and configures an appropriate workflow automatically, with no YAML to write. For more control, you can add your own workflow using the `github/codeql-action`:
+
+```yaml
+name: "CodeQL"
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: javascript
+      - uses: github/codeql-action/analyze@v3
+```
+
+Results appear as alerts in the Security tab, and — if you've required the check — as annotations directly on the pull request that introduced them.
+
+<Callout type="tip">
+Turn on code scanning as a required status check once your team is used to it. Catching a SQL injection bug in review is dramatically cheaper than finding it in production.
+</Callout>
+
+<Callout type="warning">
+Static analysis produces false positives sometimes. Don't silently ignore an alert you believe is wrong — dismiss it with a reason (false positive, won't fix, used in tests) so the decision is recorded, not just forgotten.
+</Callout>
+
+## Try it yourself
+
+Enable "Default setup" for code scanning on a repository in a supported language and watch the first scan run in the Actions tab. Browse the Security tab afterward, even if it comes back clean — it's worth knowing where these results live before you actually need them.

@@ -1,0 +1,51 @@
+---
+title: GitHub Flow
+summary: Branch off main, open a pull request, review, merge, deploy — main is always in a deployable state.
+level: intermediate
+primaryTab: workflows
+subtab: guides
+category: Branching strategy
+tags: [workflows, github-flow, branching]
+sources:
+  - label: Atlassian — Comparing Git workflows
+    url: https://www.atlassian.com/git/tutorials/comparing-workflows
+readingTime: 5
+related: [git-flow, trunk-based-development, forking-workflow]
+order: 1
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+GitHub Flow is the simplest branching strategy that still supports real collaboration. It has exactly one long-lived branch — `main` — and everything else is short-lived. If your team deploys frequently and doesn't need scheduled releases, this is very likely the right default.
+
+## The flow
+
+1. Create a branch off `main`, named for what you're doing: `feature/checkout-redesign`.
+2. Commit your work on that branch, pushing regularly.
+3. Open a pull request as soon as you want feedback — even in draft form.
+4. Once it's reviewed and passes checks, merge it into `main`.
+5. Deploy from `main` — since it's always kept deployable, this can happen immediately after every merge.
+
+```bash
+git switch -c feature/checkout-redesign
+# ...work, commit, push...
+git push -u origin feature/checkout-redesign
+# open a pull request on GitHub, get it reviewed, merge it
+```
+
+## The one rule that makes it work
+
+**`main` must always be deployable.** That's the entire discipline GitHub Flow asks for. There's no `develop` branch to buffer half-finished work — if it's merged into `main`, it should be safe to ship. This is why pull requests, code review, and automated checks (via [GitHub Actions](/github/automation-cicd/github-actions-overview)) matter so much in this model: they're the only thing standing between "merged" and "live."
+
+<Callout type="tip">
+Feature flags pair naturally with GitHub Flow — they let you merge unfinished work into `main` safely, hidden behind a flag, without breaking the "always deployable" rule.
+</Callout>
+
+<Callout type="golden">
+GitHub Flow assumes you can deploy often — ideally, multiple times a day. If your product ships on a fixed schedule instead (an app store release, a quarterly on-prem build), [Git Flow](/workflows/git-flow) usually fits better.
+</Callout>
+
+## Try it yourself
+
+Look at your current project's branch list. If you have branches other than `main` that have been open for weeks, that's a sign the "always deployable, merge fast" discipline GitHub Flow depends on has slipped.

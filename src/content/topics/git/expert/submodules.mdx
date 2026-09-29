@@ -1,0 +1,71 @@
+---
+title: Submodules
+summary: A submodule embeds one Git repository inside another, pinned to one exact commit, so you can depend on external code as its own project.
+level: expert
+primaryTab: git
+subtab: expert
+category: Multi-repo
+tags: [submodules, dependencies, multi-repo]
+sources:
+  - label: Pro Git — Submodules
+    url: https://git-scm.com/book/en/v2/Git-Tools-Submodules
+  - label: Git — git submodule
+    url: https://git-scm.com/docs/git-submodule
+readingTime: 6
+related: [subtrees, git-lfs, sparse-checkout]
+order: 9
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Sometimes you need another Git repository's code inside your project — a shared library, a vendor dependency — but you don't want to merge its history into yours, and you want precise control over exactly which commit of it you're using. Submodules are Git's built-in answer.
+
+## The core idea
+
+A submodule is a reference, not a copy: your repository stores the submodule's remote URL and one specific commit hash it should be checked out at. The submodule's own history stays entirely separate — from your main repo's point of view, it's just a special kind of entry (a "gitlink") pointing at that commit.
+
+```bash
+git submodule add https://github.com/example/shared-lib vendor/shared-lib
+git commit -m "chore: add shared-lib as a submodule"
+```
+
+That creates a `.gitmodules` file recording the URL and path, and commits a pointer to the submodule's current commit.
+
+## Working with a repo that has submodules
+
+Cloning a repository does **not** automatically fetch submodule contents — you'll see an empty folder unless you also initialize them:
+
+```bash
+git clone --recurse-submodules https://github.com/example/main-project
+```
+
+Already cloned without that flag? Fetch them after the fact:
+
+```bash
+git submodule update --init --recursive
+```
+
+## Updating a submodule to a newer commit
+
+```bash
+cd vendor/shared-lib
+git pull origin main
+cd ../..
+git add vendor/shared-lib
+git commit -m "chore: bump shared-lib to latest"
+```
+
+Notice the last two commands: from the main repo's perspective, "updating a submodule" is just staging and committing a change to which commit hash it points at.
+
+<Callout type="warning">
+Forgetting `git submodule update` after pulling changes to the main repo is the single most common submodule frustration — your teammate bumped the pointer, but your checked-out submodule folder is still sitting at the old commit until you update it.
+</Callout>
+
+<Callout type="tip">
+If submodules feel like more coordination overhead than benefit, look at <a href="/git/expert/subtrees">subtrees</a> — a different tool for a similar problem, with different tradeoffs.
+</Callout>
+
+## Try it yourself
+
+If you have any project with a submodule, run `git status` inside the parent repo — a submodule with local changes or a different checked-out commit than what's recorded shows up clearly in the output, which is the fastest way to notice it's out of sync.

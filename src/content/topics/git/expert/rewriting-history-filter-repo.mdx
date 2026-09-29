@@ -1,0 +1,77 @@
+---
+title: Rewriting History with git-filter-repo
+summary: git filter-branch is officially deprecated and dangerously slow — git-filter-repo is the modern, safer tool for rewriting large amounts of history.
+level: expert
+primaryTab: git
+subtab: expert
+category: Internals
+tags: [filter-repo, history-rewrite, filter-branch, cleanup]
+sources:
+  - label: git-filter-repo
+    url: https://github.com/newren/git-filter-repo
+  - label: Git — git fsck
+    url: https://git-scm.com/docs/git-fsck
+readingTime: 6
+related: [git-objects-blob-tree-commit-tag, packfiles-and-gc, git-lfs]
+order: 12
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Sometimes history itself needs to change — a secret got committed, a huge binary needs removing from every past commit, or an old repo needs merging into a new one with paths adjusted. This isn't editing one commit; it's rewriting potentially thousands of them, each producing a brand-new hash. Git's own documentation now actively steers people away from the tool that used to be standard for this.
+
+## Why `git filter-branch` is deprecated
+
+`git filter-branch` still exists, but Git's own docs warn against it in almost every case. It works by checking out and replaying every single commit through your filter, one at a time — which is extremely slow on any repository with real history, and it's easy to get subtly wrong in ways that silently corrupt data (mismatched parent links, wrong committer dates, orphaned refs left in `.git/`). It's kept around mainly for backward compatibility with old scripts.
+
+## git-filter-repo: the modern replacement
+
+`git-filter-repo` is a separate tool (not bundled with Git itself, so it needs installing) that Git's own documentation now recommends by name. It's dramatically faster — it processes the object graph directly instead of replaying commits one by one — and its defaults are safer: it refuses to run on a repo that isn't a fresh clone, specifically so you can't accidentally rewrite your only copy of something.
+
+Install it (it's a single Python script, also packaged for most systems):
+
+```bash
+pip install git-filter-repo
+# or: brew install git-filter-repo / apt install git-filter-repo
+```
+
+## Common jobs
+
+**Remove a file from all of history** — for example, a secret that got committed and pushed:
+
+```bash
+git filter-repo --path secrets.env --invert-paths
+```
+
+`--path` selects what to keep; `--invert-paths` flips that into "remove this instead."
+
+**Extract only a subdirectory into its own repo history** — useful when splitting a monorepo:
+
+```bash
+git filter-repo --path packages/billing-service
+```
+
+**Rewrite email addresses across every past commit** — common after a company rename or email migration:
+
+```bash
+git filter-repo --mailmap .mailmap
+```
+
+Each of these produces a genuinely rewritten history: every commit after the earliest touched one gets a new hash, because a commit's hash depends on its content, which includes its parent's hash.
+
+<Callout type="warning">
+Rewriting history changes every downstream commit's hash. Anyone with an existing clone needs to re-clone or carefully reset onto the new history — old branches and open pull requests based on the previous history won't merge cleanly. Coordinate with your team, and never rewrite a shared branch without warning everyone first.
+</Callout>
+
+<Callout type="tip">
+`git-filter-repo` works on a **fresh clone** by default and refuses to run otherwise — treat that as a feature, not friction. Clone fresh, rewrite, verify, then push with `--force` to the real remote once you're confident.
+</Callout>
+
+<Callout type="golden">
+Removing a secret from history isn't the same as invalidating it. If a credential was ever pushed to a shared remote, rotate it — assume it was seen, even if you rewrite history five minutes later.
+</Callout>
+
+## Try it yourself
+
+Clone a disposable test repository, add a file, commit it, then run `git filter-repo --path that-file --invert-paths` and inspect `git log --all --full-history -- that-file` afterward — the file, and its content, are gone from every commit that ever contained it, not just hidden from the latest snapshot.

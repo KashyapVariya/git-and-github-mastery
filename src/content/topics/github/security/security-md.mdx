@@ -1,0 +1,55 @@
+---
+title: SECURITY.md
+summary: A SECURITY.md file tells people exactly how to report a vulnerability privately, instead of leaving them to guess or post it as a public issue.
+level: advanced
+primaryTab: github
+subtab: security
+category: Security
+tags: [security-md, disclosure, documentation]
+sources:
+  - label: GitHub Docs — Code security
+    url: https://docs.github.com/en/code-security
+readingTime: 3
+related: [security-advisories, contributing-guidelines]
+order: 7
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Imagine you find a serious vulnerability in an open-source project. Where do you report it? If there's no clear answer, a well-meaning reporter might open a public GitHub issue describing exactly how to exploit it — which helps attackers more than it helps you. A `SECURITY.md` file removes the guesswork.
+
+## What goes in it
+
+GitHub looks for `SECURITY.md` in your repository root, `docs/`, or `.github/` folder, and surfaces it prominently under the Security tab. At minimum, it should answer:
+
+- **Which versions are supported** with security fixes (older major versions often aren't)
+- **How to report a vulnerability** — ideally a private channel: a security email address, or a pointer to using GitHub's private vulnerability reporting feature
+- **What to expect afterward** — a rough response time, and whether you offer any kind of credit or bounty
+
+```markdown
+# Security Policy
+
+## Supported Versions
+| Version | Supported |
+| ------- | --------- |
+| 2.x     | ✅        |
+| 1.x     | ❌        |
+
+## Reporting a Vulnerability
+Please report security issues privately via GitHub's
+"Report a vulnerability" button on the Security tab, or
+email security@example.com. We aim to respond within 72 hours.
+```
+
+## Turning on private reporting
+
+Beyond just documenting an email address, repositories can enable "Private vulnerability reporting" under Settings → Code security. This adds a "Report a vulnerability" button directly on the Security tab, which opens a private security advisory draft — no separate email thread needed, and the report is tied directly into the advisory workflow.
+
+<Callout type="tip">
+Enable private vulnerability reporting *and* keep a short SECURITY.md pointing people to it. Not everyone knows the button exists; the file makes it discoverable.
+</Callout>
+
+## Try it yourself
+
+Add a `SECURITY.md` to a project you maintain, even a simple one, and enable private vulnerability reporting in Settings → Code security. It costs a few minutes and it's exactly the kind of thing you want in place *before* you need it.

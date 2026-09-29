@@ -1,0 +1,64 @@
+---
+title: README Files
+summary: A README.md is the front door of your repository — GitHub renders it automatically on the repo's home page, so it's the first thing anyone sees.
+level: beginner
+primaryTab: github
+subtab: basics
+category: Repositories
+tags: [readme, documentation, markdown]
+sources:
+  - label: GitHub Docs — Repositories
+    url: https://docs.github.com/en/repositories
+readingTime: 3
+related: [creating-a-repository, choosing-a-license, contributing-guidelines]
+order: 6
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Before anyone reads your code, they read your README. It answers the questions every visitor has in the first ten seconds: what is this, why would I use it, and how do I get started?
+
+## What GitHub does with it
+
+Any file named `README.md` (or `README` / `README.txt`) at the root of a repository is automatically rendered as formatted text right below the file listing on the repo's home page. It uses GitHub-flavored Markdown, so headings, code blocks, images, and links all render properly without any extra setup.
+
+## What to include
+
+A good README doesn't need to be long, but a few sections consistently earn their place:
+
+- **What it is** — one or two sentences, no jargon required to understand them
+- **Installation** — the exact commands to get it running
+- **Usage** — a minimal example, ideally copy-pasteable
+- **License** — or a link to the LICENSE file
+- Optionally: badges (build status, version), contribution guidelines, or a link to fuller docs
+
+```markdown
+# Project Name
+
+One-sentence description of what this does.
+
+## Install
+
+\`\`\`bash
+npm install project-name
+\`\`\`
+
+## Usage
+
+\`\`\`js
+import { thing } from "project-name";
+\`\`\`
+```
+
+<Callout type="tip">
+Write the README for someone who has never seen your project before, not for yourself six months from now. If a stranger couldn't follow it, it needs another pass.
+</Callout>
+
+<Callout type="golden">
+Keep the README updated as the project changes. An outdated README that shows commands which no longer work is worse than no README at all — it actively costs people time.
+</Callout>
+
+## Try it yourself
+
+Write a README.md for a repository you own (or a toy project) covering what it is, how to install it, and one usage example.

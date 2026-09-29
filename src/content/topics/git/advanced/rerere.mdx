@@ -1,0 +1,79 @@
+---
+title: Rerere — Reuse Recorded Resolutions
+summary: rerere.enabled tells Git to remember how you resolved a merge conflict, then apply that same fix automatically the next time the identical conflict shows up.
+level: advanced
+primaryTab: git
+subtab: advanced
+category: Merge conflicts
+tags: [rerere, merge-conflicts, rebase, automation]
+sources:
+  - label: Pro Git — Rerere
+    url: https://git-scm.com/book/en/v2/Git-Tools-Rerere
+  - label: Pro Git — Advanced Merging
+    url: https://git-scm.com/book/en/v2/Git-Tools-Advanced-Merging
+readingTime: 5
+related: [rebase-basics, interactive-rebase, cherry-picking]
+order: 7
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+"Rerere" stands for **reuse recorded resolution** — and it solves a specific, annoying problem: resolving the *exact same conflict* over and over. This happens more than you'd expect. If you rebase a long-lived branch against `main` repeatedly, every rebase replays the same commits, and if they conflict with the same lines each time, you're stuck manually fixing the identical conflict again and again. Rerere remembers your fix the first time and applies it automatically after that.
+
+## Turning it on
+
+Rerere is off by default. Enable it globally:
+
+```bash
+git config --global rerere.enabled true
+```
+
+From then on, whenever you resolve a conflict, Git records the "before" state (the conflicting markers) and the "after" state (your resolution) in `.git/rr-cache`.
+
+## How it plays out
+
+1. You rebase or merge, and hit a conflict in `config.yml`.
+2. You resolve it by hand, `git add config.yml`, and continue.
+3. Rerere quietly records that exact conflict pattern and your fix.
+4. Later, you rebase again (perhaps `main` moved forward and you're replaying the same feature commits), and Git hits the *identical* conflict in `config.yml`.
+5. Rerere recognizes the pattern and resolves it automatically, staging the file for you — no manual work needed.
+
+You'll see a note in the output when this happens:
+
+```text
+Resolved 'config.yml' using previous resolution.
+```
+
+It's always worth a quick glance at the file before continuing, especially the first few times, to build trust that the replayed fix is actually correct for the new context.
+
+## Where it shines
+
+- **Long-lived feature branches** that get rebased onto `main` repeatedly as both move forward.
+- **Reverting and re-applying** the same change, which often reproduces the same conflicts in reverse.
+- **Team-wide conflict hot spots** — a frequently-edited file like a changelog or lockfile, where merges from many branches keep colliding in the same spot. (Rerere resolutions are per-machine by default, though the cache can be shared via `rerere.autoUpdate` and committing the resolution cache in specialized setups.)
+
+## Checking recorded resolutions
+
+```bash
+git rerere status     # files with recorded/pending resolutions
+git rerere diff        # show the recorded resolution as a diff
+```
+
+If a resolution turns out wrong, you can forget it and resolve fresh:
+
+```bash
+git rerere forget <file>
+```
+
+<Callout type="tip">
+Enable `rerere.autoUpdate` too (`git config --global rerere.autoUpdate true`) so a recognized resolution is automatically staged with `git add`, not just written to disk — one less manual step.
+</Callout>
+
+<Callout type="golden">
+Rerere is most valuable exactly where rebasing shines: keeping a feature branch current against a fast-moving `main`. The two features pair naturally — rebase often, and let rerere handle the conflicts you've already solved once.
+</Callout>
+
+## Try it yourself
+
+Enable `rerere.enabled`, then create a deliberate conflict between two branches, resolve it, and merge/rebase in a way that reproduces the same conflict again (for example, abort and retry the same rebase). Watch Git resolve it automatically the second time, and confirm with `git rerere status`.

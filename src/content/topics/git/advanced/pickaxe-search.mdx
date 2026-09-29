@@ -1,0 +1,74 @@
+---
+title: The Pickaxe Search
+summary: git log -S and -G search your history for the commit that added or removed a specific piece of text — perfect for finding when a line of code, or a bug, was introduced.
+level: advanced
+primaryTab: git
+subtab: advanced
+category: Debugging
+tags: [log, pickaxe, search, history, debugging]
+sources:
+  - label: Git — git-log
+    url: https://git-scm.com/docs/git-log
+  - label: Pro Git — Debugging with Git
+    url: https://git-scm.com/book/en/v2/Git-Tools-Debugging-with-Git
+readingTime: 5
+related: [bisecting-bugs, the-reflog]
+order: 8
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Ordinary `git log <file>` shows every commit that touched a file — which, for a busy file, can be hundreds of commits, most irrelevant. Often what you actually want is narrower: "which commit added this specific function call?" or "when did this magic number disappear?" That's what the **pickaxe** does — it searches the *content added or removed* by each commit, not just which files a commit touched.
+
+## `-S`: the string search
+
+```bash
+git log -S"MAX_RETRIES" --oneline
+```
+
+`-S` finds commits where the **number of occurrences** of the given string changed — it was added, removed, or its count changed between the old and new version of a file. This is exactly what you want when hunting for "when did this constant/function/variable first show up" or "when did it get deleted."
+
+Critically, `-S` treats the search string as a literal block of text by default, and it's fast because it's just counting occurrences, not running a regex engine.
+
+## `-G`: the regex search
+
+```bash
+git log -G"function\s+handleSubmit" --oneline
+```
+
+`-G` is more permissive: it matches commits whose **diff** contains a line matching the given regular expression, whether the total occurrence count changed or not. This catches cases `-S` would miss — like a line that moved within a file, or a match that changed from one variant to another without changing the count.
+
+## `-S` vs. `-G`, in practice
+
+- Use **`-S`** when you're hunting for an exact identifier, string literal, or constant, and you care about *when it was introduced or removed*.
+- Use **`-G`** when you want any commit whose diff *touches* a pattern — broader, and useful when the exact count doesn't matter.
+
+Both are much narrower and faster than reading full diffs by hand.
+
+## Useful companions
+
+```bash
+# only search commits touching a specific path
+git log -S"MAX_RETRIES" -- src/config.js
+
+# show the actual diff for each matching commit, not just the message
+git log -S"MAX_RETRIES" -p
+
+# search commit messages too, alongside content
+git log -S"MAX_RETRIES" --all
+```
+
+`--pickaxe-regex` makes `-S` interpret its argument as a regex too, blending the two behaviors when you need it.
+
+<Callout type="tip">
+Pair pickaxe search with `git bisect` for tricky regressions: use `-S` first to shortlist candidate commits that touched the suspicious code, then bisect between them if it's still not obvious which one caused the bug.
+</Callout>
+
+<Callout type="warning">
+`-S` and `-G` search the diff of each commit, not the final file contents — a file that has always contained the string, unchanged, across many commits won't match anywhere except the commit that first introduced it.
+</Callout>
+
+## Try it yourself
+
+Pick a distinctive string in one of your project's files — a constant name or function call. Run `git log -S"<that string>" --oneline` and see how much shorter the result is than a plain `git log -- <file>`. Add `-p` to see the exact diff of the commit that introduced it.

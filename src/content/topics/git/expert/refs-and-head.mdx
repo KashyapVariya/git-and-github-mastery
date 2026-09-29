@@ -1,0 +1,62 @@
+---
+title: Refs and HEAD
+summary: Branches, tags, and HEAD are all just "refs" — named pointers to commits, stored as tiny files Git updates for you.
+level: expert
+primaryTab: git
+subtab: expert
+category: Internals
+tags: [refs, head, branches, tags]
+sources:
+  - label: Pro Git — Git References
+    url: https://git-scm.com/book/en/v2/Git-Internals-Git-References
+  - label: Git — git update-ref
+    url: https://git-scm.com/docs/git-update-ref
+readingTime: 5
+related: [inside-the-git-folder, git-objects-blob-tree-commit-tag, reflog-internals]
+order: 3
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+"Branch," "tag," and "HEAD" sound like three different concepts, but internally they're the same idea wearing different hats: a **ref**, a human-readable name for a commit hash. Understanding refs makes detached HEAD, force-pushes, and `git update-ref` all click at once.
+
+## What a ref actually is
+
+A ref is a name that resolves to a SHA hash, stored under `.git/refs/`:
+
+- `refs/heads/main` — the `main` branch. Its content is the hash of main's latest commit.
+- `refs/tags/v1.0.0` — the `v1.0.0` tag.
+- `refs/remotes/origin/main` — your local record of where `origin`'s `main` was, last time you fetched.
+
+You can inspect any ref's resolved hash directly:
+
+```bash
+git rev-parse refs/heads/main
+```
+
+Moving a branch forward — the entire mechanism behind `git commit` — is really just rewriting one small file to point at a new hash. That's the whole reason committing and branching are instant regardless of repository size.
+
+## HEAD: a pointer to a pointer
+
+`HEAD` is special: it's a ref that (usually) points at *another* ref rather than directly at a commit. On a normal branch, `.git/HEAD` contains:
+
+```text
+ref: refs/heads/main
+```
+
+That indirection is exactly what makes committing "just work": Git resolves HEAD → `refs/heads/main` → a commit hash, creates a new commit with that hash as its parent, and updates `refs/heads/main` to point at the new commit. HEAD never had to change at all.
+
+When you check out a specific commit or tag instead of a branch, there's no branch ref to point at — so HEAD points straight at a commit hash instead. That's exactly what "detached HEAD" means; see [I'm in a detached HEAD state](/fix-it/detached-head) for what to do about it.
+
+<Callout type="tip">
+`HEAD~2` means "two commits before HEAD, following first parents." `HEAD^2` means "the *second* parent of HEAD" (only meaningful on a merge commit). They look similar but answer different questions.
+</Callout>
+
+<Callout type="golden">
+Any time you see `HEAD`, mentally read it as "whatever commit I currently have checked out" — sometimes that's indirect (via a branch), sometimes it's direct (detached).
+</Callout>
+
+## Try it yourself
+
+Run `git symbolic-ref HEAD` — it prints exactly what `.git/HEAD`'s indirection currently resolves to. Then run `git checkout HEAD~1` and run it again — notice HEAD now holds a raw commit hash instead of a `ref:` line, because you're detached.

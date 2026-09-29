@@ -1,0 +1,61 @@
+---
+title: Staging with git add
+summary: git add moves changes from your working directory into the staging area, marking exactly what should go into your next commit.
+level: beginner
+primaryTab: git
+subtab: fundamentals
+category: Commands
+tags: [git-add, staging, daily-workflow]
+sources:
+  - label: Git — git add
+    url: https://git-scm.com/docs/git-add
+readingTime: 3
+related: [the-four-areas, git-status, making-commits]
+order: 9
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+`git add` is the bridge between "I changed something" and "this change is officially part of my next commit." Nothing you edit gets committed until it passes through here first.
+
+## Staging one file
+
+```bash
+git add app.js
+```
+
+This stages exactly the current state of `app.js`. If you edit it *again* after running this, that new edit isn't staged automatically — you'd need to run `git add app.js` a second time to include it too.
+
+## Staging everything
+
+```bash
+git add .
+```
+
+Stages every changed and new file in the current directory and its subfolders. Convenient, but be a little careful — it's easy to accidentally stage a debug file or something meant to stay local. Running `git status` first is a good habit.
+
+## Staging by pattern
+
+```bash
+git add src/*.js
+git add *.md
+```
+
+Useful when you want everything of one type without staging everything else.
+
+## Un-staging
+
+Staged something by mistake? See [I staged a file by mistake](/fix-it/unstage-a-file) — `git restore --staged <file>` puts it back without touching your actual edits.
+
+<Callout type="golden">
+Staging is a snapshot of the file *at the moment you ran `git add`*, not a live link to it. If you edit the file again afterward, remember to `git add` it once more before committing — otherwise your commit won't include that latest edit.
+</Callout>
+
+<Callout type="tip">
+Want much finer control than "this whole file"? `git add -p` lets you stage a file hunk by hunk — approving or skipping each chunk of changes individually. It's covered in [Patch staging](/git/advanced/patch-staging).
+</Callout>
+
+## Try it yourself
+
+Change two different files, then run `git add` on just one of them. Run `git status` — you'll see one file listed as staged and the other still listed as an unstaged change, side by side.

@@ -1,0 +1,49 @@
+---
+title: GitHub Sponsors
+summary: GitHub Sponsors lets people fund open-source maintainers directly through GitHub, with one-time or monthly payments.
+level: intermediate
+primaryTab: github
+subtab: open-source
+category: Open source
+tags: [open-source, funding, sponsors]
+sources:
+  - label: GitHub Docs — Communities
+    url: https://docs.github.com/en/communities
+readingTime: 3
+related: [maintaining-a-project, how-to-contribute]
+order: 6
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Most open-source software is maintained for free, in people's spare time, indefinitely. GitHub Sponsors gives users and companies a direct way to pay maintainers for that ongoing work, without routing through a separate platform.
+
+## How it works
+
+A developer or organization sets up a sponsor profile with one or more tiers (for example, $5/month, $25/month, or a custom one-time amount). Anyone with a GitHub account can sponsor them directly from their profile or repository page. GitHub doesn't take a cut of the payments themselves.
+
+## Where it shows up
+
+Once a repository's owner has a sponsor profile, GitHub shows a **Sponsor** button at the top of the repository page. You can also list sponsorship links (GitHub Sponsors or external ones like Open Collective or Patreon) in a `.github/FUNDING.yml` file:
+
+```yaml
+github: [maintainer-username]
+open_collective: project-name
+```
+
+## Why it matters for the ecosystem
+
+A surprising amount of software the industry depends on is maintained by one or two people, unpaid. Sponsorship doesn't fix that on its own, but it's one of the more direct ways to acknowledge and sustain that work — especially for dependencies your own projects quietly rely on.
+
+<Callout type="tip">
+As a company, sponsoring the maintainers of libraries you depend on in production is a small, practical way to reduce the risk of that dependency going unmaintained.
+</Callout>
+
+<Callout type="golden">
+You don't have to be a company to sponsor — even a few dollars a month from many individual users adds up, and GitHub Sponsors is built with that in mind.
+</Callout>
+
+## Try it yourself
+
+Check whether a project you rely on has a GitHub Sponsors button on its repository page, or a `FUNDING.yml` file in its `.github` folder.

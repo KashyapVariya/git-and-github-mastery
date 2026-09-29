@@ -1,0 +1,56 @@
+---
+title: OIDC Basics
+summary: OpenID Connect lets GitHub Actions get short-lived cloud credentials at runtime, so you never have to store a long-lived cloud secret in your repository.
+level: advanced
+primaryTab: github
+subtab: security
+category: Security
+tags: [oidc, actions, cloud, secrets]
+sources:
+  - label: GitHub Docs — Actions
+    url: https://docs.github.com/en/actions
+readingTime: 5
+related: [secrets-and-variables, deploy-keys, environments-and-approvals]
+order: 11
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+The traditional way to let a GitHub Actions workflow deploy to AWS, Azure, or GCP is storing a long-lived access key as a repository secret. That works, but it's a standing liability: if that secret ever leaks — through a misconfigured workflow, a compromised dependency, or a logging mistake — it's valid until someone notices and manually rotates it. OIDC removes the standing secret entirely.
+
+## How it works, conceptually
+
+OpenID Connect (OIDC) is a standard for one system to prove its identity to another using short-lived, cryptographically signed tokens instead of a shared password. When a workflow run starts, GitHub Actions can generate a token that says, in effect, "this is workflow X, running for repository Y, triggered by event Z" and signs it.
+
+You configure your cloud provider (AWS IAM, Azure AD, Google Cloud) to trust GitHub as an identity provider, and set up a rule like: "if a token comes from GitHub, claiming to be from `my-org/my-repo` on the `main` branch, grant it *this specific role*, for *this one job*." The workflow exchanges that token for real, temporary cloud credentials — valid only for the life of that job run.
+
+## What changes in your workflow
+
+Instead of a stored secret, you request the token permission explicitly and use your cloud provider's official action to exchange it:
+
+```yaml
+permissions:
+  id-token: write
+  contents: read
+
+steps:
+  - uses: aws-actions/configure-aws-credentials@v4
+    with:
+      role-to-assume: arn:aws:iam::123456789012:role/deploy-role
+      aws-region: us-east-1
+```
+
+No `AWS_ACCESS_KEY_ID` or `AWS_SECRET_ACCESS_KEY` secret exists anywhere in your repository settings — there's nothing long-lived to leak.
+
+<Callout type="golden">
+If a workflow deploys to a major cloud provider and you're still using long-lived access keys stored as secrets, migrating to OIDC is one of the highest-value security changes you can make — it removes an entire category of leaked-credential incident.
+</Callout>
+
+<Callout type="tip">
+Scope the trust policy tightly — to a specific repository and branch, not "any GitHub Actions run anywhere." Otherwise a workflow in an unrelated repository could potentially assume the same role.
+</Callout>
+
+## Try it yourself
+
+If you deploy to a cloud provider from Actions today, check whether you're using stored access keys or OIDC. If it's keys, look up your provider's official GitHub Action for OIDC-based authentication — most major clouds have first-class support now.

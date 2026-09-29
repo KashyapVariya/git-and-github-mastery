@@ -1,0 +1,36 @@
+---
+import { subtabsFor, url } from '../../lib/nav';
+
+interface Props {
+  primaryTab: 'git' | 'github';
+  active: string;
+}
+
+const { primaryTab, active } = Astro.props;
+const tabs = subtabsFor(primaryTab);
+const levelDot: Record<string, string> = {
+  beginner: 'var(--color-level-beginner)',
+  intermediate: 'var(--color-level-intermediate)',
+  advanced: 'var(--color-level-advanced)',
+  expert: 'var(--color-level-expert)',
+};
+---
+
+<div class="sticky top-[var(--header-h,64px)] z-30 border-b border-[var(--color-border)] bg-[var(--color-bg)]/85 backdrop-blur-md">
+  <div class="mx-auto max-w-[1400px] px-4 sm:px-6">
+    <nav aria-label={`${primaryTab} sections`} data-tab-indicator-root class="relative flex items-center gap-1 overflow-x-auto py-2.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <span data-tab-indicator class="pointer-events-none absolute bottom-0 left-0 h-[2px] rounded-full bg-gradient-to-r from-[var(--color-git-orange)] to-[var(--color-cyan)] opacity-0 transition-[transform,width] duration-300 ease-out"></span>
+      {tabs.map((tab) => (
+        <a
+          href={url(`/${primaryTab}/${tab.slug}`)}
+          data-tab-link
+          class:list={['relative flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md px-3 py-1.5 text-[13px] font-medium text-[var(--color-ink-muted)] transition-colors hover:text-[var(--color-ink)]', tab.slug === active && 'is-active text-[var(--color-ink)]']}
+          aria-current={tab.slug === active ? 'page' : undefined}
+        >
+          {tab.level && <span class="h-1.5 w-1.5 rounded-full" style={`background:${levelDot[tab.level]}`}></span>}
+          {tab.label}
+        </a>
+      ))}
+    </nav>
+  </div>
+</div>

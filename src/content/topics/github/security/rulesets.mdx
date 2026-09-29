@@ -1,0 +1,42 @@
+---
+title: Rulesets
+summary: Rulesets are GitHub's newer way to enforce rules across many branches or tags at once, with clearer layering than classic branch protection.
+level: advanced
+primaryTab: github
+subtab: security
+category: Access control
+tags: [rulesets, branch-protection, security]
+sources:
+  - label: GitHub Docs — Code security
+    url: https://docs.github.com/en/code-security
+readingTime: 4
+related: [branch-protection-rules, permissions-and-roles]
+order: 2
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Classic branch protection rules are defined one branch pattern at a time, and it's easy to lose track of which repositories have which rules, or forget to add a new one when a new release branch appears. Rulesets fix this by letting you define a rule once and apply it broadly — to every branch matching a pattern, every tag, or even every repository in an organization.
+
+## How rulesets differ from branch protection
+
+A ruleset is a named bundle of rules (require pull requests, require status checks, block force pushes, and more) attached to a **target** — branches or tags matching a pattern — with an **enforcement status**: active, evaluate (dry run, logs what would have been blocked without blocking it), or disabled.
+
+The big advantage is **layering**: an organization can set rulesets that apply across many repositories, and individual repositories can add their own on top. You can see exactly which rules are active on a branch and where each one came from, instead of hunting through separate settings screens.
+
+## A typical setup
+
+For a team standardizing on GitHub Flow, a reasonable organization-wide ruleset might target `main` and `release/**` and require: a pull request, at least one approval, passing status checks, and no force pushes or deletions. Individual repositories can then layer stricter rules — more required reviewers, required signed commits — without touching the shared baseline.
+
+<Callout type="tip">
+Start any new ruleset in "evaluate" mode. It shows you in the ruleset's insights exactly which pushes or merges *would* have been blocked, so you can confirm it behaves the way you expect before it actually enforces anything.
+</Callout>
+
+<Callout type="golden">
+Rulesets and classic branch protection rules can coexist on the same branch — GitHub applies the strictest combination of both. If something is being blocked and you can't figure out why, check both places.
+</Callout>
+
+## Try it yourself
+
+If you manage an organization (even a free one with a couple of test repos), create an organization-level ruleset targeting `main` across all repositories, set it to "evaluate" mode, and check back after a few pushes to see what it would have caught.

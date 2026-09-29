@@ -1,0 +1,64 @@
+---
+title: GitHub Issues
+summary: Issues are GitHub's built-in tracker for bugs, ideas, and tasks — a public conversation thread attached to your repository.
+level: beginner
+primaryTab: github
+subtab: collaboration
+category: Issues
+tags: [issues, tracking, github-basics]
+sources:
+  - label: GitHub Docs — Issues
+    url: https://docs.github.com/en/issues
+readingTime: 4
+related: [labels-and-milestones, pull-requests-basics, github-discussions, issue-and-pr-templates]
+order: 1
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Code lives in files, but the *work around* the code — bug reports, feature ideas, questions, half-finished plans — needs somewhere to live too. If that conversation happens in email or chat, it disappears from the project the moment the thread scrolls away. GitHub Issues keeps it attached to the repository itself, searchable forever, right next to the code it's about.
+
+Think of an issue as a sticky note that anyone can read, reply to, and eventually throw away — except it never actually disappears, it just gets marked "closed."
+
+## Creating an issue
+
+From a repository's **Issues** tab, click **New issue**. You get:
+
+- A **title** — short and specific ("Login button unresponsive on Safari" beats "bug")
+- A **description** — the details, ideally with steps to reproduce a bug or a clear statement of what you want built
+- Optional **labels**, an **assignee**, and a **milestone** (covered in the next article)
+
+The description box supports full Markdown, so you can paste code blocks, checklists, and screenshots directly into the conversation.
+
+## The conversation
+
+Once created, an issue is a thread. Anyone with access can comment, and GitHub notifies people who are subscribed — the author, anyone assigned, and anyone who's commented already. You can:
+
+- **@mention** a person or team to pull them into the conversation
+- Add a **reaction** (👍 👎 🎉) instead of a "+1" comment, to keep threads readable
+- **Reference** another issue or pull request by typing `#` followed by its number, which GitHub turns into a live link
+
+```text
+Looks related to #142 — same root cause as the timeout bug.
+```
+
+## Closing an issue
+
+An issue closes when someone clicks **Close issue**, or automatically when a linked pull request that fixes it gets merged (see [Closing keywords](/github/project-management/closing-keywords) for the exact syntax). Closed issues aren't deleted — they stay searchable, which makes them a surprisingly good project history. "Did we already discuss this?" is often answered by searching closed issues before opening a new one.
+
+<Callout type="tip">
+Search closed issues before filing a new bug report. A huge amount of project history — decisions, workarounds, "we tried that and it didn't work" — lives in threads that are technically closed.
+</Callout>
+
+## Issues vs. pull requests vs. discussions
+
+It's easy to conflate the three. A rough rule: **issues** track a specific piece of work or a bug ("this is broken" / "we should build this"), **pull requests** propose an actual code change, and **discussions** hold open-ended conversation that isn't tied to a single fix — Q&A, ideas, announcements. Small projects often blur the line, and that's fine; the distinction matters more as a project grows.
+
+<Callout type="info">
+Not every repository has Issues enabled — maintainers can turn the tab off entirely in repository settings if they'd rather route all feedback elsewhere.
+</Callout>
+
+## Try it yourself
+
+Open any public repository you use, click the Issues tab, and read through a handful of closed issues. Notice how much design discussion and reasoning is preserved there — that history is one of the most underrated parts of GitHub.

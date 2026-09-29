@@ -1,0 +1,65 @@
+---
+title: GitHub Packages
+summary: GitHub Packages hosts your published packages — npm, Docker images, and more — right next to the code that produces them, with the same permissions model.
+level: intermediate
+primaryTab: github
+subtab: automation-cicd
+category: Deployment
+tags: [github-packages, npm, docker, registry]
+sources:
+  - label: GitHub Docs — Packages
+    url: https://docs.github.com/en/packages
+readingTime: 3
+related: [github-actions-overview, secrets-and-variables]
+order: 13
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+If your project publishes something — an npm package, a Docker image, a Maven artifact — you need somewhere to host it. GitHub Packages is a registry built into GitHub itself, so publishing lives right alongside your source code, issues, and CI.
+
+## What it supports
+
+GitHub Packages works as a registry for several ecosystems, each speaking that ecosystem's normal protocol: npm, Docker/OCI container images, RubyGems, Maven, NuGet, and more. You interact with it using the tools you already know (`npm publish`, `docker push`) — just pointed at GitHub's registry instead of the public default.
+
+## Publishing an npm package from Actions
+
+```yaml
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://npm.pkg.github.com
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+Note there's no separate secret to create here — `secrets.GITHUB_TOKEN` is automatically provided to every workflow run, scoped to that repository, and the `permissions:` block grants it write access to packages for this job specifically.
+
+## Publishing a container image
+
+```yaml
+- uses: docker/build-push-action@v6
+  with:
+    push: true
+    tags: ghcr.io/my-org/my-app:latest
+```
+
+`ghcr.io` is GitHub's container registry hostname — images pushed there show up attached to your repository or organization.
+
+<Callout type="tip">
+Packages inherit visibility and access from the repository they're linked to by default, so a private repo's packages stay private automatically — no separate access configuration needed for the common case.
+</Callout>
+
+## Try it yourself
+
+If you maintain any npm package or Docker image, try publishing one version of it to GitHub Packages using `secrets.GITHUB_TOKEN` as shown above, instead of a separate registry account.

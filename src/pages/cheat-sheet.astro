@@ -1,0 +1,24 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CheatSheetFilter from '../components/cheatsheet/CheatSheetFilter.tsx';
+import { cheatsheet } from '../data/cheatsheet';
+---
+
+<Layout title="Cheat Sheet" description="Every essential Git and GitHub CLI command in one filterable, copy-on-click reference." primaryTab="cheat-sheet">
+  <div class="mx-auto max-w-[1400px] px-4 py-10 sm:px-6 sm:py-14">
+    <div data-reveal class="mb-8">
+      <h1 class="text-3xl font-bold tracking-tight text-[var(--color-ink)] sm:text-4xl">Cheat Sheet</h1>
+      <p class="mt-3 max-w-2xl text-[15px] leading-relaxed text-[var(--color-ink-muted)]">
+        Every command grouped by task. Click any card to copy it, or filter to find exactly what you need.
+      </p>
+    </div>
+    <CheatSheetFilter categories={cheatsheet} client:load />
+  </div>
+</Layout>
+
+<style is:global>
+  @media print {
+    header, footer, #scroll-progress { display: none !important; }
+    body { background: white !important; color: black !important; }
+  }
+</style>

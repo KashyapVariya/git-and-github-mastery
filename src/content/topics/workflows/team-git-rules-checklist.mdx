@@ -1,0 +1,62 @@
+---
+title: A Team Git Rules Checklist
+summary: A short, practical set of Git conventions a team can adopt in an afternoon — branch naming, commit style, review rules, and protection settings.
+level: beginner
+primaryTab: workflows
+subtab: guides
+category: Conventions
+tags: [workflows, team-conventions, checklist, best-practices]
+sources:
+  - label: GitHub Docs — Pull requests
+    url: https://docs.github.com/en/pull-requests
+readingTime: 5
+related: [commit-message-conventions, code-review-culture, github-flow]
+order: 11
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Most Git friction on a team isn't about Git at all — it's about five people making five different reasonable-sounding decisions about branch names, commit messages, and when to merge. None of the individual choices are wrong; the inconsistency is what costs time. A short, written-down set of rules fixes this in an afternoon.
+
+## The checklist
+
+**Branching**
+- [ ] Pick one branching model ([GitHub Flow](/workflows/github-flow) is the simplest default) and write down which one, so nobody has to guess.
+- [ ] Agree on a branch naming pattern: `feature/short-description`, `fix/short-description` is enough for most teams.
+- [ ] Decide the maximum acceptable branch lifetime, even loosely — "try to merge within a few days" prevents slow drift into conflict-heavy branches.
+
+**Commits**
+- [ ] Agree on message style — plain [imperative-mood messages](/workflows/commit-message-conventions) or a prefix convention like [Conventional Commits](/workflows/conventional-commits-deep-dive).
+- [ ] Decide whether commits get squashed on merge. Squashing keeps `main`'s history to one commit per pull request; not squashing preserves the finer-grained history. Either is fine — pick one.
+
+**Pull requests**
+- [ ] Require at least one approval before merge (GitHub's [branch protection rules](/github/security/branch-protection-rules) can enforce this automatically).
+- [ ] Require passing CI checks before merge — never merge on a red build "just this once."
+- [ ] Set an expectation for first-response time, even a loose one: "someone comments within a business day."
+
+**Protection**
+- [ ] Protect `main` (and `develop`, if you use it) from direct pushes and force-pushes.
+- [ ] Decide who can bypass protection rules for genuine emergencies, and make sure that list is short and known.
+
+```bash
+# a starting-point branch name and commit, following the checklist above
+git switch -c feature/checkout-retry-logic
+git commit -m "feat: retry failed checkout requests up to 3 times"
+```
+
+<Callout type="tip">
+Write these rules down somewhere every contributor actually sees — a `CONTRIBUTING.md` in the repository root beats a rule that only lives in one senior engineer's memory.
+</Callout>
+
+## Keep it short on purpose
+
+A rules document with 40 items nobody reads is worse than one with 8 items everyone follows. Start minimal — branching, commits, review, protection — and only add a new rule once you've hit the actual problem it would have prevented.
+
+<Callout type="golden">
+The best team Git conventions are boring on purpose. If your rules are interesting enough to debate in every retro, they're probably still too complicated.
+</Callout>
+
+## Try it yourself
+
+Go through the checklist above with your team and check off what you already do consistently. For anything unchecked, pick the single most painful gap and fix just that one this week.

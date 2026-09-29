@@ -1,0 +1,38 @@
+---
+import LevelBadge from '../ui/LevelBadge.astro';
+import Icon from '../ui/Icon.astro';
+import { url } from '../../lib/nav';
+
+interface Props {
+  title: string;
+  summary: string;
+  level: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+  href: string;
+  readingTime: number;
+  category?: string;
+  compact?: boolean;
+}
+
+const { title, summary, level, href, readingTime, category, compact = false } = Astro.props;
+---
+
+<a href={url(href)} data-tilt data-reveal class="glass-card group relative flex flex-col gap-3 overflow-hidden p-5 [transform-style:preserve-3d]">
+  <span
+    class="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+    style="background: radial-gradient(280px circle at var(--spot-x, 50%) var(--spot-y, 50%), color-mix(in srgb, var(--color-git-orange) 12%, transparent), transparent 70%);"
+  ></span>
+  <div class="relative flex items-center justify-between gap-2">
+    <LevelBadge level={level} />
+    {category && !compact && <span class="text-[11px] text-[var(--color-ink-faint)]">{category}</span>}
+  </div>
+  <h3 class="relative text-[15px] font-semibold leading-snug text-[var(--color-ink)] transition-colors group-hover:text-[var(--color-git-orange-soft)]">
+    {title}
+  </h3>
+  {!compact && <p class="relative line-clamp-2 text-[13px] leading-relaxed text-[var(--color-ink-muted)]">{summary}</p>}
+  <div class="relative mt-auto flex items-center justify-between pt-1 text-[12px] text-[var(--color-ink-faint)]">
+    <span class="flex items-center gap-1"><Icon name="clock" size={12} /> {readingTime} min</span>
+    <span class="flex items-center gap-1 text-[var(--color-ink-muted)] transition group-hover:translate-x-0.5 group-hover:text-[var(--color-git-orange-soft)]">
+      Read <Icon name="arrow-right" size={12} />
+    </span>
+  </div>
+</a>

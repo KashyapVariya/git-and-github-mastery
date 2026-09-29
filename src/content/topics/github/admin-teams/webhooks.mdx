@@ -1,0 +1,65 @@
+---
+title: Webhooks
+summary: A webhook is GitHub's way of telling another system "something just happened here" the instant it happens, instead of that system having to keep asking.
+level: advanced
+primaryTab: github
+subtab: admin-teams
+category: Integrations
+tags: [webhooks, automation, integrations, events]
+sources:
+  - label: GitHub Docs — Webhooks
+    url: https://docs.github.com/en/webhooks
+readingTime: 5
+related: [github-apps-vs-oauth-apps, github-api-basics, repository-settings]
+order: 4
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Suppose you want a Slack message posted every time someone opens a pull request. One way is to write a script that asks GitHub "any new PRs?" every minute, forever, mostly getting "no" for an answer. That's slow, wasteful, and still misses the exact moment it happened.
+
+A **webhook** flips the direction: instead of your system polling GitHub, GitHub pushes a message to *your* system the moment an event occurs. You tell GitHub a URL and which events you care about, and it sends an HTTP request there in near real time.
+
+## How it's configured
+
+Webhooks are set up in a repository's or organization's Settings → Webhooks. You provide:
+
+- A **payload URL** — where GitHub sends the event data
+- A **content type** — usually `application/json`
+- A **secret** — used to sign each payload, so your server can verify the request genuinely came from GitHub
+- Which **events** to subscribe to — pushes, pull request activity, issue comments, releases, and dozens of others
+
+## What a delivery looks like
+
+When a matching event fires, GitHub sends a POST request to your URL with a JSON body describing exactly what happened — who did it, on which repository, with full details of the object involved (the pull request, the issue, the commit).
+
+```json
+{
+  "action": "opened",
+  "pull_request": {
+    "number": 42,
+    "title": "Fix login bug",
+    "user": { "login": "octocat" }
+  },
+  "repository": { "full_name": "acme-inc/api-server" }
+}
+```
+
+Your server reads this, checks the `X-Hub-Signature-256` header against the shared secret to confirm authenticity, and reacts however you like — post to Slack, trigger a deploy, update a dashboard.
+
+<Callout type="tip">
+GitHub's webhook settings page keeps a log of every delivery attempt, including the exact payload sent and your server's response. When a webhook "isn't working," this log is almost always where the real answer is — a 500 from your server, a timeout, or a signature mismatch.
+</Callout>
+
+## Webhooks vs. polling the API
+
+You could get the same information by repeatedly calling the REST API (see [GitHub API Basics](/github/admin-teams/github-api-basics)), but webhooks are faster, cheaper (no wasted requests when nothing happened), and don't count against your API rate limit at all. Use the API when you need to *ask* for information on demand; use webhooks when you need to *react* the instant something changes.
+
+<Callout type="warning">
+If your server is down when an event fires, GitHub retries failed deliveries for a while, but not forever. Don't treat webhooks as a guaranteed, exactly-once delivery mechanism — for anything critical, have your handler also be safe to run twice on the same event.
+</Callout>
+
+## Try it yourself
+
+On a repository you own, add a webhook pointing at a free tool like a webhook-testing site (many exist specifically for this), subscribe to just "push" events, then push a commit. Watch the payload arrive in real time — it's the fastest way to understand exactly what data GitHub sends.

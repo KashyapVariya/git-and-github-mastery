@@ -1,0 +1,56 @@
+---
+title: GitHub Discussions
+summary: Discussions give a repository a forum-style space for open-ended conversation that doesn't belong in an issue or a pull request.
+level: beginner
+primaryTab: github
+subtab: collaboration
+category: Community
+tags: [discussions, community, communication]
+sources:
+  - label: GitHub Docs — Building communities
+    url: https://docs.github.com/en/communities
+readingTime: 4
+related: [github-issues, contributing-guidelines, issue-and-pr-templates]
+order: 8
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Not every conversation is a bug report or a code change. "What's the best way to structure a plugin for this?" "Has anyone benchmarked this against the alternative?" "Here's a project I built using this library." Cramming those into Issues clutters the bug tracker with things that will never actually "close." GitHub Discussions gives that conversation its own space — closer to a forum than a task list.
+
+## Enabling Discussions
+
+Discussions aren't on by default. A repository maintainer turns it on from **Settings → General → Features → Discussions**. Once enabled, a new **Discussions** tab appears alongside Issues and Pull requests.
+
+## Categories
+
+Discussions are organized into categories, which maintainers can customize. Common ones include:
+
+- **Announcements** — maintainer-only posts, like release notes
+- **Q&A** — questions with a specific **Mark as answer** feature, so the best response gets pinned to the top
+- **Ideas** — feature requests and brainstorming, before they're formal enough to become an issue
+- **Show and tell** — things the community built with the project
+- **General** — everything else
+
+The Q&A category is the one that most clearly earns its own tool: unlike an issue, a discussion thread can have several competing answers, voted on and discussed, with the asker (or a maintainer) marking the one that actually solved it.
+
+## Starting a discussion
+
+Click **New discussion**, pick a category, write a title and body — full Markdown support, same as issues — and post it. Others can reply, react, and in threaded categories, reply directly to a specific comment rather than just the top-level post.
+
+<Callout type="tip">
+If an idea discussion gains real traction and turns into a concrete, actionable plan, maintainers can convert it directly into an issue from the discussion page — no need to retype anything.
+</Callout>
+
+## Discussions vs. Issues, in practice
+
+A useful habit: if the thread has a clear, checkable "done" state — a specific bug, a specific feature to build — it belongs in Issues. If it's open-ended, exploratory, or has no single correct resolution, it belongs in Discussions.
+
+<Callout type="info">
+Discussions live at the organization level too, not just per repository — useful for a group that maintains several related projects and wants one shared community space instead of splitting conversation across each repo.
+</Callout>
+
+## Try it yourself
+
+If a project you use has Discussions enabled, browse its Q&A category and look for a question close to one you've had yourself — notice how the "marked answer" feature surfaces the resolution instantly, without reading the whole thread.

@@ -1,0 +1,87 @@
+---
+title: Events and Triggers
+summary: The "on" key decides exactly when a workflow runs — on a push, a pull request, a schedule, or a manual click.
+level: intermediate
+primaryTab: github
+subtab: automation-cicd
+category: CI/CD
+tags: [github-actions, triggers, events, schedule]
+sources:
+  - label: GitHub Docs — Actions
+    url: https://docs.github.com/en/actions
+readingTime: 4
+related: [workflow-syntax, jobs-and-steps, environments-and-approvals]
+order: 3
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Not every workflow should run on every push. Tests probably should; a production deploy probably shouldn't. Getting the trigger right is what makes automation feel helpful instead of noisy — or worse, dangerous.
+
+## The common ones
+
+```yaml
+on: push                     # any push, to any branch
+```
+
+```yaml
+on:
+  push:
+    branches: [main]          # only pushes to main
+    paths: ["src/**"]         # only if files under src/ changed
+```
+
+```yaml
+on: pull_request               # opened, synchronized, or reopened PRs
+```
+
+```yaml
+on:
+  schedule:
+    - cron: "0 6 * * 1"        # every Monday at 06:00 UTC
+```
+
+```yaml
+on: workflow_dispatch          # adds a "Run workflow" button in the UI
+```
+
+You can combine several:
+
+```yaml
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+```
+
+## pull_request vs push
+
+This distinction trips people up constantly. `push` runs in the context of the branch being pushed to — with full access to repository secrets. `pull_request` runs in the context of the *merge* of the PR branch into the target branch, and — critically, for security — pull requests from forks do **not** get access to your repository's secrets by default. This protects you from a malicious fork stealing credentials through a crafted PR.
+
+<Callout type="warning">
+If you need a workflow triggered by a fork's pull request to safely access secrets (e.g. to post a preview deployment comment), use the `pull_request_target` event instead — but read GitHub's security guidance first, since it runs with the base repository's permissions and needs careful handling of any untrusted code it checks out.
+</Callout>
+
+## workflow_dispatch: manual runs
+
+Adding `workflow_dispatch:` puts a "Run workflow" button directly in the Actions tab, optionally with typed inputs:
+
+```yaml
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        default: "staging"
+```
+
+<Callout type="tip">
+`workflow_dispatch` is also how you trigger a workflow via the API or `gh workflow run` — useful for deploy buttons in external tools, or one-off manual jobs like "clear the cache."
+</Callout>
+
+## Try it yourself
+
+Add `workflow_dispatch:` to an existing workflow, push it, then trigger it manually from the Actions tab's "Run workflow" button.

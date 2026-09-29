@@ -1,0 +1,61 @@
+---
+title: What Is Version Control?
+summary: Version control keeps a complete, searchable history of every change to your files, so nothing is ever truly lost.
+level: beginner
+primaryTab: git
+subtab: fundamentals
+category: Mental model
+tags: [version-control, concepts, git-basics]
+sources:
+  - label: Pro Git — About Version Control
+    url: https://git-scm.com/book/en/v2/Getting-Started-About-Version-Control
+readingTime: 4
+related: [git-vs-github, the-four-areas, installing-git]
+order: 1
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Imagine writing an essay in a single file, and every time you make a big change you save a new copy: `essay.doc`, `essay-v2.doc`, `essay-v2-final.doc`, `essay-v2-final-ACTUAL.doc`. It works, sort of — until you need to know exactly what changed between v2 and v2-final, or you want to combine an edit your friend made with your own, or you accidentally overwrite the good version.
+
+Version control solves this properly. It's a system that records every change you make to a set of files, who made it, when, and why — and lets you jump back to any point in that history instantly.
+
+## The core idea
+
+Instead of scattering copies everywhere, a version control system stores **one project** with a **timeline of snapshots**. Each snapshot (Git calls it a *commit*) captures the exact state of every file at that moment, along with a message explaining what changed.
+
+Because the whole history lives in one place, you can:
+
+- See exactly what changed, line by line, between any two points in time
+- Jump back to how the project looked last Tuesday, or last year
+- Work on an experimental idea in isolation, without risking the working version
+- Let multiple people edit the same project and merge their work together safely
+
+## Where Git fits in
+
+Git is a specific, extremely popular *distributed* version control system. "Distributed" means every collaborator has a full copy of the entire history on their own machine — not just the latest files. That has a huge practical effect: you can commit, browse history, and create branches completely offline, and no single computer (not even a server) is a single point of failure for the project's history.
+
+This is different from older *centralized* systems, where one central server held the only full history and everyone else had just a working copy.
+
+## A tiny mental example
+
+Say you're tracking a recipe file:
+
+1. You write the first draft and record a snapshot: "Initial recipe."
+2. You try doubling the sugar and record another snapshot: "Sweeter version."
+3. You decide the original was better. With version control, you don't have to remember what it looked like — you just look at snapshot 1 again, instantly, byte for byte.
+
+That's the entire idea. Everything else in Git — branches, merges, remotes — exists to make that timeline more powerful and easier to share.
+
+<Callout type="golden">
+Version control isn't a backup tool, though it can act like one. Its real job is to track *intentional, meaningful* changes over time, each with an explanation attached.
+</Callout>
+
+<Callout type="tip">
+If you've ever renamed a file to `final_v3_reallyfinal.js`, you've already felt the exact pain Git was built to remove.
+</Callout>
+
+## Try it yourself
+
+You don't need to install anything yet — just notice the pattern next time you save a file. Ask yourself: "If I wanted to describe this change in one sentence, what would I say?" That sentence is basically a commit message. Keep it in mind; you'll write your first real one in [Installing Git](/git/fundamentals/installing-git) and [First-Time Setup](/git/fundamentals/first-time-setup).

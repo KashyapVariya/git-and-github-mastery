@@ -1,0 +1,59 @@
+---
+title: The Four Areas
+summary: Every file in a Git project sits in one of four places — working directory, staging area, repository, or remote — and almost every command just moves files between them.
+level: beginner
+primaryTab: git
+subtab: fundamentals
+category: Mental model
+tags: [mental-model, staging, working-directory, concepts]
+sources:
+  - label: Pro Git — Git Basics
+    url: https://git-scm.com/book/en/v2/Getting-Started-Git-Basics
+readingTime: 5
+related: [what-is-version-control, staging-with-add, making-commits, working-with-remotes]
+order: 3
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Most confusion about Git — "why doesn't my commit show my change," "what does staged even mean" — comes from not having this one picture in your head. Once you have it, almost every command becomes obvious: it's just moving a file from one of four areas to the next.
+
+## The four areas
+
+1. **Working directory** — the actual files on your disk, the ones you open in your editor and change. This is the only area you can see and touch directly.
+2. **Staging area** (also called the *index*) — a holding area where you build up exactly what your *next* commit will contain. It's invisible in your file browser; you only see it through Git commands.
+3. **Repository** — the permanent history: every commit you've ever made, stored inside the hidden `.git` folder. Once something is committed, it's safely part of this history.
+4. **Remote** — a copy of the repository living somewhere else, usually on GitHub. Your local repository and the remote are separate until you explicitly sync them.
+
+## How a change flows through them
+
+Picture a single file, `app.js`, moving left to right:
+
+```text
+working directory  →  staging area  →  repository  →  remote
+     (edit)             (git add)      (git commit)   (git push)
+```
+
+- You **edit** `app.js` in your editor. Right now, Git sees it as "modified" — the change exists only in the working directory.
+- You run `git add app.js`. The file moves into staging — you're telling Git "this exact version of this file should be part of my next commit."
+- You run `git commit -m "..."`. Everything in staging becomes a permanent snapshot in the repository. Staging empties out, ready for the next round.
+- You run `git push`. Your new commit(s) travel from your local repository to the remote, so others can see them too.
+
+Each arrow is a specific command, and that's really the whole shape of everyday Git.
+
+## Why the staging area exists at all
+
+This is the part beginners usually find odd: why not just commit straight from the working directory, like autosave? Because staging lets you build a commit deliberately. If you changed five files but only three of them belong together as one logical change, you stage just those three, commit them, and repeat for the rest. Your history ends up telling a clear story instead of one giant "changed a bunch of stuff" commit.
+
+<Callout type="tip">
+Run `git status` at any point and Git will tell you exactly what's sitting in the working directory versus staging — it's the fastest way to build intuition for these four areas.
+</Callout>
+
+<Callout type="golden">
+"Committed" and "pushed" are not the same thing. A commit only reaches the repository on your machine. It doesn't reach the remote — and isn't visible to anyone else — until you push it.
+</Callout>
+
+## Try it yourself
+
+Next time you edit a file, narrate it out loud: "this is in my working directory." Then `git add` it: "now it's staged." Then `git commit`: "now it's in my repository." Doing this consciously a few times is usually all it takes for the model to click permanently.

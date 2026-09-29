@@ -1,0 +1,83 @@
+---
+title: git blame and git show
+summary: git blame traces who last touched each line of a file; git show gives you the full story on one specific commit.
+level: intermediate
+primaryTab: git
+subtab: intermediate
+category: History
+tags: [blame, show, history, investigation]
+sources:
+  - label: Git — git blame
+    url: https://git-scm.com/docs/git-blame
+  - label: Git — git show
+    url: https://git-scm.com/docs/git-show
+readingTime: 4
+related: [diffing-changes, amending-commits, tagging-releases]
+order: 7
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+You're staring at a confusing line of code, or a bug you don't recognize, and the real question isn't "what does this do" — it's "why is this here, and who would know?" `git blame` and `git show` are the two commands built for exactly that kind of detective work: one points you at *who and when*, the other hands you the *full context*.
+
+Despite the name, "blame" isn't about fault. It's closer to a museum plaque: it tells you which commit placed each line where it is, so you have someone and something to ask about it.
+
+## git blame — who last touched this line
+
+```bash
+git blame file.js
+```
+
+For every line in the file, this prints the commit hash, author, date, and the line itself. Scroll down to the confusing line, and you've got a starting point: a commit to read, an author to ask, a date to understand what was going on at the time.
+
+Narrow it to just the lines you care about:
+
+```bash
+git blame -L 40,60 file.js
+```
+
+Reformatting a file — changing indentation, wrapping long lines — makes `blame` attribute every touched line to whoever did the reformat, burying the real history. Ignore whitespace-only changes to see past that:
+
+```bash
+git blame -w file.js
+```
+
+## git show — the full story of one commit
+
+Where `blame` works line-by-line across a file, `show` zooms in on a single commit and tells you everything about it:
+
+```bash
+git show a1b2c3d
+```
+
+This prints the commit's metadata — author, date, message — followed by its full diff, exactly the change that commit made. It's usually the very next command you run after `blame` points you at a suspicious commit hash.
+
+`show` isn't limited to commits, either. Point it at a file inside a specific commit to see that file's contents *at that moment in history*, without checking anything out:
+
+```bash
+git show a1b2c3d:src/config.js
+```
+
+And it understands the shorthand you already know from navigating history:
+
+```bash
+git show HEAD~2       # two commits back from HEAD
+git show main:README.md   # README.md as it exists on main right now
+```
+
+<Callout type="tip">
+Most editors and Git GUIs have an inline "blame" or "annotate" view that's far easier to scan than the raw terminal output — reach for it when you're blaming a whole file rather than a couple of lines.
+</Callout>
+
+<Callout type="warning">
+`git blame` only tells you which commit *last touched* a line — not which commit introduced the bug on it. A one-character formatting fix six months ago can end up "blamed" for logic that's actually years older; `git log -p -- file.js` gives you the fuller history if one commit doesn't explain enough.
+</Callout>
+
+<Callout type="golden">
+Blame answers "who and when." Show answers "what and why." Used together — blame to find the commit, show to read it — they turn "why is this here" from a guess into an answer in under a minute.
+</Callout>
+
+## Try it yourself
+
+Pick any file in a repo with some history and run `git blame -L 1,15 <file>`. Grab one of the commit hashes it prints and run `git show <that-hash>` to see the full change behind it.

@@ -1,0 +1,65 @@
+---
+title: Releases
+summary: A GitHub Release wraps a tag with release notes, downloadable files, and a changelog — the human-facing announcement of a version, not just the tag itself.
+level: intermediate
+primaryTab: github
+subtab: automation-cicd
+category: Deployment
+tags: [releases, tags, changelog]
+sources:
+  - label: GitHub Docs — Actions
+    url: https://docs.github.com/en/actions
+  - label: Semantic Versioning
+    url: https://semver.org
+readingTime: 4
+related: [github-packages, github-pages]
+order: 14
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+A Git tag alone is just a label on a commit — perfectly useful for Git, but not something a non-technical user would ever look at. A GitHub Release turns that tag into a proper announcement: notes on what changed, attached files people can download, and a page you can link to.
+
+## Creating one
+
+From a repository's **Releases** page, click "Draft a new release," pick (or create) a tag like `v1.2.0`, and write release notes. GitHub can generate a first draft of those notes automatically from merged pull requests since the last release.
+
+## Doing it from a workflow
+
+```yaml
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm run build
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.zip
+          generate_release_notes: true
+```
+
+This triggers whenever a tag matching `v*` is pushed, builds the project, and creates a release with the build output attached and notes generated automatically.
+
+## Tags vs releases
+
+A **tag** is a Git-level pointer to a commit — it exists whether or not GitHub knows about it, and `git tag`/`git push --tags` is all Git needs. A **release** is a GitHub-level wrapper around a tag, adding notes, assets, and a page in the UI. Every release has a tag; not every tag has a release.
+
+<Callout type="golden">
+Pair releases with <a href="https://semver.org" target="_blank" rel="noopener">Semantic Versioning</a> (MAJOR.MINOR.PATCH) so the version number itself tells people whether an update is safe to take blindly or needs a closer look.
+</Callout>
+
+<Callout type="tip">
+"Pre-release" and "latest" are both flags on a release, not separate features — mark early builds as pre-release so they don't show up as the default download for people who just want the stable version.
+</Callout>
+
+## Try it yourself
+
+Create a tag (`git tag v0.1.0 && git push origin v0.1.0`) on a test repository, then turn it into a Release from the GitHub UI, letting GitHub auto-generate the notes from your recent commits.

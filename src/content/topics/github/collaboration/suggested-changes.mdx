@@ -1,0 +1,54 @@
+---
+title: Suggested Changes
+summary: A suggestion lets a reviewer propose exact replacement code that the author can accept with a single click.
+level: intermediate
+primaryTab: github
+subtab: collaboration
+category: Code review
+tags: [code-review, suggestions, pull-requests]
+sources:
+  - label: GitHub Docs — Pull requests
+    url: https://docs.github.com/en/pull-requests
+readingTime: 3
+related: [code-review-on-github, pull-requests-basics, merge-methods]
+order: 6
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+"You have a typo here, should be `recieve` → `receive`" is a normal review comment. It's also extra work for the author: read the comment, find the line again, retype the fix, commit. For small, unambiguous fixes, GitHub has a faster path — a **suggested change** — where the reviewer proposes the exact replacement text, and the author applies it with one click, no retyping required.
+
+## Making a suggestion
+
+While commenting on a line in the **Files changed** tab, click the small suggestion icon in the comment toolbar (it looks like a document with a plus/minus). This wraps the line in a special code block:
+
+````text
+```suggestion
+receive
+```
+````
+
+Anything inside that block becomes the *proposed replacement* for the line (or lines) you're commenting on. You can edit multiple consecutive lines in one suggestion by selecting them before commenting.
+
+## Applying a suggestion
+
+The author sees the suggestion rendered as a small diff with a green **Commit suggestion** button right in the conversation. Clicking it creates a new commit on the pull request's branch with exactly that change — no need to pull the branch locally, edit, and push again.
+
+Multiple accepted suggestions across a PR can even be batched into a single commit using **Add suggestion to batch**, so a reviewer's dozen small nitpicks don't turn into a dozen separate noisy commits.
+
+<Callout type="tip">
+Suggestions are best for changes that are genuinely mechanical — typos, renaming a variable, fixing an off-by-one, swapping one function for another. For anything requiring judgment or discussion, a plain comment explaining the reasoning is more useful than a suggestion the author might accept without fully understanding why.
+</Callout>
+
+## What it doesn't replace
+
+A suggestion only changes the lines it targets — it can't restructure a function, split a file, or make changes elsewhere in the codebase. For anything bigger than a line-level fix, leave a comment describing the change and let the author implement it themselves; that keeps them engaged with the reasoning rather than passively accepting a patch.
+
+<Callout type="info">
+Committing a suggestion creates a real commit attributed to the PR author (with the suggester credited as co-author), which then needs to be pulled down like any other remote commit before the author keeps working locally.
+</Callout>
+
+## Try it yourself
+
+Next time you're reviewing a PR and spot something small and unambiguous — a typo, an unused import, a naming inconsistency — use the suggestion tool instead of a plain comment, and see how much faster it is for the author to apply.

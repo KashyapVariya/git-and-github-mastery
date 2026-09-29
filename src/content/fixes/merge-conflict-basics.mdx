@@ -1,0 +1,53 @@
+---
+title: I have a merge conflict
+symptom: "git merge stopped and said 'Automatic merge failed; fix conflicts and then commit the result.'"
+summary: Edit the conflicting files to keep the correct content, remove the conflict markers, stage the files, then commit.
+severity: moderate
+tags: [merge, conflicts]
+sources:
+  - label: Git — Basic Merge Conflicts
+    url: https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging
+related: [resolve-rebase-conflict]
+order: 14
+lastReviewed: 2026-01-15
+---
+
+## Diagnosis
+
+Both branches changed the same lines (or one edited a file the other deleted), and Git can't guess which version is correct. Run `git status` to see exactly which files need attention — they're listed as "both modified."
+
+## Fix
+
+**1. Open each conflicted file.** Git has inserted markers around every conflicting section:
+
+```text
+<<<<<<< HEAD
+the version on your current branch
+=======
+the version from the branch you're merging in
+>>>>>>> feature-branch
+```
+
+Decide what the final content should be — often a combination of both — and delete the `<<<<<<<`, `=======`, `>>>>>>>` lines completely.
+
+**2. Stage each resolved file:**
+
+```bash
+git add path/to/resolved-file.js
+```
+
+**3. Finish the merge** with a commit — Git has already pre-filled a merge commit message for you:
+
+```bash
+git commit
+```
+
+**Want out entirely?** Abort and return to how things were right before the merge started:
+
+```bash
+git merge --abort
+```
+
+<Callout type="tip">
+A GUI merge tool (VS Code's built-in editor, GitKraken, or `git mergetool`) can make conflicts much easier to read than raw markers, especially with several conflicts in the same file.
+</Callout>

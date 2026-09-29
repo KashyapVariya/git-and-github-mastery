@@ -1,0 +1,84 @@
+---
+title: git status
+summary: git status is your dashboard — it tells you exactly what's changed, what's staged, and what branch you're on, every single time.
+level: beginner
+primaryTab: git
+subtab: fundamentals
+category: Commands
+tags: [git-status, staging, daily-workflow]
+sources:
+  - label: Git — git status
+    url: https://git-scm.com/docs/git-status
+readingTime: 3
+related: [the-four-areas, staging-with-add, making-commits]
+order: 8
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+`git status` is the single most-run Git command, and for good reason: it never changes anything, it just tells you exactly where you stand. When in doubt, run it — there's no downside.
+
+## Reading the output
+
+```bash
+git status
+```
+
+A typical clean state looks like:
+
+```text
+On branch main
+nothing to commit, working tree clean
+```
+
+After editing a file, it looks different:
+
+```text
+On branch main
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+	modified:   app.js
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	notes.txt
+```
+
+This is telling you two separate things:
+
+- **`modified: app.js`** — a file Git already knows about has changed, but the change isn't staged yet.
+- **`Untracked files: notes.txt`** — a brand new file Git has never seen before and isn't tracking at all.
+
+After you run `git add`, the same file moves into a new section:
+
+```text
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	modified:   app.js
+```
+
+That's the file sitting in the staging area, ready to be included in your next commit.
+
+## The short version
+
+For a more compact view, especially useful once you're used to reading it:
+
+```bash
+git status -s
+```
+
+```text
+ M app.js
+?? notes.txt
+```
+
+`M` in the first column means staged, in the second means unstaged-modified, and `??` means untracked. This format is dense but becomes very fast to scan once it's familiar.
+
+<Callout type="tip">
+Git's own status output usually tells you the exact next command to run, in parentheses — reading those hints is one of the fastest ways to learn Git's everyday vocabulary.
+</Callout>
+
+## Try it yourself
+
+Edit any tracked file, create a new untracked one, and run `git status` after each change. Watch how the sections shift as you `git add` things — that back-and-forth is the entire daily rhythm of using Git.

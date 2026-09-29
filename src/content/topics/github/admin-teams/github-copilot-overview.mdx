@@ -1,0 +1,50 @@
+---
+title: GitHub Copilot Overview
+summary: Copilot is GitHub's AI pair programmer — it suggests code as you type, answers questions about your codebase, and can even open pull requests on its own.
+level: advanced
+primaryTab: github
+subtab: admin-teams
+category: Developer tools
+tags: [copilot, ai, productivity, code-generation]
+sources:
+  - label: GitHub Docs — Copilot
+    url: https://docs.github.com/en/copilot
+readingTime: 5
+related: [codespaces-and-dev-containers, organizations-overview, github-cli]
+order: 7
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+A huge amount of programming is boilerplate — the tenth `for` loop over an array, another API client method that looks like the last nine, a test that follows the same shape as every other test in the file. Copilot's core pitch is simple: let an AI model handle the predictable parts, so you spend more of your attention on the parts that actually require thinking.
+
+## The different surfaces Copilot shows up in
+
+Copilot isn't one feature — it's a family of integrations across the places developers already work:
+
+- **Inline completions** — as you type in your editor, Copilot suggests the rest of the line or the next several lines, which you accept with a keypress or ignore entirely
+- **Copilot Chat** — a conversational panel in your editor (or on GitHub.com) where you can ask questions about your code, request an explanation of an unfamiliar function, or ask it to write something from a description
+- **Copilot in the CLI** — suggests and explains shell commands from a plain-language description
+- **Copilot code review** — can leave automated review comments on a pull request, flagging potential issues before a human reviewer looks
+- **Copilot coding agent** — given an issue, can work somewhat autonomously in the background and open a pull request with a proposed solution for a human to review
+
+## How it actually works, at a high level
+
+Copilot sends relevant context — the current file, nearby open files, sometimes a summary of the broader repository — to a language model, which generates a suggestion grounded in that context plus its general training on code. It's genuinely useful for pattern completion and repetitive scaffolding, and genuinely capable of confidently generating something subtly wrong. Nothing it produces should be merged without the same review scrutiny you'd give a human's first draft.
+
+<Callout type="tip">
+Copilot's suggestions get noticeably better with more context. Keeping related files open, writing a clear function signature and comment before you start typing the body, and working in a well-organized codebase all give it more to work from than a blank file in isolation.
+</Callout>
+
+## Licensing and org-level controls
+
+Copilot is a paid product, licensed per seat, and organizations control who gets a seat and what those seats can do — for example, restricting whether Copilot can suggest code that matches public training data verbatim, or whether the coding agent is allowed to open pull requests unattended. Admins manage this centrally under the organization's Copilot settings, rather than each developer configuring it individually.
+
+<Callout type="warning">
+Treat every Copilot suggestion as a draft, not an answer. It has no real understanding of your business logic, security requirements, or the specific reason your code looks the way it does — it's pattern-matching against enormous amounts of code it's seen, which is powerful but not the same thing as knowing your system.
+</Callout>
+
+## Try it yourself
+
+If your organization has Copilot enabled, open a file you're actively working on and start writing a function with a clear, descriptive name. Watch what it suggests — then read the suggestion as critically as you would a teammate's first draft before accepting it.

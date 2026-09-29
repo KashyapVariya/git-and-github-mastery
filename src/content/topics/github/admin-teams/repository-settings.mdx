@@ -1,0 +1,58 @@
+---
+title: Repository Settings
+summary: A repository's Settings tab controls far more than most people realize — visibility, merge behavior, default branch, and who can do what.
+level: advanced
+primaryTab: github
+subtab: admin-teams
+category: Admin
+tags: [repository, settings, admin, configuration]
+sources:
+  - label: GitHub Docs — Repositories
+    url: https://docs.github.com/en/repositories
+readingTime: 5
+related: [organizations-overview, teams-and-permissions, branch-protection-rules]
+order: 3
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Most people interact with a repository through its code, issues, and pull requests, and never open the Settings tab. But that tab is where the *rules of the repository* live — what branch is default, how merges are allowed to happen, who can push, and what automations run. Getting these right once saves a lot of cleanup later.
+
+## The sections that matter most
+
+**General** — the repository's name, description, default branch, and feature toggles (issues, wikis, projects, discussions). Turning off features you don't use keeps the interface simpler for contributors.
+
+**Collaborators and teams** — who has access, and at what level. In a personal repo this is a flat list of people; in an organization repo, it's usually teams plus a handful of individual exceptions.
+
+**Branches** — default branch name and branch protection rules or rulesets (see [Branch Protection Rules](/github/security/branch-protection-rules) and [Rulesets](/github/security/rulesets)).
+
+**Webhooks and integrations** — outbound notifications to other systems, and installed GitHub Apps (see [Webhooks](/github/admin-teams/webhooks)).
+
+**Actions** — whether GitHub Actions is enabled at all, which actions are allowed to run (all of them, only GitHub's own, or an explicit allowlist), and default permissions granted to workflows.
+
+## Merge button behavior
+
+A setting worth knowing on purpose rather than by accident: **Settings → General → Pull Requests** controls which merge strategies are available —
+
+- **Merge commit** — keeps full history, adds an extra merge commit
+- **Squash merging** — collapses a PR's commits into one, keeping `main`'s history linear
+- **Rebase merging** — replays commits individually onto `main`, no merge commit at all
+
+Most teams pick one and disable the other two, so contributors aren't choosing a strategy on every PR — consistency here matters more than which specific option you pick.
+
+<Callout type="tip">
+"Automatically delete head branches" (also under Pull Requests settings) cleans up a merged PR's branch for you. Turn it on — it eliminates the slow buildup of dozens of stale branches nobody remembers to delete.
+</Callout>
+
+## Danger zone
+
+At the bottom of General settings sits the **Danger Zone**: changing visibility, transferring ownership, archiving, and deleting the repository. These are exactly as serious as they sound — deleting a repository removes its issues and pull request history too, not just the code.
+
+<Callout type="warning">
+Archiving a repository (rather than deleting it) makes it fully read-only while keeping everything browsable and linkable. For a project that's finished but still referenced, archive it — deletion should be reserved for repos created by mistake or containing nothing worth keeping.
+</Callout>
+
+## Try it yourself
+
+Open Settings on a repository you own and read through every section left to right, even ones you don't plan to change. You'll likely find at least one toggle — a disabled feature, an open merge strategy — that doesn't match how you actually want the repository to behave.

@@ -1,0 +1,39 @@
+---
+title: I need to fix a commit message
+symptom: "I typed the wrong thing in git commit -m, or want to reword an older commit before pushing."
+summary: Amend the last commit to change its message, or use interactive rebase to reword an older one.
+severity: minor
+tags: [commit, amend, rebase]
+sources:
+  - label: Git — git commit --amend
+    url: https://git-scm.com/docs/git-commit
+related: [undo-last-commit]
+order: 8
+lastReviewed: 2026-01-15
+---
+
+## Diagnosis
+
+Decide first: is it the **most recent** commit, or an **older** one? That determines which tool you need.
+
+## Fix
+
+**Most recent commit — amend it:**
+
+```bash
+git commit --amend -m "fix: correct the actual commit message"
+```
+
+This replaces the last commit with a new one carrying the corrected message (and the same changes).
+
+**An older commit — use interactive rebase.** Say it's 3 commits back:
+
+```bash
+git rebase -i HEAD~3
+```
+
+In the editor that opens, change `pick` to `reword` on the line for the commit you want to fix, save and close. Git will reopen an editor just for that commit's message — edit it, save, and the rebase finishes automatically.
+
+<Callout type="warning">
+Both of these rewrite commit history. If you already pushed the commit, amending or rebasing means you'll need `git push --force-with-lease` afterward — only do this on branches you're sure nobody else has already pulled.
+</Callout>

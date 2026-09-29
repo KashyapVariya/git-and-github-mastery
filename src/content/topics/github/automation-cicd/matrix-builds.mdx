@@ -1,0 +1,82 @@
+---
+title: Matrix Builds
+summary: A matrix strategy runs the same job multiple times with different variable combinations — like testing against three Node versions at once — without copy-pasting the job.
+level: intermediate
+primaryTab: github
+subtab: automation-cicd
+category: CI/CD
+tags: [github-actions, matrix, testing]
+sources:
+  - label: GitHub Docs — Actions
+    url: https://docs.github.com/en/actions
+readingTime: 4
+related: [jobs-and-steps, runners, caching-dependencies]
+order: 7
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+"Does this work on Node 18, 20, and 22?" is a completely normal question, and copy-pasting the same job three times with one line changed is exactly the kind of repetition a matrix exists to remove.
+
+## The core idea
+
+Define one or more variables under `strategy.matrix`, and GitHub runs the job once for every combination automatically:
+
+```yaml
+jobs:
+  test:
+    strategy:
+      matrix:
+        node-version: [18, 20, 22]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci
+      - run: npm test
+```
+
+This creates three parallel job runs — one per Node version — each showing up separately in the Actions tab (`test (18)`, `test (20)`, `test (22)`).
+
+## Multiple dimensions
+
+Add a second variable and the matrix expands to cover every combination:
+
+```yaml
+strategy:
+  matrix:
+    node-version: [18, 20, 22]
+    os: [ubuntu-latest, windows-latest]
+```
+
+That's 3 × 2 = 6 total runs, one for every Node version on every OS.
+
+## Fine-tuning the matrix
+
+```yaml
+strategy:
+  fail-fast: false      # let all combinations finish, even if one fails
+  matrix:
+    node-version: [18, 20, 22]
+    os: [ubuntu-latest, windows-latest]
+    exclude:
+      - node-version: 18
+        os: windows-latest    # skip this one specific combination
+    include:
+      - node-version: 22
+        os: macos-latest
+        experimental: true    # add one extra combination with an extra field
+```
+
+`fail-fast: false` is worth knowing well: by default, GitHub cancels the rest of the matrix the moment one combination fails, which hides whether the *other* combinations would have passed. Turning it off gives you the full picture.
+
+<Callout type="tip">
+Matrices aren't only for language versions — they work for anything: a list of test suites to shard across runners, a list of regions to deploy to, a list of config files to validate.
+</Callout>
+
+## Try it yourself
+
+Add a `node-version: [18, 20, 22]` matrix to a test workflow and push it — watch the Actions tab split into three separate parallel runs for the same job.

@@ -1,0 +1,84 @@
+---
+title: Fixup Commits and Autosquash
+summary: git commit --fixup marks a commit as belonging to an earlier one, and git rebase -i --autosquash automatically arranges and squashes it into place for you.
+level: advanced
+primaryTab: git
+subtab: advanced
+category: History rewriting
+tags: [fixup, autosquash, rebase, commits]
+sources:
+  - label: Git — git-commit
+    url: https://git-scm.com/docs/git-commit
+  - label: Git — git-rebase
+    url: https://git-scm.com/docs/git-rebase
+readingTime: 5
+related: [interactive-rebase, patch-staging, rebase-basics]
+order: 10
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+You open a pull request, a reviewer points out a small bug two commits back, and you fix it. The tidy way to handle that fix is to fold it back into the original commit, not bolt on a fresh "address review comments" commit at the end. Doing that by hand means opening `git rebase -i`, finding the right line, and manually changing `pick` to `squash` or `fixup` — easy to get wrong if there are many commits. `--fixup` and `--autosquash` automate that entire dance.
+
+## Creating a fixup commit
+
+```bash
+git add fixed-file.js
+git commit --fixup a1b2c3d
+```
+
+This creates a new commit whose message is automatically `fixup! <original commit's subject line>`, referencing commit `a1b2c3d`. The commit exists as normal for now — nothing is squashed yet.
+
+```text
+q4r5s6t fixup! Add login form validation
+i7j8k9l Add form validation
+```
+
+## Squashing it in automatically
+
+```bash
+git rebase -i --autosquash a1b2c3d~1
+```
+
+Git recognizes the `fixup!` prefix, and instead of leaving the interactive rebase list in commit order, it **reorders** the fixup commit directly underneath the commit it targets and marks it `fixup` instead of `pick` — all before you even see the editor:
+
+```text
+pick i7j8k9l Add form validation
+fixup q4r5s6t fixup! Add form validation
+```
+
+You can just save and close immediately, and the fixup commit disappears into the original, with no extra step.
+
+## Making it the default
+
+Typing `--autosquash` every time is easy to forget. Turn it on permanently:
+
+```bash
+git config --global rebase.autosquash true
+```
+
+Now plain `git rebase -i <base>` always applies autosquash reordering automatically, and you only need `--no-autosquash` on the rare occasion you don't want it.
+
+## `--squash` vs. `--fixup`
+
+Both target an earlier commit the same way, but differ in what happens to the **message**:
+
+- `--fixup` discards the new commit's message entirely — the original commit's message wins.
+- `--squash` combines both messages, opening your editor so you can merge them during the eventual rebase.
+
+```bash
+git commit --squash a1b2c3d   # keep both messages, edit them together later
+```
+
+<Callout type="tip">
+Reference the target commit with `git commit --fixup=a1b2c3d` even from a completely different point in your working tree — you don't need to be "near" the original commit, just have the fix staged.
+</Callout>
+
+<Callout type="golden">
+This combo is the cleanest answer to "review feedback arrived, and I need to fix an old commit without creating rebase busywork." Fixup the correction, then run one `rebase -i --autosquash`, and you're done.
+</Callout>
+
+## Try it yourself
+
+Make two commits, then introduce a small bug fix that belongs in the first one. Stage the fix and run `git commit --fixup <first-commit-hash>`. Then run `git rebase -i --autosquash <first-commit-hash>~1` and just save the editor as-is — watch the fixup commit disappear into the original when you check `git log --oneline` afterward.

@@ -1,0 +1,42 @@
+---
+title: Repository Visibility
+summary: Public, private, or internal — visibility controls who can even see a repository exists, separate from who can push to it.
+level: beginner
+primaryTab: github
+subtab: basics
+category: Repositories
+tags: [visibility, privacy, permissions]
+sources:
+  - label: GitHub Docs — Repositories
+    url: https://docs.github.com/en/repositories
+readingTime: 3
+related: [creating-a-repository, forking-a-repository]
+order: 8
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Visibility is the first and broadest permission decision for a repository — it determines who can even find and read it, before any finer-grained permission (like who can push, or who can merge) comes into play.
+
+## The three options
+
+- **Public** — anyone on the internet can view the code, clone it, and open issues or pull requests (subject to your settings). This is the default for open-source projects.
+- **Private** — only you and people you explicitly invite as collaborators (or members of the right team, for an organization) can see it at all. It won't show up in searches or on your profile to anyone else.
+- **Internal** — available on GitHub organizations (typically Enterprise plans): visible to everyone inside the organization, but not to the public outside it. A middle ground for company-wide sharing without going fully public.
+
+## Changing it later
+
+Visibility isn't locked in at creation — go to a repository's Settings → General → Danger Zone to change it. Switching a repository from private to public is worth pausing on: every commit in its history becomes visible immediately, including anything in old commits you might have forgotten was there (see [Removing a secret from history](/fix-it/remove-secret-from-history) if that's ever a concern).
+
+<Callout type="warning">
+Making a repository public exposes its *entire history*, not just the current files. Deleting a file today doesn't remove it from yesterday's commit.
+</Callout>
+
+<Callout type="tip">
+Not sure yet? Start private. It's always easy to make something public later once you're confident there's nothing sensitive in the history; the reverse is a much bigger cleanup job.
+</Callout>
+
+## Try it yourself
+
+Check the visibility setting on a repository you own, and confirm it matches what you'd actually want a stranger to be able to see.

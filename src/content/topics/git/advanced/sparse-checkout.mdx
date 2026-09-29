@@ -1,0 +1,77 @@
+---
+title: Sparse Checkout
+summary: git sparse-checkout lets you check out only part of a large repository's working directory, while still keeping the full history behind it.
+level: advanced
+primaryTab: git
+subtab: advanced
+category: Performance
+tags: [sparse-checkout, monorepo, performance, large-repos]
+sources:
+  - label: Git — git-sparse-checkout
+    url: https://git-scm.com/docs/git-sparse-checkout
+  - label: Git — git-clone
+    url: https://git-scm.com/docs/git-clone
+readingTime: 5
+related: [partial-and-shallow-clones, git-worktrees]
+order: 12
+lastReviewed: 2026-01-15
+---
+
+## Why it matters
+
+Monorepos can hold dozens of independent projects in one repository — a frontend, several backend services, shared libraries, infrastructure code. If you only work on one of them, checking out the entire tree means gigabytes of files on disk you'll never open, and a working directory so large that even simple commands like `git status` slow down scanning it. Sparse checkout lets you tell Git "only materialize these folders on disk" — the full history is still there underneath, just not every file from every folder.
+
+## Setting it up
+
+```bash
+git clone --no-checkout <url> myrepo
+cd myrepo
+git sparse-checkout init --cone
+git sparse-checkout set frontend/ shared/ui/
+```
+
+`--cone` mode is the recommended, faster mode for the common case of including whole directories (as opposed to arbitrary gitignore-style patterns). `git sparse-checkout set` replaces the current set of included paths and checks out the working directory to match — after this, only `frontend/` and `shared/ui/` appear on disk; everything else is tracked in history but absent from your working tree.
+
+If you already have a full clone, you can retrofit sparse checkout onto it the same way — `set` will remove the now-excluded files from the working directory without touching history.
+
+## Adjusting what's checked out
+
+```bash
+git sparse-checkout add backend/auth-service
+```
+
+Adds another directory to the working set without disturbing what's already there. To see what's currently included:
+
+```bash
+git sparse-checkout list
+```
+
+To go back to a full checkout of everything:
+
+```bash
+git sparse-checkout disable
+```
+
+## What stays full-size
+
+Sparse checkout only affects the **working directory** — the files on disk you can see and edit. It does not shrink the repository's object database; `git log`, `git blame`, and history operations on the whole repo still work, because all the commit and tree objects are present locally. For repositories where the history itself is the bulk of the size, pair sparse checkout with a [partial clone](/git/advanced/partial-and-shallow-clones) to shrink that too.
+
+## When it's the right tool
+
+- A monorepo where your team only ever touches one or two subprojects.
+- CI jobs that only need to build one package and shouldn't waste time materializing the rest.
+- Reducing IDE indexing time and `git status` overhead on a repository with tens of thousands of files.
+
+It's the wrong tool if you regularly need files across many different top-level folders — you'll spend more time adjusting the sparse set than you save.
+
+<Callout type="tip">
+Cone mode (`--cone`) is dramatically faster than the older non-cone pattern mode for large repos, because it can reason about whole directories instead of matching every path against a list of patterns. Use `--cone` unless you have a specific reason not to.
+</Callout>
+
+<Callout type="warning">
+Sparse checkout is a working-directory filter, not an access-control mechanism — anyone with the clone still has the full history and can inspect or re-enable any excluded path. Don't rely on it to hide sensitive files from someone with the repo.
+</Callout>
+
+## Try it yourself
+
+Clone any repository with several top-level folders using `git clone --no-checkout`, then run `git sparse-checkout init --cone` followed by `git sparse-checkout set <one-folder>`. Look at the working directory before and after — notice how much disappears from disk, while `git log` still shows the complete history.
